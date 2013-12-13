@@ -1,0 +1,27 @@
+
+=ERROR REPORT==== 8-Dec-2013::15:11:08 ===
+(debug 43) Test for log file
+
+=INFO REPORT==== 8-Dec-2013::15:11:08 ===
+(debug 31) Ping_center {["gm"],true}
+
+=INFO REPORT==== 8-Dec-2013::15:11:08 ===
+(debug 31) Ping_center {'ericts_gm@192.168.0.107'}
+
+=INFO REPORT==== 8-Dec-2013::15:11:09 ===
+(debug 31) Ping_center {'ericts_gm@192.168.0.107'}
+
+=INFO REPORT==== 8-Dec-2013::15:11:09 ===
+(debug 31) Ping_center ok  {'ericts_gm@192.168.0.107'}
+
+=INFO REPORT==== 8-Dec-2013::15:11:09 ===
+(debug 35) Mysql supervisor start 
+
+=INFO REPORT==== 8-Dec-2013::15:11:09 ===
+(debug 35) Mysql mysql_server start 
+
+=INFO REPORT==== 8-Dec-2013::15:11:10 ===
+(debug 31) *************** {gate_sup,54}
+
+=INFO REPORT==== 8-Dec-2013::15:11:10 ===
+(debug 31) *************** {gate_manager,44}

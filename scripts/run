@@ -1,0 +1,55 @@
+#!/usr/bin/env escript
+%% _*_ erlang _*_
+%%! -smp enable -pa ../ebin
+
+main([]) ->
+	run("../options/run.options");
+main(Options) ->
+	nothing.
+
+
+
+run(OptionFile) ->
+    try
+    	io:format("run option file ~p ~n", [OptionFile]),
+    	case run_option:get_options(OptionFile) of
+    		[] ->
+    			io:format("Error Option File ~p~n", [OptionFile]);
+    		Options ->
+    			ComOpt1 = run_option:get_opt_common_option(Options),
+    			Prefix = run_option:get_opt_prefix(Options),
+    			ComOpt = string_util:replace(ComOpt1, "$PREFIX", Prefix),
+    			%%io:format("run option file ~p ~n", [ComOpt]),
+    			Nodes = run_option:get_opt_nodes(Options),
+    			BeamDir = run_option:get_opt_beam_dir(Options),
+    			%% os_util:linux_run("ulimit -SHn 65535", wait),
+    			file:set_cwd(BeamDir),
+    			CacheNode = run_option:get_opt_cache_node(Options),
+    			AllNodes = Nodes ++ CacheNode,
+    			io:format("ddddddddd ~p~n", [AllNodes]),
+    			lists:foreach(fun(RunOpt) ->
+    								run_erl(Prefix, RunOpt, ComOpt)
+    							end, AllNodes)
+    	end
+	catch
+		E:R ->
+			io:format("Error ~p~n~p~n", [{E, R}, erlang:get_stacktrace()])
+	end.
+	
+	
+run_erl(Prefix, Option, ComOpt) ->
+	{SNode, Ip, DbDir, Smp, Addition} = Option,
+	case os_util:match_ip(Ip) of
+		true ->
+		io:format("ddddddddd11111~n"),
+			AddOption = ComOpt ++ " " ++ Addition,
+			case os:type() of
+				{win32, nt} ->
+				    io:format("ddddddddd~n"),
+					os_util:run_erl(normal, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
+				_ ->
+					os_util:run_erl(hiden, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption)
+			end;
+		false ->
+			nothing
+	end.

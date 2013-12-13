@@ -1,0 +1,207 @@
+
+=INFO REPORT==== 6-Oct-2013::11:23:02 ===
+(debug 30) worko "qin"
+
+=ERROR REPORT==== 6-Oct-2013::11:24:42 ===
+(debug 38) wokao "qin"
+
+=INFO REPORT==== 6-Oct-2013::18:33:00 ===
+(debug 30) [{author,'$Eric.yu$'},{ip,"192.168.0.117"}]
+
+=INFO REPORT==== 6-Oct-2013::18:34:07 ===
+(debug 30) [{author,'$Eric.yu$'},{ip,"192.168.0.117"}]
+
+=ERROR REPORT==== 7-Oct-2013::11:34:47 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:34:47 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:34:47 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:34:47 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:34:47 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:40:34 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:40:34 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:40:34 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:40:34 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:40:34 ===
+Module Error error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:02 ===
+Module Error behaviour_util error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:02 ===
+Module Error behaviour_util error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:02 ===
+Module Error behaviour_util error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:02 ===
+Module Error behaviour_util error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:02 ===
+Module Error behaviour_util error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:28 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:28 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:28 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:28 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:41:28 ===
+Module Error who_is_undercover error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error {behaviour,[gen_server]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error {behaviour,[supervisor]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error {behaviour,[module_op_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:44:02 ===
+Module Error who_is_undercover error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error {behaviour,[gen_server]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error {behaviour,[supervisor]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error {behaviour,[module_op_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:54:44 ===
+Module Error who_is_undercover error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error {behaviour,[gen_server]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error {behaviour,[supervisor]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error {behaviour,[cache_mod]} 
+
+=ERROR REPORT==== 7-Oct-2013::11:55:24 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:56:00 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:56:00 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:56:00 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:56:00 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:58:08 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:58:08 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:58:08 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:58:08 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::11:58:08 ===
+Module Error who_is_undercover error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:03 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:03 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:03 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:03 ===
+Module Error test_cache error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:50 ===
+Module Error cache_processor error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:50 ===
+Module Error cache_processor_sup error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:50 ===
+Module Error template_cache_mod error function_clause
+
+=ERROR REPORT==== 7-Oct-2013::12:08:50 ===
+Module Error test_cache error function_clause

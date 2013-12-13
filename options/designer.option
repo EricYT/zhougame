@@ -1,0 +1,22 @@
+[
+	{prefix, "ericts_"},
+	{common_option, "-s server_tool run --line $PREFIXline@192.168.1.161"},
+	
+	{beam_dir, "../ebin"},
+	{db_dir, "../dbfile/"},
+	
+	{nodes, [
+		{"db", "192.168.1.161", "../dbfile/", nosmp, []},
+		{"line", "192.168.1.161", [], nosmp, []},
+		{"gate1", "192.168.1.161", [], nosmp, []},
+		{"gate2", "192.168.1.161", [], nosmp, []},
+		{"map1", "192.168.1.161", [], nosmp, []},
+		{"map2", "192.168.1.161", [], nosmp, []},
+		{"gm", "192.168.1.161", [], nosmp, []}
+	]},
+	
+	{cache_node, [
+		{"cache", "192.168.1.161", [], nosmp, []}
+	]}
+
+].
