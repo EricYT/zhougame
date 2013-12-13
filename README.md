@@ -1,4 +1,4 @@
-webgame
+A game framework for zhou
 =======
 
-A webgame framework
+Webgame module
