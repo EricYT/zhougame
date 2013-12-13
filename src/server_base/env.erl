@@ -20,6 +20,7 @@
 -spec init(OptionName) -> 'ok' when
                                  OptionName :: string().
 init([OptionName]) ->
+	ets:new(test, [public, set, named_table]),
     try
         ets:new(?SERVER_OPTION_ETS, [public, set, named_table])
     catch
@@ -35,6 +36,7 @@ init([OptionName]) ->
 load_env(FilePath) ->
     case file:consult(FilePath) of
         {ok, [Options]} ->
+			slogger:msg("Load env ~p~n", [Options]),
             ets:delete_all_objects(?SERVER_OPTION_ETS),
             ets:insert(?SERVER_OPTION_ETS, Options),
             ok;

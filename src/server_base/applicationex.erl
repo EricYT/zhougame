@@ -68,9 +68,7 @@ init([]) ->
     OptionName = "../options/option",
     env:init([OptionName]),
     version_up:init(),
-%%     ping_center:wait_all_nodes_connect(),
     debug:info("applicationex ########################## ~p~n", [{"End"}]),
-%%     mysql_sup:start_link([]),
     {ok, #state{}}.
 
 %% --------------------------------------------------------------------

@@ -22,7 +22,8 @@ run() ->
     NodeName = node_util:get_node_name_by_node(),
     AppName = list_to_atom(NodeName++"_app"),
     debug:info("*************Server tool ~p~n", [{?MODULE, node(), AppName}]),
-    applicationex:start(AppName).
+    applicationex:start(AppName),
+	ok.
 
 print_tool() ->
 	ok.
