@@ -1,27 +1,24 @@
 
-=ERROR REPORT==== 14-Dec-2013::22:50:08 ===
+=ERROR REPORT==== 14-Dec-2013::23:15:07 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 14-Dec-2013::22:50:08 ===
-(debug 31) Ping_center {["gm"],true}
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
+(debug 31) Ping_center {["line"],true}
 
-=INFO REPORT==== 14-Dec-2013::22:50:08 ===
-(debug 31) Ping_center {'ericts_gm@127.0.0.1'}
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Dec-2013::22:50:10 ===
-(debug 31) Ping_center {'ericts_gm@127.0.0.1'}
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
+(debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Dec-2013::22:50:10 ===
-(debug 31) Ping_center ok  {'ericts_gm@127.0.0.1'}
-
-=INFO REPORT==== 14-Dec-2013::22:50:10 ===
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
 (debug 35) Mysql supervisor start 
 
-=INFO REPORT==== 14-Dec-2013::22:50:10 ===
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
 (debug 35) Mysql mysql_server start 
 
-=INFO REPORT==== 14-Dec-2013::22:50:11 ===
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
 (debug 31) *************** {gate_sup,54}
 
-=INFO REPORT==== 14-Dec-2013::22:50:11 ===
+=INFO REPORT==== 14-Dec-2013::23:15:07 ===
 (debug 31) *************** {gate_manager,44}

@@ -1,4 +1,4 @@
-%% Author: cb1224
+%% Author: eric.yutao
 %% Created: 2013-11-29
 %% Description: TODO: Add description to server_tool
 -module(server_tool).
@@ -19,10 +19,15 @@
 %%
 run() ->
     applicationex:force_start(),
-    NodeName = node_util:get_node_name_by_node(),
-    AppName = list_to_atom(NodeName++"_app"),
-    debug:info("*************Server tool ~p~n", [{?MODULE, node(), AppName}]),
-    applicationex:start(AppName),
+    check_line_run(),
+    check_map_run(),
+%%     check_db_run(),
+%%     check_cache_run(),
+    check_gate_run(),
+%%     NodeName = node_util:get_node_name_by_node(),
+%%     AppName = list_to_atom(NodeName++"_app"),
+%%     debug:info("*************Server tool ~p~n", [{?MODULE, node(), AppName}]),
+%%     applicationex:start(AppName),
 	ok.
 
 print_tool() ->

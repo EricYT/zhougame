@@ -36,7 +36,7 @@ init([OptionName]) ->
 load_env(FilePath) ->
     case file:consult(FilePath) of
         {ok, [Options]} ->
-			slogger:msg("Load env ~p~n", [Options]),
+%% 			slogger:msg("Load env ~p~n", [Options]),
             ets:delete_all_objects(?SERVER_OPTION_ETS),
             ets:insert(?SERVER_OPTION_ETS, Options),
             ok;

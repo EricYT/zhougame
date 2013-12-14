@@ -7,5 +7,5 @@
 	{prefix, "ericts_"},
 	
 	%%{pre_connect_nodes, ["db", "line", "gate1", "gate2", "map1", "map2", "gm", "cache"]}
-	{pre_connect_nodes, ["gm"]}
+	{pre_connect_nodes, ["line"]}
 ].

@@ -33,7 +33,7 @@ get_node_name_by_node() ->
     NodeString--Prefix.
 
 check_snode_match(AppType, SNode) ->
-	SNodeStr = atom_to_list(AppType),
+	SNodeStr = atom_to_list(SNode),
 	lists:foldl(fun(Node, Acc) when not Acc ->
 						AppNodeStr = atom_to_list(Node),
 						Index = string:str(SNodeStr, AppNodeStr),

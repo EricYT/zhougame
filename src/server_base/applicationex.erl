@@ -31,13 +31,8 @@ start(Application) ->
     Cookie = env:get(cookie, ?ERLNULL),
     erlang:set_cookie(node(), Cookie),
     debug:info("********* applicationex Application ~p~n", [Application]),
-    if
-        Application =:= gate_app ->
-            debug:info("********* applicationex Application111 ~p~n", [Application]),
-            application:start(Application);
-        true ->
-            ok
-    end.
+    application:start(Application),
+    ok.
 
 start(Application, Type) ->
 	force_start(),

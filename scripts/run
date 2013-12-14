@@ -41,11 +41,9 @@ run_erl(Prefix, Option, ComOpt) ->
 	{SNode, Ip, DbDir, Smp, Addition} = Option,
 	case os_util:match_ip(Ip) of
 		true ->
-		io:format("ddddddddd11111~n"),
 			AddOption = ComOpt ++ " " ++ Addition,
 			case os:type() of
 				{win32, nt} ->
-				    io:format("ddddddddd~n"),
 					os_util:run_erl(normal, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
 				_ ->
 					os_util:run_erl(hiden, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption)
