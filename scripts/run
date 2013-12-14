@@ -26,7 +26,6 @@ run(OptionFile) ->
     			file:set_cwd(BeamDir),
     			CacheNode = run_option:get_opt_cache_node(Options),
     			AllNodes = Nodes ++ CacheNode,
-    			io:format("ddddddddd ~p~n", [AllNodes]),
     			lists:foreach(fun(RunOpt) ->
     								run_erl(Prefix, RunOpt, ComOpt)
     							end, AllNodes)

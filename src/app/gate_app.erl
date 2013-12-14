@@ -45,17 +45,21 @@
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start(Type, StartArgs) ->
-    debug:info("************** Gate app ~p~n", [""]),
-    debug:log_file("../log/gate.log"),
-    debug:error("Test for log file~n"),
-    ping_center:wait_all_nodes_connect(true),
-	%% MySQL need be treated as application
-    mysql_sup:start_link([]),
-    case gate_sup:start_link(StartArgs) of
-	{ok, Pid} ->
-	    {ok, Pid};
-	Error ->
-	    Error
+    case app_util:get_argument("-line") of
+        [] -> slogger:msg("Error in Gate app ~p~n", [?MODULE]);
+        [_Center|Rest] ->
+            debug:info("************** Gate app ~p~n", [""]),
+            debug:log_file("../log/gate.log"),
+            debug:error("Test for log file~n"),
+            ping_center:wait_all_nodes_connect(true),
+            %% MySQL need be treated as application
+            mysql_sup:start_link([]),
+            case gate_sup:start_link(StartArgs) of
+                {ok, Pid} ->
+                    {ok, Pid};
+                Error ->
+                    Error
+            end
     end.
 
 start() ->

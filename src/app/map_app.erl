@@ -49,7 +49,7 @@ start(Type, StartArgs) ->
         [] -> slogger:msg("Error in Map app ~p~n", [?MODULE]);
         [_Center|Rest] ->
             debug:info("************** Mpa app ~p~n", [""]),
-            debug:log_file("../log/gate.log"),
+            debug:log_file("../log/map.log"),
             debug:error("Test for log file~n"),
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
