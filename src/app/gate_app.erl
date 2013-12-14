@@ -49,6 +49,7 @@ start(Type, StartArgs) ->
     debug:log_file("../log/gate.log"),
     debug:error("Test for log file~n"),
     ping_center:wait_all_nodes_connect(true),
+	%% MySQL need be treated as application
     mysql_sup:start_link([]),
     case gate_sup:start_link(StartArgs) of
 	{ok, Pid} ->
