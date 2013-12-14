@@ -33,7 +33,17 @@ get_node_name_by_node() ->
     NodeString--Prefix.
 
 check_snode_match(AppType, SNode) ->
-	true.
+	SNodeStr = atom_to_list(AppType),
+	lists:foldl(fun(Node, Acc) when not Acc ->
+						AppNodeStr = atom_to_list(Node),
+						Index = string:str(SNodeStr, AppNodeStr),
+						if
+							Index >= 1 -> true;
+							true -> false
+						end;
+				   (_, Acc) ->
+						Acc
+				end, false, get_appnodes(AppType)).
 
 
 make_node_full_name(Node) when is_list(Node) ->
@@ -44,4 +54,15 @@ make_node_full_name(Node) when is_list(Node) ->
 %%
 %% Local Functions
 %%
-
+get_appnodes(AppNodeType) ->
+	system_option:get_node_option(AppNodeType).
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
