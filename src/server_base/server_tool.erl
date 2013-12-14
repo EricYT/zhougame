@@ -35,4 +35,53 @@ test() ->
 %%
 %% Local Functions
 %%
+check_map_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(map, Node) of
+		true -> map_app:start();
+		_ -> ignore
+	end.
+
+check_db_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(db, Node) of
+		true -> db_app:start();
+		_ -> ignore
+	end.
+
+check_line_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(line, Node) of
+		true -> line_app:start();
+		_ -> ignore
+	end.
+
+check_gate_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(gate, Node) of
+		true -> gate_app:start();
+		_ -> ignore
+	end.
+
+check_cache_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(cache, Node) of
+		true -> map_app:start();
+		_ -> ignore
+	end.
+
+check_gm_run() ->
+	Node = node_util:get_node_sname(node()),
+	case node_util:check_snode_match(gm, Node) of
+		true -> map_app:start();
+		_ -> ignore
+	end.
+
+
+
+
+
+
+
+
 

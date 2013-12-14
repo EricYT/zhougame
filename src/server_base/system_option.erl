@@ -34,3 +34,8 @@ nodes_option() ->
 	 {line, ['line']},
 	 {cache, ['cache']},
 	 {auth, ['auth']}].
+
+
+node_ets(App) ->
+	NodeEts = [{map, all},
+			   {line, ['map_db']}].
