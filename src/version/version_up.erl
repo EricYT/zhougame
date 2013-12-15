@@ -76,7 +76,7 @@ up_node([]) ->
 	ok;
 up_node([{Mod, _}|Tail]) ->
 	c:l(Mod),
-	io:format("----------------Version Up  Up Module:~p------------------~n", [Mod]),
+	io:format("------Version Up  Up Module:~p------~n", [Mod]),
 	up_node(Tail).
 
 

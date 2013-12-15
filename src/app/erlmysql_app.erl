@@ -1,7 +1,7 @@
 %% Author: Eric.yutao
 %% Created: 2013-12-7
 %% Description: TODO: Add description to gate_app
--module(map_app).
+-module(erlmysql_app).
 
 -behaviour(application).
 %% --------------------------------------------------------------------
@@ -46,21 +46,14 @@
 %% --------------------------------------------------------------------
 start(Type, StartArgs) ->
     case app_util:get_argument("-line") of
-        [] -> slogger:msg("Error in Map app ~p~n", [?MODULE]);
+        [] -> slogger:msg("Error in erlmysql_app app ~p~n", [?MODULE]);
         [_Center|Rest] ->
-            debug:info("************** Mpa app ~p~n", [""]),
-            debug:log_file("../log/map.log"),
+            debug:info("************** erlmysql_app app ~p~n", [""]),
+            debug:log_file("../log/line.log"),
             debug:error("Test for log file~n"),
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
-%%             mysql_sup:start_link([]),
-            erlmysql_app:start(),
-            case gate_sup:start_link(StartArgs) of
-                {ok, Pid} ->
-                    {ok, Pid};
-                Error ->
-                    Error
-            end
+            mysql_sup:start_link([])
     end.
 
 start() ->
