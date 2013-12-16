@@ -69,4 +69,3 @@ get_opt_cache_node(Options) ->
 %%
 %% Local Functions
 %%
-

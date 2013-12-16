@@ -1,7 +1,8 @@
 %%% -------------------------------------------------------------------
 %%% Author  : eric.yutao
-%%% Description :
-%%%
+%%% Description :This module just likes version_up,but it's automated
+%%%  Question one: This is no need to use a send_after,gen_server has
+%%%  a way to handle a timeout. handle_info(cast, ****)
 %%% Created : 2013-12-16
 %%% -------------------------------------------------------------------
 -module(reloader).
@@ -100,6 +101,7 @@ handle_cast(Msg, State) ->
 handle_info(doit, State) ->
 	NowTimestamp = timestamp(),
 	_ = doit(State#state.last, NowTimestamp),
+	erlang:send_after(timer:seconds(?SECONDS_RELOADER), ?MODULE, doit),
 	{noreply, State#state{last = NowTimestamp}};
 handle_info(_Info, State) ->
 	debug:error("Error handle error message ~p~n", [{?MODULE, _Info, State}]),
@@ -133,14 +135,16 @@ timestamp() ->
 											 To :: timestamp(),
 											 Reason :: atom().
 doit(From, To) ->
-	[case file:read_file_info(Filename) of
-		 {ok, #file_info{mtime = MTime}} when MTime > From, MTime < To ->
-			 reload(Module);
-		 {ok, _} -> unmodified;
-		 {error, enoent} -> gone;
-		 {error, Reason} ->
-			 debug:error("Read file error in ~p ~p~n", [?MODULE, Reason]),
-			 error
+	[begin
+		 case file:read_file_info(Filename) of
+			 {ok, #file_info{mtime = MTime}} when MTime > From, MTime < To ->
+				 reload(Module);
+			 {ok, _} -> unmodified;
+			 {error, enoent} -> gone;
+			 {error, Reason} ->
+				 debug:error("Read file error in ~p ~p~n", [?MODULE, Reason]),
+				 error
+		 end
 	 end||{Module, Filename}<-code:all_loaded(), is_list(Filename)].
 
 
@@ -183,10 +187,6 @@ module_vsn(L) when is_list(L) ->
 	{_, Attrs} = lists:keyfind(attributes, 1, L),
 	{_, Vsn} = lists:keyfind(vsn, 1, Attrs),
 	Vsn.
-
-
-
-
 
 
 

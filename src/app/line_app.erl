@@ -55,6 +55,9 @@ start(Type, StartArgs) ->
             %% MySQL need be treated as application
 %%             mysql_sup:start_link([]),
             erlmysql_app:start(),
+			%% Reloader
+			reloader:start(),
+			run_option:test(),
             case gate_sup:start_link(StartArgs) of
                 {ok, Pid} ->
                     {ok, Pid};
