@@ -7,6 +7,8 @@
 %%
 %% Include files
 %%
+-include("model_han_grave_db.hrl").
+
 %%
 %% Exported Functions
 %%
@@ -32,7 +34,12 @@ handle(_Other) ->
 
 -spec uninit() -> ok.
 uninit() ->
-	debug:info("Module ~p uninit~n", [?MODULE]),
+    DbInfo = #role_han_grave_db{roleid              = 321,
+                                count               = 0,
+                                last_call_quality   = 1,
+                                monster_info        = [{3,4}],
+                                update_time         = now()},
+    mod_role_han_grave_db:write(DbInfo),
 	ok.
 
 

@@ -80,10 +80,10 @@ now_diff(_, _) ->
 -spec date_time_to_now(DateTime) -> {integer(), integer(), integer()} when
                                                                         DateTime :: tuple().
 date_time_to_now({{_, _, _}, {_, _, _}}=DateTime) ->
-%%     DateT = calendar:now_to_datetime(now()),
-    Seconds = calendar:datetime_to_gregorian_seconds(DateTime),
+    [DateT] = calendar:local_time_to_universal_time_dst(DateTime),
+    Seconds = calendar:datetime_to_gregorian_seconds(DateT),
     RightSeconds = Seconds - ?DAYS_FROM_0_TO_1970*?SECONDS_PER_DAY,
-%%     io:format("date time ~p~n", [{DateTime, now(), {RightSeconds div 1000000, RightSeconds rem 1000000, 0}}]),
+%%     io:format("date time ~p~n", [{calendar:now_to_local_time({RightSeconds div 1000000, RightSeconds rem 1000000, 0})}]),
     {RightSeconds div 1000000, RightSeconds rem 1000000, 0}.
 
 

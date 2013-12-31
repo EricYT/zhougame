@@ -12,6 +12,9 @@ select(FiledList, Conditions) ->
 
 read(#role_han_grave_db{roleid = ROLEID}) ->
     SQL = "SELECT * FROM role_han_grave_db WHERE roleid = "++ mysql_helper:pack_value_by_type({ROLEID, bigint}),
+    mysql_client:read(role_han_grave_db, SQL);
+read(ROLEID) ->
+    SQL = "SELECT * FROM role_han_grave_db WHERE roleid = "++ mysql_helper:pack_value_by_type({ROLEID, bigint}),
     mysql_client:read(role_han_grave_db, SQL).
 
 write(#role_han_grave_db{roleid = ROLEID, monster_info = MONSTER_INFO, count = COUNT, update_time = UPDATE_TIME, last_call_quality = LAST_CALL_QUALITY}) ->
