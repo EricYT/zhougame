@@ -45,7 +45,9 @@ init([]) ->
 	process_flag(trap_exit, true),
 	Servers = create_name(),
 	Size = erlang:length(Servers),
+	ServerNode = node_util:get_node_sname(node()),
     {ok, #state{server_names	= Servers,
+				server_node		= ServerNode,
 				server_size		= Size,
 				server_last		= 1}}.
 
@@ -59,6 +61,14 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
+handle_call({get_name}, _From, State) ->
+    Reply = State#state.server_names,
+    {reply, Reply, State};
+handle_call({get_all_servers}, _From, State) ->
+    Reply = State#state.server_names,
+    {reply, Reply, State};
+handle_call({stop}, _From, State) ->
+    {stop, shutdown, stopped, State};
 handle_call(Request, From, State) ->
     Reply = ok,
     {reply, Reply, State}.
