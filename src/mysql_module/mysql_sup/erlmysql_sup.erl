@@ -43,9 +43,9 @@ start_link() ->
 	supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 
-%% -spec start_mysql(ServerName) -> {ok, Pid} when
-%% 											 ServerName :: string(),
-%% 											 Pid :: pid().
+-spec start_mysql(ServerName) -> {ok, Pid} when
+											 ServerName :: atom(),
+											 Pid :: pid().
 start_mysql(ServerName) ->
 	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding],

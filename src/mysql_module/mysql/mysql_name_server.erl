@@ -13,17 +13,21 @@
 
 %% --------------------------------------------------------------------
 %% External exports
--export([]).
+-export([
+		 start_link/0
+		 ]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--record(state, {}).
+-record(state, {server_names = [], server_node, server_size, server_last}).
 
 %% ====================================================================
 %% External functions
 %% ====================================================================
-
+-spec start_link() -> ignore.
+start_link() ->
+	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 %% ====================================================================
 %% Server functions
@@ -38,7 +42,12 @@
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    {ok, #state{}}.
+	process_flag(trap_exit, true),
+	Servers = create_name(),
+	Size = erlang:length(Servers),
+    {ok, #state{server_names	= Servers,
+				server_size		= Size,
+				server_last		= 1}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -93,4 +102,11 @@ code_change(OldVsn, State, Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+%%
+%%@doc 读取配置的client size，运行mysql的节点，判断当前节点是否为运行mysql的node，将node名字存入#state中
+-spec create_name() -> [string(), ...].
+create_name() ->
+	ClientSize = mysql_util:get_client_size(),
+	AppRunNode = mysql_util:get_app_run_node(),
+	ok.
 
