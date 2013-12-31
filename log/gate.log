@@ -1,42 +1,42 @@
 
-=ERROR REPORT==== 30-Dec-2013::23:06:26 ===
+=ERROR REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 30-Dec-2013::23:06:26 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center {["line"],true}
 
-=INFO REPORT==== 30-Dec-2013::23:06:26 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 30-Dec-2013::23:06:26 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) ********* applicationex Application erlmysql_app
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) ************** erlmysql_app app []
 
-=ERROR REPORT==== 30-Dec-2013::23:06:27 ===
+=ERROR REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center {["line"],true}
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 35) Mysql supervisor start 
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 35) Mysql mysql_server start 
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) *************** {gate_sup,54}
 
-=INFO REPORT==== 30-Dec-2013::23:06:27 ===
+=INFO REPORT==== 31-Dec-2013::10:27:39 ===
 (debug 31) *************** {gate_manager,44}

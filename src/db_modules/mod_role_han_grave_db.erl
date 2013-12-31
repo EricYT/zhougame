@@ -20,6 +20,7 @@ read(ROLEID) ->
 write(#role_han_grave_db{roleid = ROLEID, monster_info = MONSTER_INFO, count = COUNT, update_time = UPDATE_TIME, last_call_quality = LAST_CALL_QUALITY}) ->
     case mysql_client:read(role_han_grave_db, "SELECT * FROM role_han_grave_db WHERE roleid = "++integer_to_list(ROLEID)) of
         [] ->
+			io:format("****************~n"),
             SQL = "INSERT INTO role_han_grave_db VALUES(" ++ mysql_helper:pack_value_by_type({ROLEID, bigint}) ++ mysql_helper:pack_value_by_type({MONSTER_INFO, term_varchar}) ++ mysql_helper:pack_value_by_type({COUNT, int}) ++ mysql_helper:pack_value_by_type({UPDATE_TIME, timestamp}) ++ mysql_helper:pack_value_by_type({LAST_CALL_QUALITY, int}) ++");",
             mysql_client:write(role_han_grave_db, SQL);
         _ ->

@@ -114,7 +114,9 @@
 
 	 encode/1,
 	 encode/2,
-	 asciz_binary/2
+	 asciz_binary/2,
+	  
+	 quote/1
 	]).
 
 %% Internal exports - just for mysql_* modules

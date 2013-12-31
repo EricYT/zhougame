@@ -28,7 +28,7 @@ read(_Table, Query) ->
     end.
 
 write(_Table, Query) ->
-    PoolId = mysql_util:get_pool_id_write(),
+    PoolId = mysql_util:get_pool_id_read(),
     Result = mysql:fetch(PoolId, Query),
     case Result of
         {data, Info} ->
