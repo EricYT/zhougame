@@ -39,7 +39,7 @@ uninit() ->
                                 last_call_quality   = 1,
                                 monster_info        = [{3,4}],
                                 update_time         = now()},
-    mod_role_han_grave_db:write(DbInfo),
+    model_role_han_grave_db:write(DbInfo),
 	ok.
 
 

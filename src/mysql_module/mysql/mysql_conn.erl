@@ -870,13 +870,16 @@ convert_type(Val, ColType) ->
     case ColType of
 	T when T == 'TINY';
 	       T == 'SHORT';
-	       T == 'LONG';
-	       T == 'LONGLONG';
-	       T == 'INT24';
-	       T == 'YEAR' ->
-	    list_to_integer(binary_to_list(Val));
-	T when T == 'TIMESTAMP';
-	       T == 'DATETIME' ->
+		   T == 'LONG';
+		   T == 'LONGLONG';
+		   T == 'INT24';
+		   T == 'YEAR' ->
+		list_to_integer(binary_to_list(Val));
+		T when T == 'DATETIME' ->
+			{ok, [Year, Month, Day, Hour, Minute, Second], _Leftovers} =
+			io_lib:fread("~d-~d-~d ~d:~d:~d", binary_to_list(Val)),
+			{{Year, Month, Day}, {Hour, Minute, Second}};
+	T when T == 'TIMESTAMP' ->
 	    {ok, [Year, Month, Day, Hour, Minute, Second], _Leftovers} =
 		io_lib:fread("~d-~d-~d ~d:~d:~d", binary_to_list(Val)),
         time_util:date_time_to_now({{Year, Month, Day}, {Hour, Minute, Second}});
@@ -885,11 +888,11 @@ convert_type(Val, ColType) ->
 	'TIME' ->
 	    {ok, [Hour, Minute, Second], _Leftovers} =
 		io_lib:fread("~d:~d:~d", binary_to_list(Val)),
-	    {time, {Hour, Minute, Second}};
+	    {Hour, Minute, Second};
 	'DATE' ->
 	    {ok, [Year, Month, Day], _Leftovers} =
 		io_lib:fread("~d-~d-~d", binary_to_list(Val)),
-	    {date, {Year, Month, Day}};
+	    {Year, Month, Day};
 	T when T == 'DECIMAL';
 	       T == 'NEWDECIMAL';
 	       T == 'FLOAT';
@@ -902,6 +905,16 @@ convert_type(Val, ColType) ->
 			Res
 		end,
 	    Num;
+	'LONG_BLOB' ->
+		binary_to_list(Val);
+	'BLOB' ->
+		binary_to_list(Val);
+	'TINYBLOB' ->
+		binary_to_list(Val);
+	'STRING' ->
+		binary_to_list(Val);
+	'VAR_STRING' ->
+		binary_to_list(Val);
 	_Other ->
 	    Val
     end.

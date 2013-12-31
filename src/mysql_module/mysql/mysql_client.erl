@@ -20,7 +20,7 @@ read(_Table, Query) ->
     PoolId = mysql_util:get_pool_id_read(),
     Result = mysql:fetch(PoolId, Query),
     case Result of
-        {data, Info} ->
+        {updated, Info} ->
             Res = mysql:get_result_rows(Info),
             mysql_helper:unpacks(Res);
         {error, _Something} ->
@@ -28,10 +28,11 @@ read(_Table, Query) ->
     end.
 
 write(_Table, Query) ->
+%%     PoolId = mysql_util:get_pool_id_write(),
     PoolId = mysql_util:get_pool_id_read(),
     Result = mysql:fetch(PoolId, Query),
     case Result of
-        {data, Info} ->
+        {updated, Info} ->
             Res = mysql:get_result_rows(Info),
             mysql_helper:unpacks(Res);
         {error, _Something} ->
@@ -42,7 +43,7 @@ select(_Table, Query) ->
     PoolId = mysql_util:get_pool_id_read(),
     Result = mysql:fetch(PoolId, Query),
     case Result of
-        {data, Info} ->
+        {updated, Info} ->
             FiledInfos = mysql:get_result_field_info(Info),
             Rows = mysql:get_result_rows(Info),
             mysql_helper:unpacks(Rows);

@@ -162,4 +162,5 @@ pack_orderby({Column, asc}) ->
 pack_orderby({Column, desc}) ->
     " ORDER BY "++atom_to_list(Column)++" DESC".
 
-
+unpack_row(Module, RowColumnDataList) ->
+	list_to_tuple([Module|RowColumnDataList]).

@@ -3,3 +3,6 @@ This file is a note,we will do it as follow.
 1. Migrate MochiWeb;
 2. Mysql generate modules;
 3. A sock connection or a http connection;
+4. 重构mysql模块使得可以启动多个mysql_dispath(将默认的server name改为给定的name);
+5. 应该有一个单独的gen_server来管理4中mysql的server name，但是这里的每次适配一个名字不应该只是
+简单的循环选取，应该有一个负载的适配过程；
