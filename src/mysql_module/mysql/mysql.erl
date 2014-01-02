@@ -967,4 +967,10 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 	[PoolId, WHost, WPort, WUser, WPwd, WDB, WEncoding, WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WPort, WUser, WPwd, WDB, LogFun, WEncoding],
 	WNewState =
-		
+		case check_run_node() of
+			true ->
+				do_connect();
+			_ ->
+				todo
+		end,
+	
