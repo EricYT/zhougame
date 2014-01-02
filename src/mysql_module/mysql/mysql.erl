@@ -101,12 +101,12 @@
 	 execute/2,
 	 execute/3,
 	 execute/4,
-	 unprepare/1,
+	 unprepare/2,
 	 get_prepared/1,
 	 get_prepared/2,
 
-	 transaction/2,
 	 transaction/3,
+	 transaction/4,
 
 	 get_result_field_info/1,
 	 get_result_rows/1,
@@ -298,11 +298,14 @@ start1(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encodin
     crypto:start(),
     gen_server:StartFunc(
       {local, ServerName}, ?MODULE,
-      [PoolId, Host, Port, User, Password, Database, LogFun, Encoding], []).
+      [ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding], []).
 
 
 %% @equiv connect(PoolId, Host, Port, User, Password, Database, Encoding,
 %%	   Reconnect, true)
+connect([ServerName, PoolId, Host, Port, User, Password, Database, Reconnect]) ->
+	connect(ServerName, PoolId, Host, Port, User, Password, Database, 'utf8', Reconnect).
+
 connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reconnect) ->
     connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding,
 	    Reconnect, true).
@@ -340,6 +343,35 @@ connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reco
 	    Err
     end.
 
+refresh_connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reconnect,
+       LinkConnection, OldState) ->
+    Port1 = if Port == undefined -> ?PORT; true -> Port end,
+    Fun = if LinkConnection ->
+		  fun mysql_conn:start_link/8;
+	     true ->
+		  fun mysql_conn:start/8
+	  end,
+
+%%    {ok, LogFun} = gen_server:call(ServerName, get_logfun),
+	LogFun = OldState#state.log_fun,
+    case Fun(Host, Port1, User, Password, Database, LogFun,
+	     Encoding, PoolId) of
+	{ok, ConnPid} ->
+	    Conn = new_conn(ServerName, PoolId, ConnPid, Reconnect, Host, Port1, User,
+			    Password, Database, Encoding),
+		NewState = add_conn(Conn, OldState),
+		{ok, ConnPid, NewState};
+%% 	    case gen_server:call(
+%% 		   ServerName, {add_conn, Conn}) of
+%% 		ok ->
+%% 		    {ok, ConnPid};
+%% 		Res ->
+%% 		    Res
+%% 	    end;
+	Err->
+	    Err
+    end.
+
 new_conn(ServerName, PoolId, ConnPid, Reconnect, Host, Port, User, Password, Database,
 	 Encoding) ->
     case Reconnect of
@@ -360,6 +392,9 @@ new_conn(ServerName, PoolId, ConnPid, Reconnect, Host, Port, User, Password, Dat
 		  pid = ConnPid,
 		  reconnect = false}
     end.
+
+do_refresh_all(ServerName) ->
+	gen_server:call(ServerName, {refresh, ServerName}).
 
 %% @doc Fetch a query inside a transaction.
 %%
@@ -540,8 +575,6 @@ get_result_affected_rows(#mysql_result{affectedrows=AffectedRows}) ->
 get_result_reason(#mysql_result{error=Reason}) ->
     Reason.
 
-connect([ServerName, PoolId, Host, Port, User, Password, Database, Reconnect]) ->
-	connect(ServerName, PoolId, Host, Port, User, Password, Database, Reconnect).
 
 connect(ServerName, PoolId, Host, undefined, User, Password, Database, Reconnect) ->
     connect(ServerName, PoolId, Host, ?PORT, User, Password, Database, undefined,
@@ -802,8 +835,9 @@ start_reconnect(Conn, LogFun) ->
     ok.
 
 reconnect_loop(Conn, LogFun, N) ->
-    {PoolId, Host, Port} = {Conn#conn.pool_id, Conn#conn.host, Conn#conn.port},
-    case connect(PoolId,
+    {ServerName, PoolId, Host, Port} = {Conn#conn.server_name, Conn#conn.pool_id, Conn#conn.host, Conn#conn.port},
+    case connect(ServerName,
+		 PoolId,
 		 Host,
 		 Port,
 		 Conn#conn.user,
