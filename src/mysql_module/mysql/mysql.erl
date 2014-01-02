@@ -77,15 +77,15 @@
 
 
 %% External exports
--export([start_link/5,
-	 start_link/6,
+-export([start_link/6,
 	 start_link/7,
 	 start_link/8,
+	 start_link/9,
 
-	 start/5,
 	 start/6,
 	 start/7,
 	 start/8,
+	 start/9,
 
 	 connect/7,
 	 connect/8,
@@ -199,53 +199,103 @@ log(Module, Line, _Level, FormatFun) ->
 %%   Username::string(), Password::string(), Database::string(),
 %%   LogFun::undefined | function() of arity 4) ->
 %%     {ok, Pid} | ignore | {error, Err}
-start_link(PoolId, Host, User, Password, Database) ->
-    start_link(PoolId, Host, ?PORT, User, Password, Database).
+%% start_link(PoolId, Host, User, Password, Database) ->
+%%     start_link(PoolId, Host, ?PORT, User, Password, Database).
+%% 
+%% start_link(PoolId, Host, Port, User, Password, Database) ->
+%%     start_link(PoolId, Host, Port, User, Password, Database, undefined,
+%% 	       undefined).
+%% 
+%% start_link(PoolId, Host, undefined, User, Password, Database, LogFun) ->
+%%     start_link(PoolId, Host, ?PORT, User, Password, Database, LogFun,
+%% 	       undefined);
+%% start_link(PoolId, Host, Port, User, Password, Database, LogFun) ->
+%%     start_link(PoolId, Host, Port, User, Password, Database, LogFun,
+%% 	       undefined).
+%% 
+%% start_link(PoolId, Host, undefined, User, Password, Database, LogFun,
+%% 	   Encoding) ->
+%%     start1(PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
+%% 	   start_link);
+%% start_link(PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
+%%     start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+%% 	   start_link).
 
-start_link(PoolId, Host, Port, User, Password, Database) ->
-    start_link(PoolId, Host, Port, User, Password, Database, undefined,
+
+%% New start_link functions,add a ServerName argument 
+start_link(ServerName, PoolId, Host, User, Password, Database) ->
+    start_link(ServerName, PoolId, Host, ?PORT, User, Password, Database).
+
+start_link(ServerName, PoolId, Host, Port, User, Password, Database) ->
+    start_link(ServerName, PoolId, Host, Port, User, Password, Database, undefined,
 	       undefined).
 
-start_link(PoolId, Host, undefined, User, Password, Database, LogFun) ->
-    start_link(PoolId, Host, ?PORT, User, Password, Database, LogFun,
+start_link(ServerName, PoolId, Host, undefined, User, Password, Database, LogFun) ->
+    start_link(ServerName, PoolId, Host, ?PORT, User, Password, Database, LogFun,
 	       undefined);
-start_link(PoolId, Host, Port, User, Password, Database, LogFun) ->
-    start_link(PoolId, Host, Port, User, Password, Database, LogFun,
+start_link(ServerName, PoolId, Host, Port, User, Password, Database, LogFun) ->
+    start_link(ServerName, PoolId, Host, Port, User, Password, Database, LogFun,
 	       undefined).
 
-start_link(PoolId, Host, undefined, User, Password, Database, LogFun,
+start_link(ServerName, PoolId, Host, undefined, User, Password, Database, LogFun,
 	   Encoding) ->
-    start1(PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
+    start1(ServerName, PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
 	   start_link);
-start_link(PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
-    start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+start_link(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
+    start1(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
 	   start_link).
+
 
 %% @doc These functions are similar to their start_link counterparts,
 %% but they call gen_server:start() instead of gen_server:start_link()
-start(PoolId, Host, User, Password, Database) ->
-    start(PoolId, Host, ?PORT, User, Password, Database).
+%% start(PoolId, Host, User, Password, Database) ->
+%%     start(PoolId, Host, ?PORT, User, Password, Database).
+%% 
+%% start(PoolId, Host, Port, User, Password, Database) ->
+%%     start(PoolId, Host, Port, User, Password, Database, undefined).
+%% 
+%% start(PoolId, Host, undefined, User, Password, Database, LogFun) ->
+%%     start(PoolId, Host, ?PORT, User, Password, Database, LogFun);
+%% start(PoolId, Host, Port, User, Password, Database, LogFun) ->
+%%     start(PoolId, Host, Port, User, Password, Database, LogFun, undefined).
+%% 
+%% start(PoolId, Host, undefined, User, Password, Database, LogFun, Encoding) ->
+%%     start1(PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
+%% 	   start);
+%% start(PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
+%%     start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+%% 	   start).
 
-start(PoolId, Host, Port, User, Password, Database) ->
-    start(PoolId, Host, Port, User, Password, Database, undefined).
+start(ServerName, PoolId, Host, User, Password, Database) ->
+    start(ServerName, PoolId, Host, ?PORT, User, Password, Database).
 
-start(PoolId, Host, undefined, User, Password, Database, LogFun) ->
-    start(PoolId, Host, ?PORT, User, Password, Database, LogFun);
-start(PoolId, Host, Port, User, Password, Database, LogFun) ->
-    start(PoolId, Host, Port, User, Password, Database, LogFun, undefined).
+start(ServerName, PoolId, Host, Port, User, Password, Database) ->
+    start(ServerName, PoolId, Host, Port, User, Password, Database, undefined).
 
-start(PoolId, Host, undefined, User, Password, Database, LogFun, Encoding) ->
-    start1(PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
+start(ServerName, PoolId, Host, undefined, User, Password, Database, LogFun) ->
+    start(ServerName, PoolId, Host, ?PORT, User, Password, Database, LogFun);
+start(ServerName, PoolId, Host, Port, User, Password, Database, LogFun) ->
+    start(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, undefined).
+
+start(ServerName, PoolId, Host, undefined, User, Password, Database, LogFun, Encoding) ->
+    start1(ServerName, PoolId, Host, ?PORT, User, Password, Database, LogFun, Encoding,
 	   start);
-start(PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
-    start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+start(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->
+    start1(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
 	   start).
 
-start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+%% start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
+%%        StartFunc) ->
+%%     crypto:start(),
+%%     gen_server:StartFunc(
+%%       {local, ?SERVER}, ?MODULE,
+%%       [PoolId, Host, Port, User, Password, Database, LogFun, Encoding], []).
+
+start1(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
        StartFunc) ->
     crypto:start(),
     gen_server:StartFunc(
-      {local, ?SERVER}, ?MODULE,
+      {local, ServerName}, ?MODULE,
       [PoolId, Host, Port, User, Password, Database, LogFun, Encoding], []).
 
 
