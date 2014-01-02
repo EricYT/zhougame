@@ -954,3 +954,17 @@ asciz_binary(<<0:8, Rest/binary>>, Acc) ->
     {lists:reverse(Acc), Rest};
 asciz_binary(<<C:8, Rest/binary>>, Acc) ->
     asciz_binary(Rest, [C | Acc]).
+
+
+
+
+
+
+
+%% 
+start_all_conn([ServerName, PoolId, LogFun], OldState) ->
+	LogFun = fun erlmysql_sup:log/4,
+	[PoolId, WHost, WPort, WUser, WPwd, WDB, WEncoding, WRunNode] = mysql_util:get_w_conf(),
+	WriteArgs = [ServerName, PoolId, WHost, WPort, WUser, WPwd, WDB, LogFun, WEncoding],
+	WNewState =
+		
