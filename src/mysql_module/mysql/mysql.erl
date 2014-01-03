@@ -959,10 +959,6 @@ asciz_binary(<<C:8, Rest/binary>>, Acc) ->
 
 
 
-
-
-
-
 %% 
 start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 	LogFun = fun erlmysql_sup:log/4,
