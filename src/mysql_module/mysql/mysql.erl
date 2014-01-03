@@ -967,10 +967,72 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 	[PoolId, WHost, WPort, WUser, WPwd, WDB, WEncoding, WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WPort, WUser, WPwd, WDB, LogFun, WEncoding],
 	WNewState =
-		case check_run_node() of
+		case check_run_node(WRunNode) of
 			true ->
-				do_connect();
+				do_connect(write, WriteArgs, OldState);
 			_ ->
-				todo
+				OldState
 		end,
-	
+	[ReadPoolId, RHost, RPort, RUser, RPwd, RDB, REncoding, RRunNode] = mysql_util:get_r_conf(),
+	ReadArgs = [ServerName, ReadPoolId, RHost, RPort, RUser, RPwd, RDB, LogFun, REncoding],
+	RNewState =
+		case check_run_node(RRunNode) of
+			true ->
+				do_connect(read, ReadArgs, WNewState);
+			_ ->
+				WNewState
+		end,
+	[LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode] = mysql_util:get_w_conf(),
+	LogArgs = [ServerName, LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode],
+	LNewState =
+		case check_run_node(LRunNode) of
+			true ->
+				do_connect(log, LogArgs, RNewState);
+			_ ->
+				RNewState
+		end,
+	LNewState.
+
+
+%%
+%%@doc Check node run
+%%@date:2014-1-3
+%%	
+check_run_node(RRunNode) when is_list(RRunNode) ->
+	CheckFun = fun(Node, Acc) when not Acc ->
+					   Index = string:str(atom_to_list(node()), atom_to_list(Node)),
+					   if
+						   Index =/= 0 ->
+							   true;
+						   true ->
+							   Acc
+					   end;
+				  (_Node, Acc) ->
+					   Acc
+			   end,
+	lists:foldl(CheckFun, false, RRunNode).
+
+
+%%
+%%@doc
+%%@date:2014-1-3
+%%
+do_connect(write, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_w_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end;
+do_connect(read, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_r_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end;
+do_connect(log, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_l_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end.
+
