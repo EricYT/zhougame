@@ -17,6 +17,37 @@
 	
 	{cache_node, [
 		%%{"cache", "127.0.0.1", [], nosmp, []}
+	]},
+	
+	{mysql, [ %% mysql options
+		{client_size, 2},			%% mysql client size
+		{app_run_node, [db, gm]},
+		% read database config
+		{r_pool_size, 20},			%% connection pool size
+		{r_port, 3306}				%% mysql port
+		{r_host, "localhost"},		%% mysql host
+		{r_user, root},				%% mysql user
+		{r_database, "webgame"},	%% mysql database
+		{r_encoding, "utf8"},		%% mysql databse encoding
+		{r_runnode, [db]},			%% mysql run node
+		
+		% write database config
+		{w_pool_size, 20},			%% connection pool size
+		{w_port, 3306}				%% mysql port
+		{w_host, "localhost"},		%% mysql host
+		{w_user, root},				%% mysql user
+		{w_database, "webgame"},	%% mysql database
+		{w_encoding, "utf8"},		%% mysql databse encoding
+		{w_runnode, [db]},			%% mysql run node
+		
+		% log database config
+		{log_pool_size, 20},		%% connection pool size
+		{log_port, 3306}			%% mysql port
+		{log_host, "localhost"},	%% mysql host
+		{log_user, root},			%% mysql user
+		{log_database, "webgame"},	%% mysql database
+		{log_encoding, "utf8"},		%% mysql databse encoding
+		{log_runnode, [gm]}			%% mysql run node
 	]}
 
 ].
