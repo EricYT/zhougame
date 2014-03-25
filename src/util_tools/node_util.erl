@@ -57,7 +57,16 @@ make_node_full_name(Node) when is_list(Node) ->
 get_appnodes(AppNodeType) ->
 	system_option:get_node_option(AppNodeType).
   
-  
+
+-spec split_node(Node::list()) -> {BaseName::atom(), Hostname::atom()}.
+split_node(Node) when is_atom(Node) -> split_node(atom_to_list(Node));
+split_node(Node) -> split_node_1(Node, []).
+
+split_node_1([$@ | Cs], As) -> split_node_2(As, Cs);
+split_node_1([C | Cs], As) -> split_node_1(Cs, [C|As]);
+split_node_1([], As) -> split_node_2(As, "localhost").
+
+split_node_2(As, Cs) -> {list_to_atom(lists:reverse(As)), list_to_atom(Cs)}.
   
   
   

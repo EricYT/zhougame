@@ -35,6 +35,12 @@ term_to_string(Term) ->
 	lists:flatten(io_lib:format("~w", [Term])).
 
 
+-spec uniq(List::list()) -> List1::list().
+uniq([X, X|Xs]) -> uniq([X|Xs]);
+uniq([X|Xs]) -> [X|uniq(Xs)];
+uniq([]) -> [].
+
+
 %%
 %% Local Functions
 %%
