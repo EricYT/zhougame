@@ -13,7 +13,7 @@
 %% Exported Functions
 %%
 -export([
-		 
+		 get_config/1
 		 ]).
 
 %%
@@ -41,8 +41,8 @@ get_pool_id_write() ->
 %% Local Functions
 %%
 -spec get_config(Key::atom()) -> [] | Value when
-											  Key :: 
-get_confige(Key) ->
+											  Value :: list().
+get_config(Key) ->
 	MysqlConfig = env:get(mysql, []),
 	case lists:keyfind(Key, 1, MysqlConfig) of
 		{_, Value} -> Value;
