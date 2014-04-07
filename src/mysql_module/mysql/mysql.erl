@@ -332,8 +332,7 @@ connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reco
 	{ok, ConnPid} ->
 	    Conn = new_conn(ServerName, PoolId, ConnPid, Reconnect, Host, Port1, User,
 			    Password, Database, Encoding),
-	    case gen_server:call(
-		   ServerName, {add_conn, Conn}) of
+	    case gen_server:call(ServerName, {add_conn, Conn}) of
 		ok ->
 		    {ok, ConnPid};
 		Res ->
@@ -740,7 +739,7 @@ call_server(ServerName, Msg, Timeout) ->
     if Timeout == undefined ->
 	    gen_server:call(ServerName, Msg, Timeout1);
        true ->
-	    gen_server:call(ServerName, Msg, Timeout1)
+	    gen_server:call(ServerName, Msg, Timeout)
     end.
 
 add_conn(Conn, State) ->
@@ -956,11 +955,6 @@ asciz_binary(<<C:8, Rest/binary>>, Acc) ->
     asciz_binary(Rest, [C | Acc]).
 
 
-
-
-
-
-
 %% 
 start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 	LogFun = fun erlmysql_sup:log/4,
@@ -972,5 +966,5 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 				do_connect();
 			_ ->
 				todo
-		end,
+		end.
 	

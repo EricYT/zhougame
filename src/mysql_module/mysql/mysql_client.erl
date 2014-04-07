@@ -33,7 +33,7 @@ read(_Table, Query) ->
 
 write(_Table, Query) ->
 	ServerName = mysql_name_server:get_client(),
-%%     PoolId = mysql_util:get_pool_id_write(),
+%%  PoolId = mysql_util:get_pool_id_write(),
     PoolId = mysql_util:get_pool_id_read(),
     Result = mysql:fetch(PoolId, Query),
     case Result of

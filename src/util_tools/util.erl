@@ -21,7 +21,7 @@ string_to_term(String) ->
 		{ok, Tokens, _} ->
 			case erl_parse:parse_term(Tokens) of
 				{ok, Term} ->
-					{ok, Term};
+					Term;
 				Reason ->
 					io:format("error string_to_term ~p~n", [{?MODULE, Reason}]),
 					parse_error
@@ -33,8 +33,6 @@ string_to_term(String) ->
 
 term_to_string(Term) ->
 	lists:flatten(io_lib:format("~w", [Term])).
-
-
 %%
 %% Local Functions
 %%
