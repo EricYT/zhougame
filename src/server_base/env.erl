@@ -19,26 +19,31 @@
 %%
 -spec init(OptionName) -> 'ok' when
                                  OptionName :: string().
-init([OptionName]) ->
-	ets:new(test, [public, set, named_table]),
+init([]) ->
     try
         ets:new(?SERVER_OPTION_ETS, [public, set, named_table])
+%%         ets:new(?OPTION_ETS, [public, set, named_table])
     catch
         E:R ->
             debug:error("Error ~p ~p~n", [?MODULE, {E, R}]),
             ignore
     end,
-    load_env(OptionName).
+    load_env().
 
 
--spec load_env(FilePath) -> ignore when
-                            FilePath :: string().
-load_env(FilePath) ->
+load_env() ->
+    load_env(?OPTION_ETS_FILE, ?SERVER_OPTION_ETS).
+
+
+-spec load_env(FilePath,ETSName) -> ignore when
+                            FilePath :: string(),
+                            ETSName :: atom().
+load_env(FilePath, ETSName) ->
     case file:consult(FilePath) of
         {ok, [Options]} ->
-%% 			slogger:msg("Load env ~p~n", [Options]),
-            ets:delete_all_objects(?SERVER_OPTION_ETS),
-            ets:insert(?SERVER_OPTION_ETS, Options),
+			slogger:msg("Load env ~p~n", [Options]),
+            ets:delete_all_objects(ETSName),
+            ets:insert(ETSName, Options),
             ok;
         {error, Reason} ->
             debug:error("~p ~p~n", [?MODULE, Reason]),

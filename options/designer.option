@@ -2,6 +2,15 @@
 	{prefix, "ericts_"},
 	{common_option, "-s server_tool run --line $PREFIXline@127.0.0.1"},
 	
+	{author,'$Eric.yu$'},
+    {cookie, '$eric.yutao'},
+    {ip, "127.0.0.1"},
+    {vsn, "1.0.0"},
+    
+    {prefix, "ericts_"},
+    
+    {pre_connect_nodes, ["line"]},
+	
 	{beam_dir, "../ebin"},
 	{db_dir, "../dbfile/"},
 	
@@ -24,25 +33,25 @@
 		{app_run_node, [db, gm]},
 		% read database config
 		{r_pool_size, 20},			%% connection pool size
-		{r_port, 3306}				%% mysql port
+		{r_port, 3306},				%% mysql port
 		{r_host, "localhost"},		%% mysql host
 		{r_user, root},				%% mysql user
 		{r_database, "webgame"},	%% mysql database
 		{r_encoding, "utf8"},		%% mysql databse encoding
-		{r_runnode, [db]},			%% mysql run node
+		{r_runnode, [db, map, gm, line]},			%% mysql run node
 		
 		% write database config
 		{w_pool_size, 20},			%% connection pool size
-		{w_port, 3306}				%% mysql port
+		{w_port, 3306},				%% mysql port
 		{w_host, "localhost"},		%% mysql host
 		{w_user, root},				%% mysql user
 		{w_database, "webgame"},	%% mysql database
 		{w_encoding, "utf8"},		%% mysql databse encoding
-		{w_runnode, [db]},			%% mysql run node
+		{w_runnode, [db, map, gm, line]},			%% mysql run node
 		
 		% log database config
 		{log_pool_size, 20},		%% connection pool size
-		{log_port, 3306}			%% mysql port
+		{log_port, 3306},			%% mysql port
 		{log_host, "localhost"},	%% mysql host
 		{log_user, root},			%% mysql user
 		{log_database, "webgame"},	%% mysql database

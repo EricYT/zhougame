@@ -60,8 +60,8 @@ force_start() ->
 %% --------------------------------------------------------------------
 init([]) ->
     debug:info("applicationex start ~p ~n", [node()]),
-    OptionName = "../options/option",
-    env:init([OptionName]),
+%%     OptionName = "../options/option",
+    env:init([]),
     version_up:init(),
     debug:info("applicationex ########################## ~p~n", [{"End"}]),
     {ok, #state{}}.

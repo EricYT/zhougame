@@ -978,7 +978,7 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 			_ ->
 				WNewState
 		end,
-	[LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode] = mysql_util:get_w_conf(),
+	[LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode] = mysql_util:get_l_conf(),
 	LogArgs = [ServerName, LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode],
 	LNewState =
 		case check_run_node(LRunNode) of
