@@ -589,7 +589,9 @@ init([ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Encoding
 	    Conn = new_conn(ServerName, PoolId, ConnPid, true, Host, Port, User, Password,
 			    Database, Encoding),
 	    State = #state{log_fun = LogFun1},
-	    {ok, add_conn(Conn, State)};
+		NewState = add_conn(Conn, State),
+		LastState = start_all_conn([ServerName, PoolId, LogFun], NewState),
+	    {ok, LastState};
 	{error, Reason} ->
 	    ?Log(LogFun1, error,
 		 "failed starting first MySQL connection handler, "
@@ -961,10 +963,79 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 	[PoolId, WHost, WPort, WUser, WPwd, WDB, WEncoding, WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WPort, WUser, WPwd, WDB, LogFun, WEncoding],
 	WNewState =
-		case check_run_node() of
+		case check_run_node(WRunNode) of
 			true ->
-				do_connect();
+				do_conn(write, WriteArgs, OldState);
 			_ ->
-				todo
-		end.
-	
+				OldState
+		end,
+	[ReadPoolId, RHost, RPort, RUser, RPwd, RDB, REncoding, RRunNode] = mysql_util:get_r_conf(),
+	ReadArgs = [ServerName, ReadPoolId, RHost, RPort, RUser, RPwd, RDB, LogFun, REncoding],
+	RNewState =
+		case check_run_node(RRunNode) of
+			true ->
+				do_conn(read, ReadArgs, WNewState);
+			_ ->
+				WNewState
+		end,
+	[LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode] = mysql_util:get_w_conf(),
+	LogArgs = [ServerName, LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode],
+	LNewState =
+		case check_run_node(LRunNode) of
+			true ->
+				do_conn(log, LogArgs, RNewState);
+			_ ->
+				RNewState
+		end,
+	LNewState.
+
+
+%%
+%%@doc Check node run
+%%@date:2014-1-3
+%%	
+check_run_node(RRunNode) when is_list(RRunNode) ->
+	CheckFun = fun(Node, Acc) when not Acc ->
+					   Index = string:str(atom_to_list(node()), atom_to_list(Node)),
+					   if
+						   Index =/= 0 ->
+							   true;
+						   true ->
+							   Acc
+					   end;
+				  (_Node, Acc) ->
+					   Acc
+			   end,
+	lists:foldl(CheckFun, false, RRunNode).
+
+
+%%
+%%@doc
+%%@date:2014-1-3
+%%
+do_conn(write, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_w_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end;
+do_conn(read, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_r_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end;
+do_conn(log, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=Args, OldState) ->
+	Size = mysql_util:get_l_pool_size() - 1,
+	if
+		Size =< 0 -> OldState;
+		true -> do_connect(Size, Args, OldState)
+	end.
+
+
+do_connect(0, _Args, OldState) ->
+	OldState;
+do_connect(N, [ServerName, PoolId, Host, Port, User, Password, Database, Encoding]=Args, OldState) when is_integer(N), N > 0 ->
+	{ok, _Pid, NewState} =
+		refresh_connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, true, true, OldState),
+	do_connect(N-1, Args, NewState).
