@@ -53,7 +53,8 @@ start(Type, StartArgs) ->
             debug:error("Test for log file~n"),
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
-            mysql_sup:start_link([])
+            erlmysql_sup:start_link(),
+            erlmysql_sup:start_mysql()
     end.
 
 start() ->

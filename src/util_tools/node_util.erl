@@ -68,10 +68,3 @@ split_node_1([], As) -> split_node_2(As, "localhost").
 
 split_node_2(As, Cs) -> {list_to_atom(lists:reverse(As)), list_to_atom(Cs)}.
   
-  
-  
-  
-  
-  
-  
-  

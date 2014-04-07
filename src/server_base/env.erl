@@ -41,7 +41,6 @@ load_env() ->
 load_env(FilePath, ETSName) ->
     case file:consult(FilePath) of
         {ok, [Options]} ->
-			slogger:msg("Load env ~p~n", [Options]),
             ets:delete_all_objects(ETSName),
             ets:insert(ETSName, Options),
             ok;

@@ -10,12 +10,14 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
+-define(SERVER_NAME, 'mysql_name_server').
 
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
 -export([
 		 start_link/0,
+         start_mysql/0,
 		 start_mysql/1,
          log/4
 		]).
@@ -48,13 +50,17 @@ start_link() ->
 											 ServerName :: atom(),
 											 Pid :: pid().
 start_mysql(ServerName) ->
-	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_w_conf(),
-	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding],
+	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_r_conf(),
+	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, fun log/4, WEncoding],
 	Spec = {ServerName, {mysql, start_link, WriteArgs},
 			transient, 2000, worker, [ServerName]},
 	{ok, Pid} = supervisor:start_child(?MODULE, Spec),
 	debug:info("Start mysql(master) ~p~n", [Pid]),
 	{ok, Pid}.
+
+start_mysql() ->
+    ServerName = gen_server:call(?SERVER_NAME, {get_name}),
+    start_mysql(ServerName).
 
 
 

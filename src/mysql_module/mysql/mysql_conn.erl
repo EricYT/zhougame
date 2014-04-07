@@ -610,7 +610,7 @@ mysql_init(Sock, RecvPid, User, Password, LogFun) ->
 
 %% part of mysql_init/4
 greeting(Packet, LogFun) ->
-    <<_Protocol:8, Rest/binary>> = Packet,
+    <<Protocol:8, Rest/binary>> = Packet,
     {Version, Rest2} = asciz(Rest),
     <<_TreadID:32/little, Rest3/binary>> = Rest2,
     {Salt, Rest4} = asciz(Rest3),
@@ -620,7 +620,7 @@ greeting(Packet, LogFun) ->
 %%     ?Log2(LogFun, debug,
 %% 	  "greeting version ~p (protocol ~p) salt ~p caps ~p serverchar ~p"
 %% 	  "salt2 ~p",
-%% 	  [Version, Protocol, Salt, Caps, ServerChar, Salt2]),
+%% 	  [Version, Protocol, Salt, Caps, _ServerChar, Salt2]),
     {normalize_version(Version, LogFun), Salt, Salt2, Caps}.
 
 %% part of greeting/2

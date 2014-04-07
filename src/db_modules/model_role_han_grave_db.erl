@@ -15,7 +15,8 @@ read(#role_han_grave_db{roleid = ROLEID}) ->
     mysql_client:read(role_han_grave_db, SQL);
 read(ROLEID) ->
     SQL = "SELECT * FROM role_han_grave_db WHERE roleid = "++ mysql_helper:pack_value_by_type({ROLEID, bigint}),
-    mysql_client:read(role_han_grave_db, SQL).
+    Res = mysql_client:read(role_han_grave_db, SQL),
+    unpack_data(Res, []).
 
 write(#role_han_grave_db{roleid = ROLEID, monster_info = MONSTER_INFO, count = COUNT, update_time = UPDATE_TIME, last_call_quality = LAST_CALL_QUALITY}) ->
     case mysql_client:read(role_han_grave_db, "SELECT * FROM role_han_grave_db WHERE roleid = "++integer_to_list(ROLEID)) of
@@ -29,6 +30,16 @@ write(#role_han_grave_db{roleid = ROLEID, monster_info = MONSTER_INFO, count = C
             SQL = "",
             mysql_client:write(role_han_grave_db, SQL)
     end.
+
+
+unpack_data([[RoleId, MonsterInfo, Count, UpdateTime, LastCallQuality]|Tail], AccInfo) ->
+    unpack_data(Tail, [#role_han_grave_db{roleid           = RoleId,
+                                          monster_info     = mysql_helper:string_to_term(MonsterInfo),
+                                          count            = Count,
+                                          update_time      = UpdateTime,
+                                          last_call_quality= LastCallQuality}|AccInfo]);
+unpack_data([], AccInfo) ->
+    lists:reverse(AccInfo).
 
 
 where_condition_fromat(Conditions) ->

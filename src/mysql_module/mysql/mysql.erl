@@ -77,7 +77,8 @@
 
 
 %% External exports
--export([start_link/6,
+-export([
+     start_link/6,
 	 start_link/7,
 	 start_link/8,
 	 start_link/9,
@@ -268,6 +269,7 @@ start_link(ServerName, PoolId, Host, Port, User, Password, Database, LogFun, Enc
 %%     start1(PoolId, Host, Port, User, Password, Database, LogFun, Encoding,
 %% 	   start).
 
+
 start(ServerName, PoolId, Host, User, Password, Database) ->
     start(ServerName, PoolId, Host, ?PORT, User, Password, Database).
 
@@ -342,6 +344,7 @@ connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reco
 	    Err
     end.
 
+%%ServerName, PoolId, Host, Port, User, Password, Database, Encoding
 refresh_connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, Reconnect,
        LinkConnection, OldState) ->
     Port1 = if Port == undefined -> ?PORT; true -> Port end,
@@ -958,7 +961,7 @@ asciz_binary(<<C:8, Rest/binary>>, Acc) ->
 
 
 %% 
-start_all_conn([ServerName, PoolId, LogFun], OldState) ->
+start_all_conn([ServerName, _PoolId, _LogFun], OldState) ->
 	LogFun = fun erlmysql_sup:log/4,
 	[PoolId, WHost, WPort, WUser, WPwd, WDB, WEncoding, WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WPort, WUser, WPwd, WDB, LogFun, WEncoding],
@@ -979,7 +982,7 @@ start_all_conn([ServerName, PoolId, LogFun], OldState) ->
 				WNewState
 		end,
 	[LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode] = mysql_util:get_l_conf(),
-	LogArgs = [ServerName, LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode],
+	LogArgs = [ServerName, LPoolId, LHost, LPort, LUser, LPwd, LDB, LogFun, LEncoding],
 	LNewState =
 		case check_run_node(LRunNode) of
 			true ->
@@ -1035,7 +1038,7 @@ do_conn(log, [ServerName, PoolId, Host, Port, User, Pwd, DB, LogFun, Encoding]=A
 
 do_connect(0, _Args, OldState) ->
 	OldState;
-do_connect(N, [ServerName, PoolId, Host, Port, User, Password, Database, Encoding]=Args, OldState) when is_integer(N), N > 0 ->
+do_connect(N, [ServerName, PoolId, Host, Port, User, Password, Database, _LogFun, Encoding]=Args, OldState) when is_integer(N), N > 0 ->
 	{ok, _Pid, NewState} =
 		refresh_connect(ServerName, PoolId, Host, Port, User, Password, Database, Encoding, true, true, OldState),
 	do_connect(N-1, Args, NewState).

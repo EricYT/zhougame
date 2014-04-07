@@ -24,7 +24,11 @@ init() ->
 
 
 up_all() ->
+    up_nodes(),
 	up_new().
+
+up_all_by_other_node() ->
+    up_new().
 
 
 up_new() ->
@@ -71,12 +75,19 @@ list_beam(BeamDir) ->
 		{error, Reason} -> io:format("List all beam file:~p~n", [Reason])
 	end.
 
+up_nodes() ->
+    AllNodes = nodes(),
+    lists:foreach(fun(Node) ->
+                          io:format(">>>>>>>>> Node ~p~n", [Node]),
+                          rpc:call(Node, ?MODULE, up_all_by_other_node, [])
+                  end, AllNodes).
+
 
 up_node([]) ->
 	ok;
 up_node([{Mod, _}|Tail]) ->
 	c:l(Mod),
-	io:format("------Version Up  Up Module:~p------~n", [Mod]),
+	io:format("------Version Up : Up Module:~p------~n", [Mod]),
 	up_node(Tail).
 
 

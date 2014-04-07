@@ -16,6 +16,8 @@
 		 get_config/1,
          get_pool_id_read/0,
          get_pool_id_write/0,
+         get_client_size/0,
+         get_app_run_node/0,
          get_r_pool_size/0,
          get_w_pool_size/0,
          get_l_pool_size/0,
@@ -38,6 +40,20 @@ get_pool_id_read() ->
                                          ReadPoolId :: atom().
 get_pool_id_write() ->
     write.
+
+
+-spec get_app_run_node() -> RunNodes when
+                                        RunNodes :: [Node, ...],
+                                        Node :: atom().
+get_app_run_node() ->
+    get_config(app_run_node).
+
+
+-spec get_client_size() -> ClientSize when
+                                        ClientSize :: non_neg_integer().
+get_client_size() ->
+    get_config(client_size).
+
 
 -spec get_r_pool_size() -> PoolSize when
                                       PoolSize :: integer().
@@ -63,7 +79,7 @@ get_w_conf() ->
     PoolId      = get_pool_id_write(),
     WHost       = get_config(w_host),
     WPort       = get_config(w_port),
-    WUser       = get_config(w_usert),
+    WUser       = get_config(w_user),
     WPwd        = get_config(w_pwd),
     WDB         = get_config(w_database),
     WEncoding   = get_config(w_encoding),
@@ -76,13 +92,13 @@ get_w_conf() ->
                                Config :: list().
 get_l_conf() ->
     LPoolId     = get_pool_id_write(),
-    LHost       = get_config(w_host),
-    LPort       = get_config(w_port),
-    LUser       = get_config(w_usert),
-    LPwd        = get_config(w_pwd),
-    LDB         = get_config(w_database),
-    LEncoding   = get_config(w_encoding),
-    LRunNode    = get_config(r_runnode),
+    LHost       = get_config(log_host),
+    LPort       = get_config(log_port),
+    LUser       = get_config(log_user),
+    LPwd        = get_config(l_pwd),
+    LDB         = get_config(log_database),
+    LEncoding   = get_config(log_encoding),
+    LRunNode    = get_config(log_runnode),
     [LPoolId, LHost, LPort, LUser, LPwd, LDB, LEncoding, LRunNode].
 
 
@@ -90,13 +106,13 @@ get_l_conf() ->
 -spec get_r_conf() -> Config when
                                Config :: list().
 get_r_conf() ->
-    RPoolId     = get_pool_id_write(),
-    RHost       = get_config(w_host),
-    RPort       = get_config(w_port),
-    RUser       = get_config(w_usert),
-    RPwd        = get_config(w_pwd),
-    RDB         = get_config(w_database),
-    REncoding   = get_config(w_encoding),
+    RPoolId     = get_pool_id_read(),
+    RHost       = get_config(r_host),
+    RPort       = get_config(r_port),
+    RUser       = get_config(r_user),
+    RPwd        = get_config(r_pwd),
+    RDB         = get_config(r_database),
+    REncoding   = get_config(r_encoding),
     RRunNode    = get_config(r_runnode),
     [RPoolId, RHost, RPort, RUser, RPwd, RDB, REncoding, RRunNode].
 
