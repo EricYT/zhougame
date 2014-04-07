@@ -17,7 +17,7 @@
 %% --------------------------------------------------------------------
 -export([
 		 start_link/0,
-         start_mysql/0,
+%%          start_mysql/0,
 		 start_mysql/1,
          log/4
 		]).
@@ -50,7 +50,7 @@ start_link() ->
 											 ServerName :: atom(),
 											 Pid :: pid().
 start_mysql(ServerName) ->
-	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_r_conf(),
+	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_w_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, fun log/4, WEncoding],
 	Spec = {ServerName, {mysql, start_link, WriteArgs},
 			transient, 2000, worker, [ServerName]},
@@ -59,7 +59,7 @@ start_mysql(ServerName) ->
 	{ok, Pid}.
 
 start_mysql() ->
-    ServerName = gen_server:call(?SERVER_NAME, {get_name}),
+    ServerNames = mysql_name_server:get_all_clients(),
     start_mysql(ServerName).
 
 
@@ -74,9 +74,13 @@ start_mysql() ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    AChild = {'mysql_name_server',{'mysql_name_server',start_link,[]},
-	      permanent,2000,worker,['mysql_name_server']},
-    {ok,{{one_for_one,10,100}, [AChild]}}.
+    AReadChild = {'mysql_name_server_read',{'mysql_name_server',start_link,[read]},
+	      permanent,2000,worker,['mysql_name_server_read']},
+    AWriteChild = {'mysql_name_server_write',{'mysql_name_server',start_link,[write]},
+	      permanent,2000,worker,['mysql_name_server_write']},
+    ALogChild = {'mysql_name_server_log',{'mysql_name_server',start_link,[log]},
+	      permanent,2000,worker,['mysql_name_server_log']},
+    {ok,{{one_for_one,10,100}, [AReadChild, AWriteChild, ALogChild]}}.
 
 %% ====================================================================
 %% Internal functions

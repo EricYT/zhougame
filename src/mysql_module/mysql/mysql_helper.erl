@@ -16,6 +16,8 @@
 %%
 %% API Functions
 %%
+
+%% Old unpack function,zip the type and value
 unpacks(Values) when erlang:is_list(Values) ->
     unpacks(Values, []).
 

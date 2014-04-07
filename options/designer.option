@@ -29,10 +29,10 @@
 	]},
 	
 	{mysql, [ %% mysql options
-		{client_size, 1},			%% mysql client size
+		{read_client_size, 1},			%% mysql client size
 		{app_run_node, [db, gm]},
 		% read database config
-		{r_pool_size, 2},			%% connection pool size
+		{r_pool_size, 2},			%% connection pool size.通过增加连接池数量来平衡负载
 		{r_port, 3306},				%% mysql port
 		{r_host, "localhost"},		%% mysql host
 		{r_user, "root"},			%% mysql user
@@ -42,6 +42,7 @@
 		{r_runnode, [db, map, gm, line]},			%% mysql run node
 		
 		% write database config
+		{write_client_size, 1},          %% mysql client size
 		{w_pool_size, 2},			%% connection pool size
 		{w_port, 3306},				%% mysql port
 		{w_host, "localhost"},		%% mysql host
@@ -52,6 +53,7 @@
 		{w_runnode, [db, map, gm, line]},			%% mysql run node
 		
 		% log database config
+		{log_client_size, 1},          %% mysql client size
 		{log_pool_size, 2},		%% connection pool size
 		{log_port, 3306},			%% mysql port
 		{log_host, "localhost"},	%% mysql host
