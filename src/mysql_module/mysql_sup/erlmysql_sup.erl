@@ -49,8 +49,18 @@ start_link() ->
 -spec start_mysql(ServerName) -> {ok, Pid} when
 											 ServerName :: atom(),
 											 Pid :: pid().
-start_mysql(ServerName) ->
+start_mysql() ->
 	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_w_conf(),
+	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, fun log/4, WEncoding],
+	Spec = {ServerName, {mysql, start_link, WriteArgs},
+			transient, 2000, worker, [ServerName]},
+	{ok, Pid} = supervisor:start_child(?MODULE, Spec),
+	[RPoolId, RHost, RProt, RUser, RPwd, RDB, REncoding, _RRunNode] = mysql_util:get_r_conf(),
+	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, fun log/4, WEncoding],
+	Spec = {ServerName, {mysql, start_link, WriteArgs},
+			transient, 2000, worker, [ServerName]},
+	{ok, Pid} = supervisor:start_child(?MODULE, Spec),
+	[PoolId, WHost, WProt, WUser, WPwd, WDB, WEncoding, _WRunNode] = mysql_util:get_log_conf(),
 	WriteArgs = [ServerName, PoolId, WHost, WProt, WUser, WPwd, WDB, fun log/4, WEncoding],
 	Spec = {ServerName, {mysql, start_link, WriteArgs},
 			transient, 2000, worker, [ServerName]},
