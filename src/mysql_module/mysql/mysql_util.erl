@@ -16,9 +16,7 @@
 		 get_config/1,
          get_pool_id_read/0,
          get_pool_id_write/0,
-         get_read_client_size/0,
-         get_write_client_size/0,
-         get_log_client_size/0,
+         get_client_size/0,
          get_app_run_node/0,
          get_r_pool_size/0,
          get_w_pool_size/0,
@@ -51,22 +49,11 @@ get_app_run_node() ->
     get_config(app_run_node).
 
 
--spec get_read_client_size() -> ClientSize when
+-spec get_client_size() -> ClientSize when
                                         ClientSize :: non_neg_integer().
-get_read_client_size() ->
-    get_config(read_client_size).
+get_client_size() ->
+    get_config(client_size).
 
-
--spec get_write_client_size() -> ClientSize when
-                                        ClientSize :: non_neg_integer().
-get_write_client_size() ->
-    get_config(write_client_size).
-
-
--spec get_log_client_size() -> ClientSize when
-                                        ClientSize :: non_neg_integer().
-get_log_client_size() ->
-    get_config(log_client_size).
 
 
 -spec get_r_pool_size() -> PoolSize when

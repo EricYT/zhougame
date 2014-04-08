@@ -58,9 +58,9 @@ start_mysql(ServerName) ->
 	debug:info("Start mysql(master) ~p~n", [Pid]),
 	{ok, Pid}.
 
-start_mysql() ->
-    ServerNames = mysql_name_server:get_all_clients(),
-    start_mysql(ServerName).
+%% start_mysql() ->
+%%     ServerNames = mysql_name_server:get_all_clients(),
+%%     start_mysql(ServerName).
 
 
 
@@ -74,13 +74,9 @@ start_mysql() ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    AReadChild = {'mysql_name_server_read',{'mysql_name_server',start_link,[read]},
-	      permanent,2000,worker,['mysql_name_server_read']},
-    AWriteChild = {'mysql_name_server_write',{'mysql_name_server',start_link,[write]},
-	      permanent,2000,worker,['mysql_name_server_write']},
-    ALogChild = {'mysql_name_server_log',{'mysql_name_server',start_link,[log]},
-	      permanent,2000,worker,['mysql_name_server_log']},
-    {ok,{{one_for_one,10,100}, [AReadChild, AWriteChild, ALogChild]}}.
+    NameChild = {'mysql_name_server',{'mysql_name_server',start_link,[]},
+	      permanent,2000,worker,['mysql_name_server']},
+    {ok,{{one_for_one,10,100}, [NameChild]}}.
 
 %% ====================================================================
 %% Internal functions

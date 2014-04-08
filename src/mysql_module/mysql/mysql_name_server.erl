@@ -60,9 +60,9 @@ get_all_clients() ->
 %%          ignore               |
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
-init([Type]) ->
+init([]) ->
 	process_flag(trap_exit, true),
-	Servers = create_name(Type),
+	Servers = create_name(),
 	Size = erlang:length(Servers),
 	ServerNode = node_util:get_node_sname(node()),
     {ok, #state{server_names	= Servers,
@@ -142,16 +142,14 @@ get_client(#state{server_names = Servers}=State) ->
 
 
 %%@doc 读取配置的client size，运行mysql的节点，判断当前节点是否为运行mysql的node，将node名字存入#state中
--spec create_name(Type::atom()) -> [string(), ...].
-create_name(read) ->
+-spec create_name() -> [string(), ...].
+create_name() ->
     RClientSize = mysql_util:get_read_client_size(),
     AppRunNode = mysql_util:get_app_run_node(),
-    [?DEFAULT_READ_NAME++integer_to_list(Client)||Client<-lists:seq(1, RClientSize)];
-create_name(write) ->
-    WClientSize = mysql_util:get_write_client_size(),
-    AppRunNode = mysql_util:get_app_run_node(),
-    [?DEFAULT_WRITE_NAME++integer_to_list(Client)||Client<-lists:seq(1, WClientSize)];
-create_name(log) ->
-    LClientSize = mysql_util:get_log_client_size(),
-    AppRunNode = mysql_util:get_app_run_node(),
-    [?DEFAULT_LOG_NAME++integer_to_list(Client)||Client<-lists:seq(1, LClientSize)].
+    case node_uitl:check_run_node(AppRunNode) of
+        true ->
+            NodeName = atom_to_list(node());
+        false ->
+            NodeName = node_util:get_appnodes(AppNodeType)
+    end,
+    [?DEFAULT_READ_NAME++integer_to_list(Client)||Client<-lists:seq(1, RClientSize)].

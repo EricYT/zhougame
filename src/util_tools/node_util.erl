@@ -45,6 +45,20 @@ check_snode_match(AppType, SNode) ->
 						Acc
 				end, false, get_appnodes(AppType)).
 
+check_run_node(RRunNode) when is_list(RRunNode) ->
+    CheckFun = fun(Node, Acc) when not Acc ->
+                       Index = string:str(atom_to_list(node()), atom_to_list(Node)),
+                       if
+                           Index =/= 0 ->
+                               true;
+                           true ->
+                               Acc
+                       end;
+                  (_Node, Acc) ->
+                       Acc
+               end,
+    lists:foldl(CheckFun, false, RRunNode).
+
 
 make_node_full_name(Node) when is_list(Node) ->
     Prefix = env:get(prefix, ""),
