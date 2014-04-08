@@ -10,9 +10,7 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--define(DEFAULT_READ_NAME, "mysql_read_").
--define(DEFAULT_WRITE_NAME, "mysql_write_").
--define(DEFAULT_LOG_NAME, "mysql_log_").
+-define(DEFAULT_NAME, "_mysql_client_").
 
 -define(SERVER_NAME, server_name).              %% Server Name
 
@@ -20,8 +18,8 @@
 %% --------------------------------------------------------------------
 %% External exports
 -export([
-		 start_link/1,
-         create_name/1,
+		 start_link/0,
+         create_name/0,
          get_client/0,
          get_all_clients/0
 		 ]).
@@ -29,16 +27,14 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--record(state, {server_names = [], server_node, server_size, server_last, server_index}).
+-record(state, {server_names = [], server_node, server_size, server_last}).
 
 %% ====================================================================
 %% External functions
 %% ====================================================================
--spec start_link(Type::atom()) -> ignore.
-start_link(Type) ->
-    ServerName = erlang:list_to_atom(erlang:atom_to_list(?MODULE)++"_"++erlang:atom_to_list(Type)),
-    put(?SERVER_NAME, ServerName),
-	gen_server:start_link({local, ServerName}, ?MODULE, [Type], []).
+-spec start_link() -> ignore.
+start_link() ->
+	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 %% ====================================================================
 %% Server functions
@@ -68,8 +64,7 @@ init([]) ->
     {ok, #state{server_names	= Servers,
 				server_node		= ServerNode,
 				server_size		= Size,
-				server_last		= 1,
-                server_index    = 1}}.
+				server_last		= 1}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -144,12 +139,18 @@ get_client(#state{server_names = Servers}=State) ->
 %%@doc 读取配置的client size，运行mysql的节点，判断当前节点是否为运行mysql的node，将node名字存入#state中
 -spec create_name() -> [string(), ...].
 create_name() ->
-    RClientSize = mysql_util:get_read_client_size(),
+    RClientSize = mysql_util:get_client_size(),
     AppRunNode = mysql_util:get_app_run_node(),
-    case node_uitl:check_run_node(AppRunNode) of
+    case node_util:check_run_node(AppRunNode) of
         true ->
-            NodeName = atom_to_list(node());
+            NodeNames = [atom_to_list(node())];
         false ->
-            NodeName = node_util:get_appnodes(AppNodeType)
+            NodeNames = node_util:get_all_nodes_by_appnodes(AppRunNode)
     end,
-    [?DEFAULT_READ_NAME++integer_to_list(Client)||Client<-lists:seq(1, RClientSize)].
+    [{Node++?DEFAULT_NAME++integer_to_list(Client), Node}||Client<-lists:seq(1, RClientSize), Node<-NodeNames].
+
+
+
+
+
+

@@ -21,7 +21,7 @@ run() ->
     applicationex:force_start(),
     check_line_run(),
     check_map_run(),
-%%     check_db_run(),
+    check_db_run(),
 %%     check_cache_run(),
     check_gate_run(),
 	ok.

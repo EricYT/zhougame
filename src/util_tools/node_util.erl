@@ -65,12 +65,25 @@ make_node_full_name(Node) when is_list(Node) ->
     Ip = env:get(ip, ""),
     erlang:list_to_atom(lists:concat([Prefix, Node, "@", Ip])).
 
-%%
-%% Local Functions
-%%
+
 get_appnodes(AppNodeType) ->
 	system_option:get_node_option(AppNodeType).
-  
+
+
+get_all_nodes_by_appnodes(AppNodeTypes) ->
+    AllNodes = global_node:get_all_nodes(),
+    Res = lists:foldl(fun(SNode, AccInfo) ->
+                        [lists:foldl(fun(Type, Acc) ->
+                                             case check_snode_match(Type, SNode) of
+                                                 true ->
+                                                     [SNode|Acc];
+                                                 false ->
+                                                     Acc
+                                             end
+                                     end, [], AppNodeTypes)|AccInfo]
+                end, [], AllNodes),
+    lists:flatten(Res).
+
 
 -spec split_node(Node::list()) -> {BaseName::atom(), Hostname::atom()}.
 split_node(Node) when is_atom(Node) -> split_node(atom_to_list(Node));
