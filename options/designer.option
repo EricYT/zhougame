@@ -9,7 +9,7 @@
     
     {prefix, "ericts_"},
     
-    {pre_connect_nodes, ["line"]},
+    {pre_connect_nodes, ["line", "db", "gate1", "map1", "map2"]},
 	
 	{beam_dir, "../ebin"},
 	{db_dir, "../dbfile/"},

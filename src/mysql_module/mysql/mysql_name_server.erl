@@ -58,7 +58,7 @@ init([]) ->
     process_flag(trap_exit, true),
     Servers = create_name(),
     Size = erlang:length(Servers),
-    io:format(">>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Servers}]),
+    io:format(">>>>>>>>>>>>>> ~p~n", [nodes()]),
     {ok, #state{server_names	= Servers,
                 server_size		= Size,
                 server_last		= 1}}.
@@ -74,7 +74,6 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({get_name}, _From, State) ->
-      io:format(">>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, State}]),
     {{ServerName, Node}, NewState} = get_client(State),
     {reply, {list_to_atom(ServerName), Node}, NewState};
 handle_call({get_all_servers}, _From, State) ->
