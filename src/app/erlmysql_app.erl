@@ -45,17 +45,20 @@
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start(Type, StartArgs) ->
-    case app_util:get_argument("-line") of
-        [] -> slogger:msg("Error in erlmysql_app app ~p~n", [?MODULE]);
-        [_Center|Rest] ->
-            debug:info("************** erlmysql_app app ~p~n", [""]),
-            debug:log_file("../log/line.log"),
-            debug:error("Test for log file~n"),
-            ping_center:wait_all_nodes_connect(true),
-            %% MySQL need be treated as application
-            erlmysql_sup:start_link()
-%%             erlmysql_sup:start_mysql()
-    end.
+    debug:info("************** erlmysql_app app ~p~n", [""]),
+    debug:log_file("../log/line.log"),
+    debug:error("Test for log file~n"),
+    ping_center:wait_all_nodes_connect(true),
+    %% MySQL need be treated as application
+    {ok, Pid} = erlmysql_sup:start_link(),
+    AppRunNode = mysql_util:get_app_run_node(),
+    case node_util:check_run_node(AppRunNode) of
+        true ->
+            start_mysql_all();
+        false ->
+            nothing
+    end,
+    {ok, Pid}.
 
 start() ->
     applicationex:start(?MODULE).
@@ -70,4 +73,17 @@ stop(State) ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
+start_mysql_all() ->
+    AllServers = mysql_name_server:get_all_servers(),
+    start_mysql(AllServers, []).
+
+start_mysql([ServerName|Tail], AccPid) ->
+    {ok, Pid} = erlmysql_sup:start_mysql(list_to_atom(ServerName)),
+    start_mysql(Tail, [Pid|AccPid]);
+start_mysql([], AccPid) ->
+    AccPid.
+        
+
+
+
 

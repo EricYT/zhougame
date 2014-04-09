@@ -1,38 +1,42 @@
 
-=ERROR REPORT==== 8-Apr-2014::23:02:18 ===
+=ERROR REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 8-Apr-2014::23:02:18 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center {["line"],true}
 
-=INFO REPORT==== 8-Apr-2014::23:02:18 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
-
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) ********* applicationex Application erlmysql_app
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) ************** erlmysql_app app []
 
-=ERROR REPORT==== 8-Apr-2014::23:02:19 ===
+=ERROR REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center {["line"],true}
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
+=INFO REPORT==== 9-Apr-2014::23:17:38 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 8-Apr-2014::23:02:19 ===
-    application: db_app
-    exited: {bad_return,{{db_app,start,[normal,[]]},ok}}
-    type: temporary
+=INFO REPORT==== 9-Apr-2014::23:17:39 ===
+(debug 31) Start mysql(master) <0.60.0>
+
+=INFO REPORT==== 9-Apr-2014::23:17:39 ===
+(debug 31) Start mysql(master) <0.84.0>
+
+=INFO REPORT==== 9-Apr-2014::23:17:39 ===
+(debug 31) *************** {gate_sup,54}
+
+=INFO REPORT==== 9-Apr-2014::23:17:39 ===
+(debug 31) *************** {gate_manager,44}

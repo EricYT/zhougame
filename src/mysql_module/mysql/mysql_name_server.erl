@@ -10,7 +10,7 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--define(DEFAULT_NAME, "_mysql_client_").
+-define(DEFAULT_NAME, "_mysql_").
 
 -define(SERVER_NAME, server_name).              %% Server Name
 
@@ -21,7 +21,7 @@
 		 start_link/0,
          create_name/0,
          get_client/0,
-         get_all_clients/0
+         get_all_servers/0
 		 ]).
 
 %% gen_server callbacks
@@ -40,12 +40,10 @@ start_link() ->
 %% Server functions
 %% ====================================================================
 get_client() ->
-    ServerName = get(?SERVER_NAME),
-    gen_server:call(ServerName, {get_name}).
+    gen_server:call(?MODULE, {get_name}).
 
-get_all_clients() ->
-    ServerName = get(?SERVER_NAME),
-    gen_server:call(ServerName, {get_all_servers}).
+get_all_servers() ->
+    gen_server:call(?MODULE, {get_all_servers}).
 
 
 %% --------------------------------------------------------------------
@@ -143,11 +141,11 @@ create_name() ->
     AppRunNode = mysql_util:get_app_run_node(),
     case node_util:check_run_node(AppRunNode) of
         true ->
-            NodeNames = [atom_to_list(node())];
+            NodeNames = [node_util:get_node_sname(node())];
         false ->
-            NodeNames = node_util:get_all_nodes_by_appnodes(AppRunNode)
+            NodeNames = [node_util:get_node_sname(Node)||Node<-node_util:get_all_nodes_by_appnodes([db])]
     end,
-    [{Node++?DEFAULT_NAME++integer_to_list(Client), Node}||Client<-lists:seq(1, RClientSize), Node<-NodeNames].
+    [lists:concat([Node, ?DEFAULT_NAME, integer_to_list(Client)])||Client<-lists:seq(1, RClientSize), Node<-NodeNames].
 
 
 
