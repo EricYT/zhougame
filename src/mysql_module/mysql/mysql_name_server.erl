@@ -27,7 +27,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--record(state, {server_names = [], server_node, server_size, server_last}).
+-record(state, {server_names = [], server_size, server_last}).
 
 %% ====================================================================
 %% External functions
@@ -55,14 +55,13 @@ get_all_servers() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	process_flag(trap_exit, true),
-	Servers = create_name(),
-	Size = erlang:length(Servers),
-	ServerNode = node_util:get_node_sname(node()),
+    process_flag(trap_exit, true),
+    Servers = create_name(),
+    Size = erlang:length(Servers),
+    io:format(">>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Servers}]),
     {ok, #state{server_names	= Servers,
-				server_node		= ServerNode,
-				server_size		= Size,
-				server_last		= 1}}.
+                server_size		= Size,
+                server_last		= 1}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -75,8 +74,9 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({get_name}, _From, State) ->
-    {Reply, NewState} = get_client(State),
-    {reply, Reply, NewState};
+      io:format(">>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, State}]),
+    {{ServerName, Node}, NewState} = get_client(State),
+    {reply, {list_to_atom(ServerName), Node}, NewState};
 handle_call({get_all_servers}, _From, State) ->
     Reply = State#state.server_names,
     {reply, Reply, State};
@@ -127,11 +127,11 @@ code_change(OldVsn, State, Extra) ->
 %% --------------------------------------------------------------------
 %%
 %%@doc 
--spec get_client(record()) -> {string(), record()}.
+%% -spec get_client(record()) -> {string(), record()}.
 get_client(#state{server_size = Size, server_names = Servers, server_last = Last}=State) when Last =< Size ->
-    {list_to_atom(lists:nth(Last, Servers)), State#state{server_last=Last+1}};
+    {lists:nth(Last, Servers), State#state{server_last=Last+1}};
 get_client(#state{server_names = Servers}=State) ->
-    {list_to_atom(lists:nth(1, Servers)), State#state{server_last=2}}.
+    {lists:nth(1, Servers), State#state{server_last=2}}.
 
 
 %%@doc 读取配置的client size，运行mysql的节点，判断当前节点是否为运行mysql的node，将node名字存入#state中
@@ -141,11 +141,12 @@ create_name() ->
     AppRunNode = mysql_util:get_app_run_node(),
     case node_util:check_run_node(AppRunNode) of
         true ->
-            NodeNames = [node_util:get_node_sname(node())];
+            NodeNames = [{node_util:get_node_sname(node()), node()}];
         false ->
-            NodeNames = [node_util:get_node_sname(Node)||Node<-node_util:get_all_nodes_by_appnodes([db])]
+            NodeNames = [{node_util:get_node_sname(Node), Node}||Node<-node_util:get_all_nodes_by_appnodes([db])]
     end,
-    [lists:concat([Node, ?DEFAULT_NAME, integer_to_list(Client)])||Client<-lists:seq(1, RClientSize), Node<-NodeNames].
+    [{lists:concat([NodeS, ?DEFAULT_NAME, integer_to_list(Client)]), NodeN}
+    ||Client<-lists:seq(1, RClientSize), {NodeS, NodeN}<-NodeNames].
 
 
 

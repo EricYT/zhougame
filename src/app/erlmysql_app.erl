@@ -74,11 +74,11 @@ stop(State) ->
 %% Internal functions
 %% ====================================================================
 start_mysql_all() ->
-    AllServers = mysql_name_server:get_all_servers(),
+    AllServers = [list_to_atom(Server)||{Server, _Node}<-mysql_name_server:get_all_servers()],
     start_mysql(AllServers, []).
 
 start_mysql([ServerName|Tail], AccPid) ->
-    {ok, Pid} = erlmysql_sup:start_mysql(list_to_atom(ServerName)),
+    {ok, Pid} = erlmysql_sup:start_mysql(ServerName),
     start_mysql(Tail, [Pid|AccPid]);
 start_mysql([], AccPid) ->
     AccPid.
