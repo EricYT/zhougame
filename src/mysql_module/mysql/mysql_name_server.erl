@@ -147,8 +147,3 @@ create_name() ->
     [{lists:concat([NodeS, ?DEFAULT_NAME, integer_to_list(Client)]), NodeN}
     ||Client<-lists:seq(1, RClientSize), {NodeS, NodeN}<-NodeNames].
 
-
-
-
-
-
