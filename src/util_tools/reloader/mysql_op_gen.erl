@@ -10,6 +10,7 @@
 %%
 %% Exported Functions
 %%
+-compile(export_all).
 -export([]).
 
 %%
@@ -22,3 +23,13 @@
 %% Local Functions
 %%
 
+-spec key_value_replace(KVList, Code) -> Code1 when
+                                             KVList :: [KV, ...],
+                                             KV :: tuple(),
+                                             Code :: string(),
+                                             Code1 :: string().
+key_value_replace([{Key, Value}|Tail], Code) ->
+    [Part1, Part2] = binary:split(list_to_binary(Code), [list_to_binary(Key)], [global]),
+    key_value_replace(Tail, string:join([binary_to_list(Part1), binary_to_list(Part2)], Value));
+key_value_replace([], Code) ->
+    Code.
