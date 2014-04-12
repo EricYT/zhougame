@@ -29,7 +29,7 @@
                                              Code :: string(),
                                              Code1 :: string().
 key_value_replace([{Key, Value}|Tail], Code) ->
-    [Part1, Part2] = binary:split(list_to_binary(Code), [list_to_binary(Key)], [global]),
-    key_value_replace(Tail, string:join([binary_to_list(Part1), binary_to_list(Part2)], Value));
+    CodeBins = binary:split(list_to_binary(Code), [list_to_binary(Key)], [global]),
+    key_value_replace(Tail, string:join([binary_to_list(CodeTemp)||CodeTemp<-CodeBins], Value));
 key_value_replace([], Code) ->
     Code.
