@@ -91,7 +91,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 %%--------------------------------------------------------------------
 
-accept(State = #state{sock=LSock}) ->
+accept(State = #state{sock=LSock}) -> 
     case prim_inet:async_accept(LSock, -1) of
         {ok, Ref} -> {noreply, State#state{ref=Ref}};
         Error     -> {stop, {cannot_accept, Error}, State}

@@ -41,6 +41,8 @@ format_inet_error0(address) -> "cannot connect to host/port";
 format_inet_error0(timeout) -> "timed out";
 format_inet_error0(Error)   -> inet:format_error(Error).
 
+format(Fmt, Args) -> lists:flatten(io_lib:format(Fmt, Args)).
+
 
 %%
 %% Local Functions
