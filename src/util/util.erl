@@ -184,7 +184,7 @@ wait_for_process_to_die(Name) when is_atom(Name) ->
 wait_for_process_to_die(Pid) ->
     wait_for(fun() -> not is_process_alive(Pid) end).
 
--spec wait_for_table_to_disappear(Pid::pid(), tid() | atom()) -> ok.
+%% -spec wait_for_table_to_disappear(Pid::pid(), tid() | atom()) -> ok.
 wait_for_table_to_disappear(Pid, Table) ->
     wait_for(fun() ->
                      case ets:info(Table, owner) of
