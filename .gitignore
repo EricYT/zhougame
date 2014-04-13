@@ -5,7 +5,6 @@ deps
 *.plt
 erl_crash.dump
 .project
-.settings
+.settings/
 *.log
-.settings
 
