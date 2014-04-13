@@ -27,17 +27,6 @@
 
 %%----------------------------------------------------------------------------
 
--ifdef(use_specs).
-
--type(mfargs() :: {atom(), atom(), [any()]}).
-
--spec(start_link/8 ::
-        (inet:ip_address(), inet:port_number(), [gen_tcp:listen_option()],
-         integer(), atom(), mfargs(), mfargs(), string()) ->
-                           rabbit_types:ok_pid_or_error()).
-
--endif.
-
 %%--------------------------------------------------------------------
 
 start_link(IPAddress, Port, SocketOpts,
@@ -65,7 +54,7 @@ init({IPAddress, Port, SocketOpts,
             {ok, {LIPAddress, LPort}} = inet:sockname(LSock),
             error_logger:info_msg(
               "started ~s on ~s:~p~n",
-              [Label, rabbit_misc:ntoab(LIPAddress), LPort]),
+              [Label, tcp_util:ntoab(LIPAddress), LPort]),
             apply(M, F, A ++ [IPAddress, Port]),
             {ok, #state{sock = LSock,
                         on_startup = OnStartup, on_shutdown = OnShutdown,
@@ -73,7 +62,7 @@ init({IPAddress, Port, SocketOpts,
         {error, Reason} ->
             error_logger:error_msg(
               "failed to start ~s on ~s:~p - ~p (~s)~n",
-              [Label, rabbit_misc:ntoab(IPAddress), Port,
+              [Label, tcp_util:ntoab(IPAddress), Port,
                Reason, inet:format_error(Reason)]),
             {stop, {cannot_listen, IPAddress, Port, Reason}}
     end.
@@ -91,8 +80,10 @@ terminate(_Reason, #state{sock=LSock, on_shutdown = {M,F,A}, label=Label}) ->
     {ok, {IPAddress, Port}} = inet:sockname(LSock),
     gen_tcp:close(LSock),
     error_logger:info_msg("stopped ~s on ~s:~p~n",
-                          [Label, rabbit_misc:ntoab(IPAddress), Port]),
+                          [Label, tcp_util:ntoab(IPAddress), Port]),
     apply(M, F, A ++ [IPAddress, Port]).
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+

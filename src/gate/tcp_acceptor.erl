@@ -64,8 +64,8 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}},
                              error_logger:error_msg(
                                "failed to tune buffer size of "
                                "connection accepted on ~s:~p - ~s~n",
-                               [rabbit_misc:ntoab(IPAddress), Port,
-                                rabbit_misc:format_inet_error(Err)]),
+                               [tcp_util:ntoab(IPAddress), Port,
+                                tcp_util:format_inet_error(Err)]),
                              catch port_close(Sock)
     end,
 

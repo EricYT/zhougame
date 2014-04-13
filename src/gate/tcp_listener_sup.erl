@@ -24,21 +24,6 @@
 
 %%----------------------------------------------------------------------------
 
--ifdef(use_specs).
-
--type(mfargs() :: {atom(), atom(), [any()]}).
-
--spec(start_link/7 ::
-        (inet:ip_address(), inet:port_number(), [gen_tcp:listen_option()],
-         mfargs(), mfargs(), mfargs(), string()) ->
-                           rabbit_types:ok_pid_or_error()).
--spec(start_link/8 ::
-        (inet:ip_address(), inet:port_number(), [gen_tcp:listen_option()],
-         mfargs(), mfargs(), mfargs(), integer(), string()) ->
-                           rabbit_types:ok_pid_or_error()).
-
--endif.
-
 %%----------------------------------------------------------------------------
 
 start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
@@ -58,7 +43,7 @@ init({IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
     %% tcp_acceptor_sup, and the only way I can think of accomplishing
     %% that without jumping through hoops is to register the
     %% tcp_acceptor_sup.
-    Name = rabbit_misc:tcp_name(tcp_acceptor_sup, IPAddress, Port),
+    Name = tcp_name(tcp_acceptor_sup, IPAddress, Port),
     {ok, {{one_for_all, 10, 10},
           [{tcp_acceptor_sup, {tcp_acceptor_sup, start_link,
                                [Name, AcceptCallback]},
@@ -68,3 +53,11 @@ init({IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
                             ConcurrentAcceptorCount, Name,
                             OnStartup, OnShutdown, Label]},
             transient, 16#ffffffff, worker, [tcp_listener]}]}}.
+
+
+tcp_name(Prefix, IPAddress, Port)
+  when is_atom(Prefix) andalso is_number(Port) ->
+    list_to_atom(
+      format("~w_~s:~w", [Prefix, inet_parse:ntoa(IPAddress), Port])).
+
+format(Fmt, Args) -> lists:flatten(io_lib:format(Fmt, Args)).
