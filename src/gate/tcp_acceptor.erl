@@ -24,6 +24,7 @@
          terminate/2, code_change/3]).
 
 -record(state, {callback, sock, ref}).
+%% -record(state, {callback, sock, ref, disable_connect}).
 
 %%--------------------------------------------------------------------
 
