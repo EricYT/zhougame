@@ -30,5 +30,5 @@ start_link([]) ->
 init([]) ->
 	io:format(">>>>>>>>>>> ~p~n", [{?MODULE, ?LINE}]),
     {ok, {{simple_one_for_one, 10, 10},
-          [{player_session_processor, {player_session_processor, start_link, []},
+          [{player_session_processor, {player_session_processor, start_link, [[]]},
             transient, brutal_kill, worker, [player_session_processor]}]}}.

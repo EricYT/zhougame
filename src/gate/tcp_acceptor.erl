@@ -61,22 +61,20 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}},
 	io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, LSock}]),
 	
 	%% handle
-%% 	try
-%% 		{Address, Port} = inet_op(fun() -> inet:sockname(LSock) end),
-		Res = inet_op(fun() -> inet:sockname(LSock) end),
-		io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, Res}]),
+	try
+		{Address, Port} = inet_op(fun() -> inet:sockname(LSock) end),
 		{PeerAddress, PeerPort} = inet_op(fun() -> inet:peername(LSock) end),
+		io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE}]),
 		{ok, ChildPid} = supervisor:start_child(player_session_sup, []),
 		ok = gen_tcp:controlling_process(Sock, ChildPid),
-		io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, ChildPid, {M,F,A}}]),
-%% 		apply(M, F, A++[Sock, ChildPid]),
-%% 	catch
-%% 		{inet_error, Reason} ->
-%% 			gen_tcp:close(Sock),
-%% 			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Reason]);
-%% 		Exp ->
-%% 			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Exp])
-%% 	end,
+		apply(M, F, A++[Sock, ChildPid])
+	catch
+		{inet_error, Reason} ->
+			gen_tcp:close(Sock),
+			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Reason]);
+		Exp ->
+			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Exp])
+	end,
 	io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, 111111111111}]),
 	%% accept more
 	accept(State);
@@ -115,9 +113,9 @@ tune_buffer_size(Sock) ->
 
 throw_on_error(E, Trunk) ->
 	case Trunk() of
-		Res -> io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Res}]);
 		{error, Error} -> throw({E, Error});
-		{ok, Res} -> Res
+		{ok, Res} -> Res;
+        Res -> Res
 	end.
 
 inet_op(F) -> throw_on_error(inet_error, F).

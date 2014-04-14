@@ -1,90 +1,95 @@
 
-=ERROR REPORT==== 14-Apr-2014::16:55:04 ===
+=ERROR REPORT==== 14-Apr-2014::22:40:41 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:41 ===
 (debug 31) Ping_center {["line","db","gate1","map1","map2"],true}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:41 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) ********* applicationex Application erlmysql_app
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) ************** erlmysql_app app []
 
-=ERROR REPORT==== 14-Apr-2014::16:55:04 ===
+=ERROR REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {["line","db","gate1","map1","map2"],true}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 14-Apr-2014::16:55:04 ===
-(debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
+=IN
+=ERROR REPORT==== 14-Apr-2014::22:40:52 ===
+Unable to accept TCP connection:enotconn
+.0.1'}
 
-=ERROR REPORT==== 14-Apr-2014::16:55:10 ===
-** Generic server <0.67.0> terminating 
-** Last message in was {inet_async,#Port<0.829>,20,{ok,#Port<0.833>}}
-** When Server state == {state,{gate_app,start_client,[]},#Port<0.829>,20}
-** Reason for termination == 
-** {{badmatch,ok},
-    [{tcp_acceptor,handle_info,2,
-                   [{file,"e:/GitHub/webgame/src/gate/tcp_acceptor.erl"},
-                    {line,68}]},
-     {gen_server,handle_msg,5,[{file,"gen_server.erl"},{line,597}]},
-     {proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,227}]}]}
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
+(debug 31) Start mysql(master) <0.74.0>
+
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
+(debug 31) Start mysql(master) <0.83.0>
+
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
+(debug 31) *************** {gate_sup,54}
+
+=INFO REPORT==== 14-Apr-2014::22:40:42 ===
+(debug 31) *************** {gate_manager,44}
