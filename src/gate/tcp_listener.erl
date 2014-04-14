@@ -18,6 +18,8 @@
 
 -behaviour(gen_server).
 
+-include("network_define.hrl").
+
 -export([start_link/4]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -36,7 +38,8 @@ start_link(Port, ConcurrentAcceptorCount, OnStartup, OnShutdown) ->
 
 init({Port, ConcurrentAcceptorCount, {M,F,A} = OnStartup, OnShutdown}) ->
     process_flag(trap_exit, true),
-	Opts = [],
+	Opts = ?TCP_OPTIONS,
+	io:format(">>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Port, ConcurrentAcceptorCount, {M,F,A} = OnStartup, OnShutdown}]),
     case gen_tcp:listen(Port, Opts) of
         {ok, LSock} ->
             Fun = fun (AccIndex, Acc) ->
@@ -45,17 +48,14 @@ init({Port, ConcurrentAcceptorCount, {M,F,A} = OnStartup, OnShutdown}) ->
 								  [AcceptorName|Acc]
                           end,
 			AccProcs = lists:foldl(Fun, [], lists:seq(1, ConcurrentAcceptorCount)),
-            {ok, {LIPAddress, LPort}} = inet:sockname(LSock),
-            apply(M, F, A ++ [Port]),
-            {ok, #state{sock = LSock,
-                        on_startup = OnStartup, on_shutdown = OnShutdown,
-                        label = Label}};
+            apply(M, F, A ++ [Port, LSock]),
+            {ok, #state{sock = LSock, on_startup = OnStartup, on_shutdown = OnShutdown,
+                        acceptors = AccProcs}};
         {error, Reason} ->
             error_logger:error_msg(
               "failed to start ~s on ~s:~p - ~p (~s)~n",
-              [Label, tcp_util:ntoab(IPAddress), Port,
-               Reason, inet:format_error(Reason)]),
-            {stop, {cannot_listen, IPAddress, Port, Reason}}
+              [Reason]),
+            {stop, {cannot_listen, Port, Reason}}
     end.
 
 handle_call(_Request, _From, State) ->
@@ -67,11 +67,10 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(_Reason, #state{sock=LSock, on_shutdown = {M,F,A}, label=Label}) ->
+terminate(_Reason, #state{sock=LSock, on_shutdown = {M,F,A}}) ->
     {ok, {IPAddress, Port}} = inet:sockname(LSock),
     gen_tcp:close(LSock),
-    error_logger:info_msg("stopped ~s on ~s:~p~n",
-                          [Label, tcp_util:ntoab(IPAddress), Port]),
+    error_logger:info_msg("stopped ~s on ~s:~p~n", [Port]),
     apply(M, F, A ++ [IPAddress, Port]).
 
 code_change(_OldVsn, State, _Extra) ->

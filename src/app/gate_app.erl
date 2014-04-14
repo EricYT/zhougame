@@ -20,7 +20,7 @@
 %% --------------------------------------------------------------------
 %% Internal exports
 %% --------------------------------------------------------------------
--export([]).
+-export([tcp_listener_stopped/2, tcp_listener_started/2]).
 
 %% --------------------------------------------------------------------
 %% Macros
@@ -60,7 +60,7 @@ start(Type, StartArgs) ->
 				{error, _Error} ->
 					ListennerState = false
 			end,
-			boot_session_manager_sup(),
+%% 			boot_session_manager_sup(),
 			if
 				not ListennerState ->
 					server_control_op:stop_server();
@@ -90,8 +90,8 @@ boot_listener_sup() ->
 		0 -> slogger:msg("Error gate port ~~~~~~~~~~~~~~");
 		Port ->
 			AcceptorCount = env:get2(gate, acceptor_count, 1),
-			OnStartup = {?MODULE, tcp_litener_started, []},
-			OnShutdown = {?MODULE, tcp_litener_stopped, []},
+			OnStartup = {?MODULE, tcp_listener_started, []},
+			OnShutdown = {?MODULE, tcp_listener_stopped, []},
 			AcceptCallback = {?MODULE, start_client, []},
 			case tcp_listener_sup:start_link(Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount) of
 				{ok, Pid} ->
@@ -102,3 +102,8 @@ boot_listener_sup() ->
 			end
 	end.
 
+tcp_listener_started(Port, Sock) ->
+	io:format(">>>>>>>>>>>>>>> tcp_listener_started ~p:~p~n", [Port, Sock]).
+
+tcp_listener_stopped(Port, Sock) ->
+	io:format(">>>>>>>>>>>>>>> tcp_listener_stopped ~p:~p~n", [Port, Sock]).
