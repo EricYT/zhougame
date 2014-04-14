@@ -58,13 +58,11 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}},
 	%% gen_tcp:accept/1
 	{ok, Mod} = inet_db:lookup_socket(LSock),
 	inet_db:register_socket(Sock, Mod),
-	io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, LSock}]),
 	
 	%% handle
 	try
 		{Address, Port} = inet_op(fun() -> inet:sockname(LSock) end),
-		{PeerAddress, PeerPort} = inet_op(fun() -> inet:peername(LSock) end),
-		io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE}]),
+		{PeerAddress, PeerPort} = inet_op(fun() -> inet:peername(Sock) end),
 		{ok, ChildPid} = supervisor:start_child(player_session_sup, []),
 		ok = gen_tcp:controlling_process(Sock, ChildPid),
 		apply(M, F, A++[Sock, ChildPid])
@@ -75,7 +73,6 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}},
 		Exp ->
 			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Exp])
 	end,
-	io:format(">>>>>>>>>>>>> accpet ~p~n", [{?MODULE, ?LINE, 111111111111}]),
 	%% accept more
 	accept(State);
 
