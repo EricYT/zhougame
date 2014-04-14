@@ -32,7 +32,7 @@
 %%--------------------------------------------------------------------
 
 start_link(Port, ConcurrentAcceptorCount, OnStartup, OnShutdown) ->
-    gen_server:start_link(?MODULE, {Port, ConcurrentAcceptorCount, OnStartup, OnShutdown}, []).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, {Port, ConcurrentAcceptorCount, OnStartup, OnShutdown}, []).
 
 %%--------------------------------------------------------------------
 

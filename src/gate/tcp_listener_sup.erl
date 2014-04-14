@@ -26,7 +26,7 @@
 
 %%----------------------------------------------------------------------------
 start_link(Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount) ->
-    supervisor:start_link(?MODULE, {Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount}).
+    supervisor:start_link({local, ?MODULE}, ?MODULE, {Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount}).
 
 init({Port, OnStartup, OnShutdown, AcceptCallback, ConcurrentAcceptorCount}) ->
     %% This is gross. The tcp_listener needs to know about the

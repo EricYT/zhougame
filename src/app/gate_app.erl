@@ -54,6 +54,7 @@ start(Type, StartArgs) ->
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
             erlmysql_app:start(),
+			boot_player_session_sup(),
 			case boot_listener_sup() of
 				{ok, _ListenerSupPid} ->
 					ListennerState = true;
@@ -82,6 +83,12 @@ stop(State) ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
+boot_player_session_sup() ->
+	case player_session_sup:start_link() of
+		{ok, Pid} -> {ok, Pid};
+		{error, Error} -> {error, Error}
+	end.
+
 
 boot_listener_sup() ->
 	SName = node_util:get_match_snode(gate, node()),
