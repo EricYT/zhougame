@@ -18,16 +18,17 @@
 
 -behaviour(supervisor).
 
--export([start_link/0]).
+-export([start_link/1]).
 
 -export([init/1]).
 
 %%----------------------------------------------------------------------------
 
-start_link() ->
+start_link([]) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
+	io:format(">>>>>>>>>>> ~p~n", [{?MODULE, ?LINE}]),
     {ok, {{simple_one_for_one, 10, 10},
           [{player_session_processor, {player_session_processor, start_link, []},
             transient, brutal_kill, worker, [player_session_processor]}]}}.

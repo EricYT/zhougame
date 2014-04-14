@@ -20,7 +20,7 @@
 %% --------------------------------------------------------------------
 %% Internal exports
 %% --------------------------------------------------------------------
--export([tcp_listener_stopped/2, tcp_listener_started/2]).
+-export([tcp_listener_stopped/2, tcp_listener_started/2, start_client/2]).
 
 %% --------------------------------------------------------------------
 %% Macros
@@ -84,7 +84,7 @@ stop(State) ->
 %% Internal functions
 %% ====================================================================
 boot_player_session_sup() ->
-	case player_session_sup:start_link() of
+	case player_session_sup:start_link([]) of
 		{ok, Pid} -> {ok, Pid};
 		{error, Error} -> {error, Error}
 	end.
@@ -114,3 +114,6 @@ tcp_listener_started(Port, Sock) ->
 
 tcp_listener_stopped(Port, Sock) ->
 	io:format(">>>>>>>>>>>>>>> tcp_listener_stopped ~p:~p~n", [Port, Sock]).
+
+start_client(Port, Sock) ->
+	io:format(">>>>>>>>>>>>>>> start_client ~p:~p~n", [Port, Sock]).
