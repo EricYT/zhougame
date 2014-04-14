@@ -18,38 +18,26 @@
 
 -behaviour(supervisor).
 
--export([start_link/7, start_link/8]).
+-export([start_link/5]).
 
 -export([init/1]).
 
 %%----------------------------------------------------------------------------
 
 %%----------------------------------------------------------------------------
+start_link(Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount) ->
+    supervisor:start_link(?MODULE, {Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount}).
 
-start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-           AcceptCallback, Label) ->
-    start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-               AcceptCallback, 1, Label).
-
-start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-           AcceptCallback, ConcurrentAcceptorCount, Label) ->
-    supervisor:start_link(
-      ?MODULE, {IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-                AcceptCallback, ConcurrentAcceptorCount, Label}).
-
-init({IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-      AcceptCallback, ConcurrentAcceptorCount, Label}) ->
+init({Port, OnStartup, OnShutdown, AcceptCallback, ConcurrentAcceptorCount}) ->
     %% This is gross. The tcp_listener needs to know about the
     %% tcp_acceptor_sup, and the only way I can think of accomplishing
     %% that without jumping through hoops is to register the
     %% tcp_acceptor_sup.
-    Name = tcp_util:tcp_name(tcp_acceptor_sup, IPAddress, Port),
+%%     Name = tcp_util:tcp_name(tcp_acceptor_sup, IPAddress, Port),
     {ok, {{one_for_all, 10, 10},
           [{tcp_acceptor_sup, {tcp_acceptor_sup, start_link,
-                               [Name, AcceptCallback]},
+                               [AcceptCallback]},
             transient, infinity, supervisor, [tcp_acceptor_sup]},
            {tcp_listener, {tcp_listener, start_link,
-                           [IPAddress, Port, SocketOpts,
-                            ConcurrentAcceptorCount, Name,
-                            OnStartup, OnShutdown, Label]},
+                           [Port, ConcurrentAcceptorCount, OnStartup, OnShutdown]},
             transient, 16#ffffffff, worker, [tcp_listener]}]}}.

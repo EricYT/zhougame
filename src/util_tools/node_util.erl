@@ -94,4 +94,40 @@ split_node_1([C | Cs], As) -> split_node_1(Cs, [C|As]);
 split_node_1([], As) -> split_node_2(As, "localhost").
 
 split_node_2(As, Cs) -> {list_to_atom(lists:reverse(As)), list_to_atom(Cs)}.
+
+get_match_snode_str(SNode) ->
+	SNodeStr = atom_to_list(SNode),
+	case string:tokens(SNodeStr, "@") of
+		[NodeStr, _Host] -> NodeStr;
+		[NodeStr] -> NodeStr;
+		_ -> []
+	end.
+
+
+get_match_snode(AppType, SNode) ->
+	SNodeStr = get_match_snode_str(SNode),
+	Ret = lists:foldl(fun(Node, Acc) ->
+							  AppNodeStr = atom_to_list(Node),
+							  {_, TempRe} = Acc,
+							  case TempRe of
+								  true -> Acc;
+								  _ ->
+									  AppNodeStrLen = string:len(AppNodeStr),
+									  SNodeStrLen = string:len(SNodeStr),
+									  if
+										  AppNodeStrLen > SNodeStrLen ->
+											  Acc;
+										  true ->
+											  NewStr = string:substr(SNodeStr, SNodeStrLen - AppNodeStrLen+1),
+											  if
+												  NewStr =:= AppNodeStr ->
+													  {Node, true};
+												  true ->
+													  Acc
+											  end
+									  end
+							  end
+					  end, {SNode, false}, get_appnodes(AppType)),
+	{MathNode, _} = Ret,
+	MathNode.
   

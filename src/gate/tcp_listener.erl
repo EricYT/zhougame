@@ -18,44 +18,35 @@
 
 -behaviour(gen_server).
 
--export([start_link/8]).
+-export([start_link/4]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--record(state, {sock, on_startup, on_shutdown, label}).
+-record(state, {sock, on_startup, on_shutdown, acceptors}).
 
 %%----------------------------------------------------------------------------
 
 %%--------------------------------------------------------------------
 
-start_link(IPAddress, Port, SocketOpts,
-           ConcurrentAcceptorCount, AcceptorSup,
-           OnStartup, OnShutdown, Label) ->
-    gen_server:start_link(
-      ?MODULE, {IPAddress, Port, SocketOpts,
-                ConcurrentAcceptorCount, AcceptorSup,
-                OnStartup, OnShutdown, Label}, []).
+start_link(Port, ConcurrentAcceptorCount, OnStartup, OnShutdown) ->
+    gen_server:start_link(?MODULE, {Port, ConcurrentAcceptorCount, OnStartup, OnShutdown}, []).
 
 %%--------------------------------------------------------------------
 
-init({IPAddress, Port, SocketOpts,
-      ConcurrentAcceptorCount, AcceptorSup,
-      {M,F,A} = OnStartup, OnShutdown, Label}) ->
+init({Port, ConcurrentAcceptorCount, {M,F,A} = OnStartup, OnShutdown}) ->
     process_flag(trap_exit, true),
-    case gen_tcp:listen(Port, SocketOpts ++ [{ip, IPAddress},
-                                             {active, false}]) of
+	Opts = [],
+    case gen_tcp:listen(Port, Opts) of
         {ok, LSock} ->
-            lists:foreach(fun (_) ->
-                                  {ok, _APid} = supervisor:start_child(
-                                                  AcceptorSup, [LSock])
+            Fun = fun (AccIndex, Acc) ->
+                                  {ok, _APid} = supervisor:start_child(tcp_acceptor_sup, [LSock, AccIndex]),
+								  AcceptorName = tcp_acceptor:get_proc_name(AccIndex),
+								  [AcceptorName|Acc]
                           end,
-                          lists:duplicate(ConcurrentAcceptorCount, dummy)),
+			AccProcs = lists:foldl(Fun, [], lists:seq(1, ConcurrentAcceptorCount)),
             {ok, {LIPAddress, LPort}} = inet:sockname(LSock),
-            error_logger:info_msg(
-              "started ~s on ~s:~p~n",
-              [Label, tcp_util:ntoab(LIPAddress), LPort]),
-            apply(M, F, A ++ [IPAddress, Port]),
+            apply(M, F, A ++ [Port]),
             {ok, #state{sock = LSock,
                         on_startup = OnStartup, on_shutdown = OnShutdown,
                         label = Label}};

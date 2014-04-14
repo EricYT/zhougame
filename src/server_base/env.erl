@@ -66,6 +66,17 @@ put(Key, Value) ->
     ets:insert(?SERVER_OPTION_ETS, {Key, Value}).
 
 
+get2(Key1, Key2, Default) ->
+	case ets:lookup(?SERVER_OPTION_ETS, Key1) of
+		[] -> Default;
+		[{_, Value}] ->
+			case lists:keyfind(Key2, 1, Value) of
+				false -> [];
+				{_, Value1} -> Value1
+			end
+	end.
+
+
 
 
 %%

@@ -53,14 +53,20 @@ start(Type, StartArgs) ->
             debug:error("Test for log file~n"),
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
-%%             mysql_sup:start_link([]),
             erlmysql_app:start(),
-            case gate_sup:start_link(StartArgs) of
-                {ok, Pid} ->
-                    {ok, Pid};
-                Error ->
-                    Error
-            end
+			case boot_listener_sup() of
+				{ok, _ListenerSupPid} ->
+					ListennerState = true;
+				{error, _Error} ->
+					ListennerState = false
+			end,
+			boot_session_manager_sup(),
+			if
+				not ListennerState ->
+					server_control_op:stop_server();
+				true ->
+					{ok, self()}
+			end
     end.
 
 start() ->
@@ -76,4 +82,23 @@ stop(State) ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
+
+boot_listener_sup() ->
+	SName = node_util:get_match_snode(gate, node()),
+	Port = env:get2(gateport, SName, 0),
+	case Port of
+		0 -> slogger:msg("Error gate port ~~~~~~~~~~~~~~");
+		Port ->
+			AcceptorCount = env:get2(gate, acceptor_count, 1),
+			OnStartup = {?MODULE, tcp_litener_started, []},
+			OnShutdown = {?MODULE, tcp_litener_stopped, []},
+			AcceptCallback = {?MODULE, start_client, []},
+			case tcp_listener_sup:start_link(Port, OnStartup, OnShutdown, AcceptCallback, AcceptorCount) of
+				{ok, Pid} ->
+					{ok, Pid};
+				Error ->
+					slogger:msg("tcp_listener_sup start error ~p~n", [Error]),
+					{error, Error}
+			end
+	end.
 

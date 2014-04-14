@@ -18,7 +18,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/2]).
+-export([start_link/3, get_proc_name/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -27,12 +27,16 @@
 
 %%--------------------------------------------------------------------
 
-start_link(Callback, LSock) ->
-    gen_server:start_link(?MODULE, {Callback, LSock}, []).
+start_link(Callback, LSock, AcceptorIndex) ->
+    gen_server:start_link(?MODULE, {Callback, LSock, AcceptorIndex}, []).
+
+get_proc_name(AcceptorIndex) ->
+	list_to_atom("acceptor_"++integer_to_list(AcceptorIndex)).
 
 %%--------------------------------------------------------------------
 
-init({Callback, LSock}) ->
+init({Callback, LSock, Port}) ->
+	erlang:register(get_proc_name(Port), self()),
     gen_server:cast(self(), accept),
     {ok, #state{callback=Callback, sock=LSock}}.
 
@@ -40,37 +44,36 @@ handle_call(_Request, _From, State) ->
     {noreply, State}.
 
 handle_cast(accept, State) ->
-    ok = file_handle_cache:obtain(),
+%%     ok = file_handle_cache:obtain(),
     accept(State);
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_info({inet_async, LSock, Ref, {ok, Sock}},
-            State = #state{callback={M,F,A}, sock=LSock, ref=Ref}) ->
-
-    %% patch up the socket so it looks like one we got from
-    %% gen_tcp:accept/1
-    {ok, Mod} = inet_db:lookup_socket(LSock),
-    inet_db:register_socket(Sock, Mod),
-
-    %% handle
-    case tune_buffer_size(Sock) of
-        ok                -> file_handle_cache:transfer(
-                               apply(M, F, A ++ [Sock])),
-                             ok = file_handle_cache:obtain();
-        {error, enotconn} -> catch port_close(Sock);
-        {error, Err}      -> {ok, {IPAddress, Port}} = inet:sockname(LSock),
-                             error_logger:error_msg(
-                               "failed to tune buffer size of "
-                               "connection accepted on ~s:~p - ~s~n",
-                               [tcp_util:ntoab(IPAddress), Port,
-                                tcp_util:format_inet_error(Err)]),
-                             catch port_close(Sock)
-    end,
-
-    %% accept more
-    accept(State);
+			State = #state{callback={M,F,A}, sock=LSock, ref=Ref}) ->
+	
+	%% patch up the socket so it looks like one we got from
+	%% gen_tcp:accept/1
+	{ok, Mod} = inet_db:lookup_socket(LSock),
+	inet_db:register_socket(Sock, Mod),
+	
+	%% handle
+	try
+		{Address, Port} = inet_op(fun() -> inet:sockname(LSock) end),
+		{PeerAddress, PeerPort} = inet_op(fun() -> inet:peername(LSock) end),
+		{ok, ChildPid} = supervisor:start_child(player_session_sup, []),
+		ok = gen_tcp:controlling_process(Sock, ChildPid),
+		apply(M, F, A++[Sock, ChildPid])
+	catch
+		{inet_error, Reason} ->
+			gen_tcp:close(Sock),
+			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Reason]);
+		Exp ->
+			error_logger:error_msg("Unable to accept TCP connection:~p~n", [Exp])
+	end,
+	%% accept more
+	accept(State);
 
 handle_info({inet_async, LSock, Ref, {error, Reason}},
             State=#state{sock=LSock, ref=Ref}) ->
@@ -103,3 +106,11 @@ tune_buffer_size(Sock) ->
                           inet:setopts(Sock, [{buffer, BufSz}]);
         Error          -> Error
     end.
+
+throw_on_error(E, Trunk) ->
+	case Trunk() of
+		{error, Error} -> throw({E, Error});
+		{ok, Res} -> Res
+	end.
+
+inet_op(F) -> throw_on_error(inet_error, F).

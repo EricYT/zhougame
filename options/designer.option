@@ -28,6 +28,9 @@
 		%%{"cache", "127.0.0.1", [], nosmp, []}
 	]},
 	
+	{gateport, [{'gate1', 8001}, {'gate2', 8002}]},
+	{gate, [{acceptor_count, 2}]},
+	
 	{mysql, [ %% mysql options
 		{client_size, 2},			%% mysql client size
 		{app_run_node, [db, gm]},
