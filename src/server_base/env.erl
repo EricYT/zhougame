@@ -32,7 +32,8 @@ init([]) ->
 
 
 load_env() ->
-    load_env(?OPTION_ETS_FILE, ?SERVER_OPTION_ETS).
+    load_env(?OPTION_ETS_FILE, ?SERVER_OPTION_ETS),
+    fresh().
 
 
 -spec load_env(FilePath,ETSName) -> ignore when
@@ -76,8 +77,24 @@ get2(Key1, Key2, Default) ->
 			end
 	end.
 
+fresh() ->
+    load_run_option(),
+    init_pre_connect_nodes(),
+    todo.
+
+init_pre_connect_nodes() ->
+    Prefix = env:get(prefix, ""),
+    Nodes = env:get(nodes, []),
+    Res = [list_to_atom(lists:concat([Prefix, Node, "@", Ip]))||{Node, Ip, _, _, _}<-Nodes],
+    env:put(pre_connect_nodes, Res).
 
 
+load_run_option() ->
+    case file:consult(?SERVER_OPTION_ETS_FILE) of
+        {ok, [ConsultRes]} ->
+            ets:insert(?SERVER_OPTION_ETS, ConsultRes);
+        {error, Reason} -> {error, Reason}
+    end.
 
 %%
 %% Local Functions

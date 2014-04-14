@@ -10,16 +10,14 @@
 
 wait_all_nodes_connect() ->
 	AllNodes = env:get(pre_connect_nodes, []),
-    AllFullNodes = convert_node_name(AllNodes, []),
-    debug:info("Ping_center ~p~n", [{AllNodes, AllFullNodes, erlang:node()}]),
-	wait_nodes(AllFullNodes).
+    debug:info("Ping_center ~p~n", [{AllNodes, erlang:node()}]),
+	wait_nodes(AllNodes).
 
 
 wait_all_nodes_connect(Flag) ->
     AllNodes = env:get(pre_connect_nodes, []),
-    AllFullNodes = convert_node_name(AllNodes, []),
     debug:info("Ping_center ~p~n", [{AllNodes, Flag}]),
-	wait_nodes(AllFullNodes, Flag).
+	wait_nodes(AllNodes, Flag).
 
 wait_node_connect(Type) ->
 	NeedConNodes = lists:filter(fun(Node) ->
@@ -85,11 +83,3 @@ ping_loop(Node, Count) ->
 			after 1000 -> ping_loop(Node, Count-1)
 			end
 	end.
-
-
-convert_node_name([], AccNodes) ->
-    lists:reverse(AccNodes);
-convert_node_name([Node|Rest], AccNodes) ->
-    convert_node_name(Rest, [node_util:make_node_full_name(Node)|AccNodes]).
-
-

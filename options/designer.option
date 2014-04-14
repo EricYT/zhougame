@@ -7,27 +7,6 @@
     {ip, "127.0.0.1"},
     {vsn, "1.0.0"},
     
-    {prefix, "ericts_"},
-    
-    {pre_connect_nodes, ["line", "db", "gate1", "map1", "map2"]},
-	
-	{beam_dir, "../ebin"},
-	{db_dir, "../dbfile/"},
-	
-	{nodes, [
-		{"db", "127.0.0.1", "../dbfile/", nosmp, []},
-		{"line", "127.0.0.1", [], nosmp, []},
-		{"gate1", "127.0.0.1", [], nosmp, []},
-		%%{"gate2", "127.0.0.1", [], nosmp, []},
-		{"map1", "127.0.0.1", [], nosmp, []},
-		%%{"map2", "127.0.0.1", [], nosmp, []},
-		{"gm", "127.0.0.1", [], nosmp, []}
-	]},
-	
-	{cache_node, [
-		%%{"cache", "127.0.0.1", [], nosmp, []}
-	]},
-	
 	{gateport, [{'gate1', 8089}, {'gate2', 8090}]},
 	{gate, [{acceptor_count, 2}]},
 	
