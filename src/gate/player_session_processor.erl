@@ -84,7 +84,8 @@ handle_info({scoket_ready, Sock}, State) ->
 	{noreply, State#state{socket = Sock}};
 handle_info({tcp, Port, BinData}, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, binary_to_list(BinData)}]),
-	inet:setopts(Socket, [{active, once}]),
+    %% Make the packet can be unpacket
+	inet:setopts(Socket, [{active, once}, {packet, 2}]),
     {noreply, State};
 handle_info(Info, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
