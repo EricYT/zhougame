@@ -61,10 +61,11 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}},
 	
 	%% handle
 	try
-		{Address, Port} = inet_op(fun() -> inet:sockname(LSock) end),
-		{PeerAddress, PeerPort} = inet_op(fun() -> inet:peername(Sock) end),
+		{Address, Port} 		= inet_op(fun() -> inet:sockname(LSock) end),
+		{PeerAddress, PeerPort}	= inet_op(fun() -> inet:peername(Sock) end),
 		{ok, ChildPid} = supervisor:start_child(player_session_sup, []),
 		ok = gen_tcp:controlling_process(Sock, ChildPid),
+		ChildPid ! {scoket_ready, Sock},
 		apply(M, F, A++[Sock, ChildPid])
 	catch
 		{inet_error, Reason} ->

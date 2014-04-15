@@ -10,6 +10,7 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
+-include("network_define.hrl").
 
 %% --------------------------------------------------------------------
 %% External exports
@@ -24,8 +25,8 @@
 %% External functions
 %% ====================================================================
 start_link([]) ->
-	io:format(">>>>>>>>>>>>>>> A processor be created ~p~n", [{?MODULE, ?LINE}]),
-	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+	%% Don't register server name, because so many process will be created when socket created.
+	gen_server:start_link(?MODULE, [], []).
 
 %% ====================================================================
 %% Server functions
@@ -40,6 +41,7 @@ start_link([]) ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
+	process_flag(trap_exit, true),
 	io:format(">>>>>>>>>>>>>>> A processor be created ~p~n", [{?MODULE, ?LINE}]),
     {ok, #state{}}.
 
@@ -74,7 +76,14 @@ handle_cast(Msg, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
+handle_info({scoket_ready, Sock}, State) ->
+	Res = gen_tcp:recv(Sock, 4, 180000),
+	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Sock, Res}]),
+%% 	inet:setopts(Sock, ?TCP_CLIENT_SOCKET_OPTIONS),
+	inet:setopts(Sock, [{active, once}]),
+	{noreply, State};
 handle_info(Info, State) ->
+	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
     {noreply, State}.
 
 %% --------------------------------------------------------------------
