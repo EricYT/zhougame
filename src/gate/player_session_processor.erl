@@ -19,7 +19,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--record(state, {}).
+-record(state, {socket}).
 
 %% ====================================================================
 %% External functions
@@ -81,9 +81,14 @@ handle_info({scoket_ready, Sock}, State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Sock, Res}]),
 %% 	inet:setopts(Sock, ?TCP_CLIENT_SOCKET_OPTIONS),
 	inet:setopts(Sock, [{active, once}]),
-	{noreply, State};
-handle_info(Info, State) ->
+	{noreply, State#state{socket = Sock}};
+handle_info({tcp, Port, BinData}, #state{socket = Socket}=State) ->
+	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, binary_to_list(BinData)}]),
+	inet:setopts(Socket, [{active, once}]),
+    {noreply, State};
+handle_info(Info, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
+	inet:setopts(Socket, [{active, once}]),
     {noreply, State}.
 
 %% --------------------------------------------------------------------
