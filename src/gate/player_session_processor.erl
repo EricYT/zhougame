@@ -94,6 +94,11 @@ handle_info({send_data, Data}, #state{socket = Socket}=State) ->
     gen_tcp:send(Socket, BinData),
     {noreply, State};
 
+handle_info({tcp_closed, Port}, #state{socket = Socket}=State) ->
+    io:format("Tcp closed Socket:~p Port:~p~n", [Socket, Port]),
+    gen_tcp:close(Socket),
+    {stop, normal, State};
+
 handle_info(Info, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
 	inet:setopts(Socket, [{active, once}]),
