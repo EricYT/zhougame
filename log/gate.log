@@ -1,111 +1,108 @@
 
-=ERROR REPORT==== 15-Apr-2014::23:50:39 ===
+=ERROR REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
                          'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
                          'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
                         true}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:30 ===
 (debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:39 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
-(debug 31) Ping_center {'ericts_map2@127.0.0.1'}
-
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) ********* applicationex Application erlmysql_app
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) ************** erlmysql_app app []
 
-=ERROR REPORT==== 15-Apr-2014::23:50:40 ===
+=ERROR REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
                          'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
                          'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
                         true}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:31 ===
 (debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:32 ===
 (debug 31) Start mysql(master) <0.81.0>
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:32 ===
 (debug 31) Start mysql(master) <0.90.0>
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:32 ===
 (debug 31) *************** {gate_sup,54}
 
-=INFO REPORT==== 15-Apr-2014::23:50:40 ===
+=INFO REPORT==== 16-Apr-2014::22:45:32 ===
 (debug 31) *************** {gate_manager,44}

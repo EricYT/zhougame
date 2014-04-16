@@ -77,16 +77,23 @@ handle_cast(Msg, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_info({scoket_ready, Sock}, State) ->
-	Res = gen_tcp:recv(Sock, 4, 180000),
-	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Sock, Res}]),
+%% 	Res = gen_tcp:recv(Sock, 4, 180000),
+%% 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Sock, Res}]),
 %% 	inet:setopts(Sock, ?TCP_CLIENT_SOCKET_OPTIONS),
-	inet:setopts(Sock, [{active, once}]),
+	inet:setopts(Sock, [{active, once}, {packet, 2}]),
 	{noreply, State#state{socket = Sock}};
 handle_info({tcp, Port, BinData}, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, binary_to_list(BinData)}]),
     %% Make the packet can be unpacket
 	inet:setopts(Socket, [{active, once}, {packet, 2}]),
     {noreply, State};
+
+handle_info({send_data, Data}, #state{socket = Socket}=State) ->
+    io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Data}]),
+    BinData = erlang:term_to_binary(Data),
+    gen_tcp:send(Socket, BinData),
+    {noreply, State};
+
 handle_info(Info, #state{socket = Socket}=State) ->
 	io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
 	inet:setopts(Socket, [{active, once}]),
