@@ -75,7 +75,11 @@ handle_cast(Msg, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
+handle_info({tcp, Port, BinData}, State) ->
+	io:format(">>>>>>>>>>>>>> handle data from server:~p~n", [{?MODULE, ?LINE, binary_to_term(BinData)}]),
+    {noreply, State};
 handle_info(Info, State) ->
+	io:format(">>>>>>>>>>>>>> handle data from server:~p~n", [{?MODULE, ?LINE, Info}]),
     {noreply, State}.
 
 %% --------------------------------------------------------------------
