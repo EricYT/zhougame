@@ -91,7 +91,8 @@ handle_info({tcp, Port, BinData}, #state{socket = Socket}=State) ->
 handle_info({send_data, Data}, #state{socket = Socket}=State) ->
     io:format(">>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Data}]),
     BinData = erlang:term_to_binary(Data),
-    gen_tcp:send(Socket, BinData),
+	erlang:port_command(Socket, BinData, [force]),
+%%     gen_tcp:send(Socket, BinData),
     {noreply, State};
 
 handle_info({tcp_closed, Port}, #state{socket = Socket}=State) ->
