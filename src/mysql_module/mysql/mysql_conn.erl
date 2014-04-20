@@ -278,6 +278,7 @@ do_fetch(Pid, Queries, From, Timeout) ->
 send_msg(Pid, Msg, From, Timeout) ->
     Self = self(),
     Pid ! Msg,
+    io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Msg, From, Self}]),
     case From of
 	Self ->
 	    %% We are not using a mysql_dispatcher, await the response
@@ -411,6 +412,7 @@ send_reply(GenSrvFrom, Res) when is_pid(GenSrvFrom) ->
     %% The query was not sent using gen_server mechanisms       
     GenSrvFrom ! {fetch_result, self(), Res};
 send_reply(GenSrvFrom, Res) ->
+    io:format(">>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, GenSrvFrom, Res}]),
     gen_server:reply(GenSrvFrom, Res).
 
 do_query(State, Query) ->
