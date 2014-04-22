@@ -1,28 +1,4 @@
-%% Author: Administrator
-%% Created: 2014-4-22
-%% Description: TODO: Add description to mysql_module_gen
--module(mysql_module_gen).
 
-%%
-%% Include files
-%%
-
-%%
-%% Exported Functions
-%%
--export([]).
--compile(export_all).
-
-%%
-%% API Functions
-%%
-file_test() ->
-    {ok, File} = file:open("../log/mysql_test.erl", [write]),
-    file:write(File, 'module_template'()).
-
-
-'module_template'() ->
-"
 -module($MODULENAME).
 
 -compile(export_all).
@@ -31,22 +7,22 @@ file_test() ->
 
 select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),
-    Columns = string:join([atom_to_list(Key)||Key<-FiledList], \",\"),
-    SQL = \"SELECT \" ++ Columns ++ \" FROM $MODULENAME \" ++ mysql_helper:pack_where(FormatCond),
+    Columns = string:join([atom_to_list(Key)||Key<-FiledList], ","),
+    SQL = "SELECT " ++ Columns ++ " FROM $MODULENAME " ++ mysql_helper:pack_where(FormatCond),
     mysql_client:select($MODULENAME, SQL).
 
 read(#$MODULENAME{$KEYVALUES}) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE $PACKKEYS,
+    SQL = "SELECT * FROM $MODULENAME WHERE $PACKKEYS,
     mysql_client:read($MODULENAME, SQL);
 read($KEYS) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE $PACKKEYS,
+    SQL = "SELECT * FROM $MODULENAME WHERE $PACKKEYS,
     Res = mysql_client:read($MODULENAME, SQL),
     unpack_data(Res, []).
 
 write(#$MODULENAME{$RECORDVALUES}) ->
-    case mysql_client:read($MODULENAME, \"SELECT * FROM $MODULENAME WHERE $PACKKEYS) of
+    case mysql_client:read($MODULENAME, "SELECT * FROM $MODULENAME WHERE $PACKKEYS) of
         [] ->
-            SQL = \"INSERT INTO $MODULENAME ($RECORDS) VALUES($PACKVALUES),
+            SQL = "INSERT INTO $MODULENAME ($RECORDS) VALUES($PACKVALUES),
             mysql_client:write(role_han_grave_db, SQL);
         _ ->
             todo
@@ -68,12 +44,3 @@ get_column_datatype(Column) ->
 
 column_datatype() ->
     [$RECORDDEFINES].
-".
-
-
-
-
-%%
-%% Local Functions
-%%
-
