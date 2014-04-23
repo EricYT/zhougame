@@ -16,7 +16,7 @@
 %%% @doc    Utility Functions.
 %%% @end
 %% @version $Id: util.erl 3727 2012-09-13 15:23:32Z kruber@zib.de $
--module(util).
+-module(util_tool).
 
 -author('schuett@zib.de').
 -vsn('$Id: util.erl 3727 2012-09-13 15:23:32Z kruber@zib.de $').
