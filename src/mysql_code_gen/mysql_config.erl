@@ -1,6 +1,6 @@
 %% Author: Administrator
 %% Created: 2014-4-25
-%% Description: TODO: Add description to mysql_config
+%% Description: TODO: read mysql config
 -module(mysql_config).
 
 %%
