@@ -1,9 +1,9 @@
 
--module($MODULENAME).
+-module($FILENAME).
 
 -compile(export_all).
 
--record($MODULENAME, {$RECORDS}).
+-record($MODULENAME, $RECORDS).
 
 select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),

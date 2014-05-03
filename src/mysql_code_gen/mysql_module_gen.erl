@@ -6,6 +6,10 @@
 %%
 %% Include files
 %%
+-include("module_define.hrl").
+
+-define(FilePre, "module_").
+
 
 %%
 %% Exported Functions
@@ -17,17 +21,44 @@
 %% API Functions
 %%
 file_test() ->
+    {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
+    Values = formate_values(ModuleInfos),
+    io:format(">>>>>>>>> ~p~n", [Values]),
     {ok, File} = file:open("../log/mysql_test.erl", [write]),
     file:write(File, 'module_template'()).
+
+formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
+                              index = Indexs, engine = Eng}=MoudleRecord) ->
+    FileName = ?FilePre++erlang:atom_to_list(ModuleName),
+    {Records, RecordValues} = formate_records(Cols, [], []),
+    KeyValues = formate_key_values(PriKeys, Records),
+    {Records, RecordValues, KeyValues}.
+
+formate_records([#columns_define{col_name = Name, type = Type, length = Len, is_null = IsNull,
+                                 default = Def, description = Des}|Tail], AccCols, AccColsValues) ->
+    RecordList = lists:concat([Name, " = ", string:to_upper(atom_to_list(Name))]),
+    formate_records(Tail, [Name|AccCols], [RecordList|AccColsValues]);
+formate_records([], AccCols, AccColsValues) ->
+    {lists:reverse(AccCols), string:join(lists:reverse(AccColsValues), ", ")}.
+
+formate_key_values(Keys, Records) ->
+    string:join([begin
+                     case lists:member(Key, Records) of
+                         true ->
+                             lists:concat([Key, " = ", string:to_upper(atom_to_list(Key))]);
+                         false ->
+                             throw("Not Found Key")
+                     end
+                 end||Key<-Keys], ", ").
 
 
 'module_template'() ->
 "
--module($MODULENAME).
+-module($FILENAME).
 
 -compile(export_all).
 
--record($MODULENAME, {$RECORDS}).
+-record($MODULENAME, $RECORDS).
 
 select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),
@@ -72,8 +103,9 @@ column_datatype() ->
 
 
 
-
 %%
 %% Local Functions
 %%
+
+
 
