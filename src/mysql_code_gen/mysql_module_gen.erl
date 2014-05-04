@@ -23,23 +23,25 @@
 file_test() ->
     {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
     Values = formate_values(ModuleInfos),
-    io:format(">>>>>>>>> ~p~n", [Values]),
     {ok, File} = file:open("../log/mysql_test.erl", [write]),
-    file:write(File, 'module_template'()).
+    io:format(">>>>>>>>> ~p~n", [Values]),
+    file:write(File, Values).
+%%     file:write(File, 'module_template'()).
 
 formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
                               index = Indexs, engine = Eng}=MoudleRecord) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
-    {Records, RecordValues} = formate_records(Cols, [], []),
+    {Records, RecordValues, RecordTypes} = formate_records(Cols, [], [], []),
     KeyValues = formate_key_values(PriKeys, Records),
-    {Records, RecordValues, KeyValues}.
+    NameTypes = formate_packs(RecordTypes, [], []),
+    {Records, RecordValues, RecordTypes, NameTypes, KeyValues}.
 
 formate_records([#columns_define{col_name = Name, type = Type, length = Len, is_null = IsNull,
-                                 default = Def, description = Des}|Tail], AccCols, AccColsValues) ->
+                                 default = Def, description = Des}|Tail], AccCols, AccColsValues, AccColsTypes) ->
     RecordList = lists:concat([Name, " = ", string:to_upper(atom_to_list(Name))]),
-    formate_records(Tail, [Name|AccCols], [RecordList|AccColsValues]);
-formate_records([], AccCols, AccColsValues) ->
-    {lists:reverse(AccCols), string:join(lists:reverse(AccColsValues), ", ")}.
+    formate_records(Tail, [Name|AccCols], [RecordList|AccColsValues], [{Name, Type}|AccColsTypes]);
+formate_records([], AccCols, AccColsValues, AccColsTypes) ->
+    {lists:reverse(AccCols), string:join(lists:reverse(AccColsValues), ", "), lists:reverse(AccColsTypes)}.
 
 formate_key_values(Keys, Records) ->
     string:join([begin
@@ -50,6 +52,13 @@ formate_key_values(Keys, Records) ->
                              throw("Not Found Key")
                      end
                  end||Key<-Keys], ", ").
+
+formate_packs([{Name, Type}|Tail], AccNames, AccPacks) ->
+    NameType = {string:to_upper(atom_to_list(Name)), Type},
+    NameTypeString = util:term_to_string(NameType),
+    formate_packs(Tail, [NameType|AccNames], ["mysql_helper:pack_value_by_type("++NameTypeString++")"|AccPacks]);
+formate_packs([], AccNames, AccPacks) ->
+    {lists:reverse(AccNames), lists:reverse(AccPacks)}.
 
 
 'module_template'() ->
