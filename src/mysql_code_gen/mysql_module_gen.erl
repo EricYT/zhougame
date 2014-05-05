@@ -61,9 +61,14 @@ formate_packs([], AccNames) ->
 
 
 pack_insert(ModuleName, TableArgsString, TypeArgList) ->
-	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value], Separator).
+	"INSERT INTO "++ModuleName++"("++TableArgsString++") VALUES "++pack_values_of_insert0(TypeArgList)++";".
 
+pack_values_of_insert0(TypeArgList) ->
+	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value_format(Value)++"\"" ||Value<-TypeArgList], ", "),
+	"("++Values++")".
 
+value_format({Name, Type}) ->
+	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
 
 
 'module_template'() ->
