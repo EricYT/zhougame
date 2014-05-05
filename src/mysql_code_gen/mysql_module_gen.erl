@@ -60,6 +60,10 @@ formate_packs([], AccNames) ->
     {lists:reverse(AccNames)}.
 
 
+pack_insert(ModuleName, TableArgsString, TypeArgList) ->
+	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value], Separator).
+
+
 
 
 'module_template'() ->
