@@ -11,10 +11,10 @@ select(FiledList, Conditions) ->
     SQL = "SELECT " ++ Columns ++ " FROM mysql_test " ++ mysql_helper:pack_where(FormatCond),
     mysql_client:select(mysql_test, SQL).
 
-read(#mysql_test{$KEYVALUES}) ->
+read(#mysql_test{key = KEY, type = TYPE}) ->
     SQL = "SELECT * FROM mysql_test WHERE $PACKKEYS,
     mysql_client:read(mysql_test, SQL);
-read($KEYS) ->
+read(KEY, TYPE) ->
     SQL = "SELECT * FROM mysql_test WHERE $PACKKEYS,
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
@@ -37,4 +37,4 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [$RECORDDEFINES].
+    [{{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar}}].

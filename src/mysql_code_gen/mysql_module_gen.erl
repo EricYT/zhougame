@@ -10,6 +10,7 @@
 
 -define(FilePre, "module_").
 
+-define(IF(C, A, B), case C of true -> A; _Other -> B end).
 
 %%
 %% Exported Functions
@@ -28,48 +29,64 @@ file_test() ->
     file:write(File, Content).
 
 formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
-                              index = Indexs, engine = Eng}=MoudleRecord) ->
+                              index = Indexs, engine = Eng}=_MoudleRecord) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
     ModuleNameS = atom_to_list(ModuleName),
     ConvertFun =
-        fun(#columns_define{col_name = Name, type = Type}, {AccTypeArgList, AccArgList, AccArgUps, AccArgs}) ->
+        fun(#columns_define{col_name = Name, type = Type}, {AccTypeArgList, AccTypeArgS, AccArgList,
+                                                            AccArgUps, AccArgs}) ->
                 NameString = atom_to_list(Name),
                 NameToUpper = string:to_upper(atom_to_list(Name)),
                 {[{Name, Type}|AccTypeArgList],
+                 [util:term_to_string({Name, Type})|AccTypeArgS],
                  [NameString++" = "++NameToUpper|AccArgList],
                  [NameToUpper|AccArgUps],
                  [NameString|AccArgs]};
            (_, Values) ->
                 Values
         end,
-    {TypeArgList, ArgListTemp, ArgUpsTemp, ArgsTemp} =
-        lists:foldr(ConvertFun, {[], [], [], []}, Cols),
+    {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp, ArgsTemp} =
+        lists:foldr(ConvertFun, {[], [], [], [], []}, Cols),
     
+    TypeArgS= string:join(TypeArgSTemp, ",\r\t "),
     ArgList = string:join(ArgListTemp, ", "),
     ArgUps  = string:join(ArgUpsTemp, ", "),
     Args    = string:join(ArgsTemp, ", "),
     
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args}]),
+    {KeyValuesStrings, Keys} = formate_key_values(PriKeys, Cols),
+    
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys}]),
     
     ValueTest = pack_insert(atom_to_list(ModuleName), Args, TypeArgList),
     
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
+                                                  {"$KEYVALUES", KeyValuesStrings},
+                                                  {"$KEYS", Keys},
                                                   {"$RECORDVALUES", ArgList},
-                                                  {"$SQL_INSERT0", ValueTest}
+                                                  {"$SQL_INSERT0", ValueTest},
+                                                  {"$RECORDDEFINES", TypeArgS}
                                                  ], 'module_template'()),
     TestReplace.
 
 formate_key_values(Keys, Records) ->
-    string:join([begin
-                     case lists:member(Key, Records) of
-                         true ->
-                             lists:concat([Key, " = ", string:to_upper(atom_to_list(Key))]);
-                         false ->
-                             throw("Not Found Key")
-                     end
-                 end||Key<-Keys], ", ").
+    ConvertFun =
+        fun(Key, {AccKeys, AccKeyString}) ->
+                case lists:keymember(Key, #columns_define.col_name, Records) of
+                    true ->
+                        KeyString = atom_to_list(Key),
+                        KeyUpper = string:to_upper(atom_to_list(Key)),
+                        {[KeyString++" = "++KeyUpper|AccKeys], [KeyUpper|AccKeyString]};
+                    false ->
+                        exit("Not Found Key")
+                end;
+           (_, Values) ->
+                Values
+        end,
+    {KeyValues, KeyStringTemp} =
+        lists:foldr(ConvertFun, {[], []}, Keys),
+    {string:join(KeyValues, ", "), string:join(KeyStringTemp, ", ")}.
 
 
 pack_insert(ModuleName, TableArgsString, TypeArgList) ->
@@ -123,7 +140,7 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [$RECORDDEFINES].
+    [{$RECORDDEFINES}].
 ".
 
 
