@@ -22,18 +22,44 @@
 %%
 file_test() ->
     {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
-    {FileName, TypeArgList, ValueTest} = formate_values(ModuleInfos),
+    Content = formate_values(ModuleInfos),
     {ok, File} = file:open("../log/mysql_test.erl", [write]),
-    io:format(">>>>>>>>> ~p~n", [{FileName, TypeArgList, ValueTest}]),
-	TestReplace = mysql_op_gen:key_value_replace([{"$SQL_INSERT0", ValueTest}], 'module_template'()),
-    file:write(File, TestReplace).
+%%     io:format(">>>>>>>>> ~p~n", [{Content}]),
+    file:write(File, Content).
 
 formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
                               index = Indexs, engine = Eng}=MoudleRecord) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
-	TypeArgList = [{ModuleAttr#columns_define.col_name, ModuleAttr#columns_define.type}||ModuleAttr<-Cols],
-	ValueTest = pack_insert(atom_to_list(ModuleName), "1, 2, 3", TypeArgList),
-    {FileName, TypeArgList, ValueTest}.
+    ModuleNameS = atom_to_list(ModuleName),
+    ConvertFun =
+        fun(#columns_define{col_name = Name, type = Type}, {AccTypeArgList, AccArgList, AccArgUps, AccArgs}) ->
+                NameString = atom_to_list(Name),
+                NameToUpper = string:to_upper(atom_to_list(Name)),
+                {[{Name, Type}|AccTypeArgList],
+                 [NameString++" = "++NameToUpper|AccArgList],
+                 [NameToUpper|AccArgUps],
+                 [NameString|AccArgs]};
+           (_, Values) ->
+                Values
+        end,
+    {TypeArgList, ArgListTemp, ArgUpsTemp, ArgsTemp} =
+        lists:foldr(ConvertFun, {[], [], [], []}, Cols),
+    
+    ArgList = string:join(ArgListTemp, ", "),
+    ArgUps  = string:join(ArgUpsTemp, ", "),
+    Args    = string:join(ArgsTemp, ", "),
+    
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args}]),
+    
+    ValueTest = pack_insert(atom_to_list(ModuleName), Args, TypeArgList),
+    
+    TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
+                                                  {"$RECORDS", Args},
+                                                  {"$MODULENAME", ModuleNameS},
+                                                  {"$RECORDVALUES", ArgList},
+                                                  {"$SQL_INSERT0", ValueTest}
+                                                 ], 'module_template'()),
+    TestReplace.
 
 formate_key_values(Keys, Records) ->
     string:join([begin
@@ -63,7 +89,7 @@ value_format({Name, Type}) ->
 
 -compile(export_all).
 
--record($MODULENAME, $RECORDS).
+-record($MODULENAME, {$RECORDS}).
 
 select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),
@@ -79,13 +105,8 @@ read($KEYS) ->
     Res = mysql_client:read($MODULENAME, SQL),
     unpack_data(Res, []).
 
-write(#$MODULENAME{$RECORDVALUES}) ->
-    case mysql_client:read($MODULENAME, \"SELECT * FROM $MODULENAME WHERE $PACKKEYS) of
-        [] ->
-            mysql_client:write(role_han_grave_db, \"$SQL_INSERT0\");
-        _ ->
-            todo
-    end.
+insert(#$MODULENAME{$RECORDVALUES}) ->
+    mysql_client:insert(role_han_grave_db, \"$SQL_INSERT0\");
 
 
 unpack_data([[#VALUESRECORD]|Tail], AccInfo) ->
