@@ -22,26 +22,18 @@
 %%
 file_test() ->
     {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
-    Values = formate_values(ModuleInfos),
+    {FileName, TypeArgList, ValueTest} = formate_values(ModuleInfos),
     {ok, File} = file:open("../log/mysql_test.erl", [write]),
-    io:format(">>>>>>>>> ~p~n", [Values]),
-    file:write(File, Values).
-%%     file:write(File, 'module_template'()).
+    io:format(">>>>>>>>> ~p~n", [{FileName, TypeArgList, ValueTest}]),
+	TestReplace = mysql_op_gen:key_value_replace([{"$SQL_INSERT0", ValueTest}], 'module_template'()),
+    file:write(File, TestReplace).
 
 formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
                               index = Indexs, engine = Eng}=MoudleRecord) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
-    {Records, RecordValues, RecordTypes} = formate_records(Cols, [], [], []),
-    KeyValues = formate_key_values(PriKeys, Records),
-    NameTypes = formate_packs(RecordTypes, []),
-    {Records, RecordValues, RecordTypes, NameTypes, KeyValues}.
-
-formate_records([#columns_define{col_name = Name, type = Type, length = Len, is_null = IsNull,
-                                 default = Def, description = Des}|Tail], AccCols, AccColsValues, AccColsTypes) ->
-    RecordList = lists:concat([Name, " = ", string:to_upper(atom_to_list(Name))]),
-    formate_records(Tail, [Name|AccCols], [RecordList|AccColsValues], [{Name, Type}|AccColsTypes]);
-formate_records([], AccCols, AccColsValues, AccColsTypes) ->
-    {lists:reverse(AccCols), string:join(lists:reverse(AccColsValues), ", "), lists:reverse(AccColsTypes)}.
+	TypeArgList = [{ModuleAttr#columns_define.col_name, ModuleAttr#columns_define.type}||ModuleAttr<-Cols],
+	ValueTest = pack_insert(atom_to_list(ModuleName), "1, 2, 3", TypeArgList),
+    {FileName, TypeArgList, ValueTest}.
 
 formate_key_values(Keys, Records) ->
     string:join([begin
@@ -53,18 +45,12 @@ formate_key_values(Keys, Records) ->
                      end
                  end||Key<-Keys], ", ").
 
-formate_packs([{Name, Type}|Tail], AccNames) ->
-    NameType = {string:to_upper(atom_to_list(Name)), Type},
-    formate_packs(Tail, [NameType|AccNames]);
-formate_packs([], AccNames) ->
-    {lists:reverse(AccNames)}.
-
 
 pack_insert(ModuleName, TableArgsString, TypeArgList) ->
 	"INSERT INTO "++ModuleName++"("++TableArgsString++") VALUES "++pack_values_of_insert0(TypeArgList)++";".
 
 pack_values_of_insert0(TypeArgList) ->
-	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value_format(Value)++"\"" ||Value<-TypeArgList], ", "),
+	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value_format(Value)++")++\"" ||Value<-TypeArgList], ", "),
 	"("++Values++")".
 
 value_format({Name, Type}) ->
@@ -96,8 +82,7 @@ read($KEYS) ->
 write(#$MODULENAME{$RECORDVALUES}) ->
     case mysql_client:read($MODULENAME, \"SELECT * FROM $MODULENAME WHERE $PACKKEYS) of
         [] ->
-            SQL = \"INSERT INTO $MODULENAME ($RECORDS) VALUES($PACKVALUES),
-            mysql_client:write(role_han_grave_db, SQL);
+            mysql_client:write(role_han_grave_db, \"$SQL_INSERT0\");
         _ ->
             todo
     end.
