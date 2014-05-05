@@ -33,7 +33,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
     {Records, RecordValues, RecordTypes} = formate_records(Cols, [], [], []),
     KeyValues = formate_key_values(PriKeys, Records),
-    NameTypes = formate_packs(RecordTypes, [], []),
+    NameTypes = formate_packs(RecordTypes, []),
     {Records, RecordValues, RecordTypes, NameTypes, KeyValues}.
 
 formate_records([#columns_define{col_name = Name, type = Type, length = Len, is_null = IsNull,
@@ -53,12 +53,13 @@ formate_key_values(Keys, Records) ->
                      end
                  end||Key<-Keys], ", ").
 
-formate_packs([{Name, Type}|Tail], AccNames, AccPacks) ->
+formate_packs([{Name, Type}|Tail], AccNames) ->
     NameType = {string:to_upper(atom_to_list(Name)), Type},
-    NameTypeString = util:term_to_string(NameType),
-    formate_packs(Tail, [NameType|AccNames], ["mysql_helper:pack_value_by_type("++NameTypeString++")"|AccPacks]);
-formate_packs([], AccNames, AccPacks) ->
-    {lists:reverse(AccNames), lists:reverse(AccPacks)}.
+    formate_packs(Tail, [NameType|AccNames]);
+formate_packs([], AccNames) ->
+    {lists:reverse(AccNames)}.
+
+
 
 
 'module_template'() ->
