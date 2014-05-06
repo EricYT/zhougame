@@ -34,34 +34,37 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
     ModuleNameS = atom_to_list(ModuleName),
     ConvertFun =
         fun(#columns_define{col_name = Name, type = Type}, {AccTypeArgList, AccTypeArgS, AccArgList,
-                                                            AccArgUps, AccArgs}) ->
+                                                            AccArgUps, AccArgs, AccArgsStr}) ->
                 NameString = atom_to_list(Name),
                 NameToUpper = string:to_upper(atom_to_list(Name)),
                 {[{Name, Type}|AccTypeArgList],
                  [util:term_to_string({Name, Type})|AccTypeArgS],
                  [NameString++" = "++NameToUpper|AccArgList],
                  [NameToUpper|AccArgUps],
-                 [NameString|AccArgs]};
+                 [NameString|AccArgs],
+				 ["`"++NameString++"`"|AccArgsStr]};
            (_, Values) ->
                 Values
         end,
-    {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp, ArgsTemp} =
-        lists:foldr(ConvertFun, {[], [], [], [], []}, Cols),
+    {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp, ArgsTemp, ArgsStrTemp} =
+        lists:foldr(ConvertFun, {[], [], [], [], [], []}, Cols),
     TypeArgS= string:join(TypeArgSTemp, ",\r\t "),
     ArgList = string:join(ArgListTemp, ", "),
     ArgUps  = string:join(ArgUpsTemp, ", "),
     Args    = string:join(ArgsTemp, ", "),
+	ArgsStr = string:join(ArgsStrTemp, ", "),
     {KeyValuesStrings, Keys} = formate_key_values(PriKeys, Cols),
 	This = "{"++ModuleNameS++", "++ArgList++"}",
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This}]),
-    ValueTest = pack_insert(atom_to_list(ModuleName), Args, TypeArgList),
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr}]),
+    ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
                                                   {"$KEYVALUES", KeyValuesStrings},
                                                   {"$KEYS", Keys},
 												  {"$THIS", This},
+												  {"$RESTR", ArgsStr},
 												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
                                                   {"$SQL_INSERT0", ValueTest},
@@ -245,7 +248,7 @@ get_bash_insert_value_list($THIS) ->
 
 pack_bash_insert(Inserts) ->
 	Values = string:join([get_bash_insert_value_list(Record)||Record<-Inserts], \", \"),
-	\"INSERT INTO \"++erlang:atom_to_list($MODULENAME)++\"($RECORDS) VALUES\"++Values++\";\".
+	\"INSERT INTO \"++erlang:atom_to_list($MODULENAME)++\"($RESTR) VALUES\"++Values++\";\".
 
 ".
 
