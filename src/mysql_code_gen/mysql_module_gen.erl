@@ -99,6 +99,100 @@ value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
 
 
+pack_value_by_type({Val, blob}) ->
+    pack_value(term_to_binary(Val));
+pack_value_by_type({Val, Type}) when Type =:= term_varchar;
+                                     Type =:= term_char ->
+    pack_value(util:term_to_string(Val));
+pack_value_by_type({Val, _Type}) ->
+    pack_value(Val).
+
+
+pack_value(undefined) ->
+    "null";
+pack_value(true) ->
+    "TRUE";
+pack_value(false) ->
+    "FALSE";
+pack_value(Val) when is_atom(Val) ->
+    pack_value(atom_to_list(Val));
+pack_value(Val) when is_integer(Val) ->
+    integer_to_list(Val);
+pack_value(Val) when is_float(Val) ->
+    float_to_list(Val);
+pack_value({MegaSec, Sec, MicroSec}=Now) when is_integer(MegaSec),
+                                          is_integer(Sec),
+                                          is_integer(MicroSec) ->
+    pack_datetime(Now);
+pack_value({{_, _, _}, {_, _, _}}=Time) ->
+    pack_datetime(Time);
+pack_value(Val) when is_binary(Val) ->
+    mysql:quote(binary_to_list(Val));
+pack_value(Val) when is_list(Val) ->
+    mysql:quote(Val).
+
+
+pack_datetime(undefined) ->
+    "null";
+pack_datetime(0) ->
+    "null";
+pack_datetime({0, 0, 0}) ->
+    "null";
+pack_datetime({{Y, M, D}, {H, I, S}}) ->
+    [format_time(X)||X<-[Y, M, D, H, I, S]];
+pack_datetime({_, _, _}=Now) ->
+    {{Y, M, D}, {H, I, S}} = calendar:now_to_local_time(Now), %% local time    datetime
+    "'" ++ string:join([format_time(X)||X<-[Y, M, D]], "-") ++ " " ++ string:join([format_time(X)||X<-[H, I, S]], ":") ++ "'".
+
+format_time(Val) when Val < 10 ->
+    "0" ++ integer_to_list(Val);
+format_time(Val) ->
+    integer_to_list(Val).
+
+
+pack_where(Conditions) ->
+    SQL = pack_kv(Conditions, []),
+    case SQL of
+        [] -> "";
+        _ -> " WHERE " ++ string:join(SQL, " AND ")
+    end.
+
+pack_kv([], SQL) ->
+    lists:reverse(SQL);
+pack_kv([{ColumnName, '=', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName) ++ " = " ++ pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, '!=', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" != "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, '>', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" > "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, '>=', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" >= "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, '<', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" < "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, '!=', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" <= "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, 'in', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" IN "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]);
+pack_kv([{ColumnName, 'not in', Val}|Tail], SQL) ->
+    New = atom_to_list(ColumnName)++" NOT IN "++pack_value_by_type(Val),
+    pack_kv(Tail, [New|SQL]).
+
+
+pack_update_columns(Columns) ->
+    KV = pack_kv(Columns, []),
+    case length(KV) of
+        0 -> "";
+        _Any -> " SET " ++ string:join(KV, ", ")
+    end.
+
+
 'module_template'() ->
 "
 -module($FILENAME).
