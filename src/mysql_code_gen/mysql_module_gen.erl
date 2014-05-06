@@ -98,6 +98,15 @@ pack_values_of_insert0(TypeArgList) ->
 	Values = string:join(["\"++mysql_helper:pack_value_by_type("++value_format(Value)++")++\"" ||Value<-TypeArgList], ", "),
 	"("++Values++")".
 
+pack_delete0(ModuleName, PriKeys, TypeArgList) ->
+	Conditions = [{Key, " = ", proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
+	"DELETE FROM "++ModuleName++pack_where(Conditions).
+
+pack_update0(ModuleName, PriKeys, ModuleAttrs, TypeArgList) ->
+	WhereCon = [{Key, " = ", proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
+	UpdateCon = [{Name, " = ", proplists:lookup(Name, TypeArgList)}||Name<-(ModuleAttrs--PriKeys)],
+	"UPDATE "++ModuleName++pack_update_columns(UpdateCon)++pack_where(WhereCon).
+
 value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
 
