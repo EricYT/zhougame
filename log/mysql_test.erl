@@ -12,10 +12,10 @@ select(FiledList, Conditions) ->
     mysql_client:select(mysql_test, SQL).
 
 read(#mysql_test{key = KEY, type = TYPE}) ->
-    SQL = "SELECT * FROM mysql_test WHERE "++$PACKKEYS,
+    SQL = "SELECT * FROM mysql_test WHERE "++"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++")",
     mysql_client:read(mysql_test, SQL);
 read(KEY, TYPE) ->
-    SQL = "SELECT * FROM mysql_test WHERE "++$PACKKEYS,
+    SQL = "SELECT * FROM mysql_test WHERE "++"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++")",
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
 
@@ -42,7 +42,7 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [{{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar}}].
+    [{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar}].
 
 get_bash_insert_value_list({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
 	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++")".

@@ -34,7 +34,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
     ModuleNameS = atom_to_list(ModuleName),
     ConvertFun =
         fun(#columns_define{col_name = Name, type = Type}, {AccTypeArgList, AccTypeArgS, AccArgList,
-                                                            AccArgUps, AccArgs, AccArgsStr}) ->
+                                                            AccArgUps, AccArgs, AccArgsStr, AccArgsCol}) ->
                 NameString = atom_to_list(Name),
                 NameToUpper = string:to_upper(atom_to_list(Name)),
                 {[{Name, Type}|AccTypeArgList],
@@ -42,12 +42,14 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
                  [NameString++" = "++NameToUpper|AccArgList],
                  [NameToUpper|AccArgUps],
                  [NameString|AccArgs],
-				 ["`"++NameString++"`"|AccArgsStr]};
+				 ["`"++NameString++"`"|AccArgsStr],
+                 [Name|AccArgsCol]};
            (_, Values) ->
                 Values
         end,
-    {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp, ArgsTemp, ArgsStrTemp} =
-        lists:foldr(ConvertFun, {[], [], [], [], [], []}, Cols),
+    {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp,
+     ArgsTemp, ArgsStrTemp, ArgsCol} =
+        lists:foldr(ConvertFun, {[], [], [], [], [], [], []}, Cols),
     TypeArgS= string:join(TypeArgSTemp, ",\r\t "),
     ArgList = string:join(ArgListTemp, ", "),
     ArgUps  = string:join(ArgUpsTemp, ", "),
@@ -56,7 +58,8 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
     {KeyValuesStrings, Keys} = formate_key_values(PriKeys, Cols),
 	This = "{"++ModuleNameS++", "++ArgList++"}",
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr}]),
+    PrimaryKeys = pack_keys(PriKeys, TypeArgList),
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, PrimaryKeys}]),
     ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
@@ -68,6 +71,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
                                                   {"$SQL_INSERT0", ValueTest},
+                                                  {"$PACKKEYS", PrimaryKeys},
                                                   {"$RECORDDEFINES", TypeArgS}
                                                  ], 'module_template'()),
     TestReplace.
@@ -99,13 +103,18 @@ pack_values_of_insert0(TypeArgList) ->
 	"("++Values++")".
 
 pack_delete0(ModuleName, PriKeys, TypeArgList) ->
-	Conditions = [{Key, " = ", proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
+	Conditions = [{Key, '=', proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
 	"DELETE FROM "++ModuleName++pack_where(Conditions).
 
 pack_update0(ModuleName, PriKeys, ModuleAttrs, TypeArgList) ->
-	WhereCon = [{Key, " = ", proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
-	UpdateCon = [{Name, " = ", proplists:lookup(Name, TypeArgList)}||Name<-(ModuleAttrs--PriKeys)],
+	WhereCon = [{Key, '=', proplists:lookup(Key, TypeArgList)}||Key<-PriKeys],
+	UpdateCon = [{Name, '=', proplists:lookup(Name, TypeArgList)}||Name<-(ModuleAttrs--PriKeys)],
 	"UPDATE "++ModuleName++pack_update_columns(UpdateCon)++pack_where(WhereCon).
+
+pack_keys(PriKeys, TypeArgList) ->
+    Keys = [proplists:lookup(Name, TypeArgList)||Name<-PriKeys],
+    Values = string:join(["\"++mysql_helper:pack_value_by_type("++value_format(Value)++")++\"" ||Value<-Keys], ", "),
+    "("++Values++")".
 
 value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
@@ -220,10 +229,10 @@ select(FiledList, Conditions) ->
     mysql_client:select($MODULENAME, SQL).
 
 read(#$MODULENAME{$KEYVALUES}) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE \"++$PACKKEYS,
+    SQL = \"SELECT * FROM $MODULENAME WHERE \"++\"$PACKKEYS\",
     mysql_client:read($MODULENAME, SQL);
 read($KEYS) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE \"++$PACKKEYS,
+    SQL = \"SELECT * FROM $MODULENAME WHERE \"++\"$PACKKEYS\",
     Res = mysql_client:read($MODULENAME, SQL),
     unpack_data(Res, []).
 
@@ -250,7 +259,7 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [{$RECORDDEFINES}].
+    [$RECORDDEFINES].
 
 get_bash_insert_value_list($THIS) ->
 	\"?ValuesOfInsertSqlString\".
