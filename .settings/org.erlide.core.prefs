@@ -1,4 +1,4 @@
-#Tue Apr 22 22:38:42 CST 2014
+#Tue May 06 23:15:35 CST 2014
 backend_version=R15B
 eclipse.preferences.version=1
 external_includes=
@@ -6,4 +6,4 @@ external_modules=
 include_dirs=include
 nukeOutputOnClean=false
 output_dir=ebin
-source_dirs=src/mysql_code_gen;src/client_robot;src/app;src/base_mod;src/cache_mod;src/cache_mods;src/code_tools;src/db_modules;src/game_module/creature;src/game_module/gate;src/game_module;src/game_module/role_processor;src/game_util;src/gate;src/gen_code_tool;src/mochiweb/src;src/mod;src/mysql_module/mysql;src/mysql_module/mysql_sup;src;src/server_base;src/string;src/util;src/util_tools;src/util_tools/reloader;src/version
+source_dirs=log;src/mysql_code_gen;src/client_robot;src/app;src/base_mod;src/cache_mod;src/cache_mods;src/code_tools;src/db_modules;src/game_module/creature;src/game_module/gate;src/game_module;src/game_module/role_processor;src/game_util;src/gate;src/gen_code_tool;src/mochiweb/src;src/mod;src/mysql_module/mysql;src/mysql_module/mysql_sup;src;src/server_base;src/string;src/util;src/util_tools;src/util_tools/reloader;src/version

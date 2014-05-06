@@ -230,7 +230,8 @@ select(FiledList, Conditions) ->
 
 read(#$MODULENAME{$KEYVALUES}) ->
     SQL = \"SELECT * FROM $MODULENAME WHERE \"++\"$PACKKEYS\",
-    mysql_client:read($MODULENAME, SQL);
+    mysql_client:read($MODULENAME, SQL).
+
 read($KEYS) ->
     SQL = \"SELECT * FROM $MODULENAME WHERE \"++\"$PACKKEYS\",
     Res = mysql_client:read($MODULENAME, SQL),
