@@ -47,23 +47,22 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
         end,
     {TypeArgList, TypeArgSTemp, ArgListTemp, ArgUpsTemp, ArgsTemp} =
         lists:foldr(ConvertFun, {[], [], [], [], []}, Cols),
-    
     TypeArgS= string:join(TypeArgSTemp, ",\r\t "),
     ArgList = string:join(ArgListTemp, ", "),
     ArgUps  = string:join(ArgUpsTemp, ", "),
     Args    = string:join(ArgsTemp, ", "),
-    
     {KeyValuesStrings, Keys} = formate_key_values(PriKeys, Cols),
-    
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys}]),
-    
+	This = "{"++ModuleNameS++", "++ArgList++"}",
+	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This}]),
     ValueTest = pack_insert(atom_to_list(ModuleName), Args, TypeArgList),
-    
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
                                                   {"$KEYVALUES", KeyValuesStrings},
                                                   {"$KEYS", Keys},
+												  {"$THIS", This},
+												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
                                                   {"$SQL_INSERT0", ValueTest},
                                                   {"$RECORDDEFINES", TypeArgS}
@@ -115,15 +114,20 @@ select(FiledList, Conditions) ->
     mysql_client:select($MODULENAME, SQL).
 
 read(#$MODULENAME{$KEYVALUES}) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE $PACKKEYS,
+    SQL = \"SELECT * FROM $MODULENAME WHERE \"++$PACKKEYS,
     mysql_client:read($MODULENAME, SQL);
 read($KEYS) ->
-    SQL = \"SELECT * FROM $MODULENAME WHERE $PACKKEYS,
+    SQL = \"SELECT * FROM $MODULENAME WHERE \"++$PACKKEYS,
     Res = mysql_client:read($MODULENAME, SQL),
     unpack_data(Res, []).
 
-insert(#$MODULENAME{$RECORDVALUES}) ->
-    mysql_client:insert(role_han_grave_db, \"$SQL_INSERT0\");
+insert($THIS) ->
+    mysql_client:insert($MODULENAME, \"$SQL_INSERT0\");
+insert([#$MODULENAME{}|_]=INSERTS) ->
+	SQL = pack_bash_insert(INSERTS),
+	mysql_client:insert($MODULENAME, SQL);
+insert([]) ->
+	nothing.
 
 
 unpack_data([[#VALUESRECORD]|Tail], AccInfo) ->
@@ -141,6 +145,14 @@ get_column_datatype(Column) ->
 
 column_datatype() ->
     [{$RECORDDEFINES}].
+
+get_bash_insert_value_list($THIS) ->
+	\"?ValuesOfInsertSqlString\".
+
+pack_bash_insert(Inserts) ->
+	Values = string:join([get_bash_insert_value_list(Record)||Record<-Inserts], \", \"),
+	\"INSERT INTO \"++erlang:atom_to_list($MODULENAME)++\"($RECORDS) VALUES\"++Values++\";\".
+
 ".
 
 

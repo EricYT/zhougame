@@ -12,15 +12,20 @@ select(FiledList, Conditions) ->
     mysql_client:select(mysql_test, SQL).
 
 read(#mysql_test{key = KEY, type = TYPE}) ->
-    SQL = "SELECT * FROM mysql_test WHERE $PACKKEYS,
+    SQL = "SELECT * FROM mysql_test WHERE "++$PACKKEYS,
     mysql_client:read(mysql_test, SQL);
 read(KEY, TYPE) ->
-    SQL = "SELECT * FROM mysql_test WHERE $PACKKEYS,
+    SQL = "SELECT * FROM mysql_test WHERE "++$PACKKEYS,
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
 
-insert(#mysql_test{key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
-    mysql_client:insert(role_han_grave_db, "INSERT INTO mysql_test(key, type, term, string, term2) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++");");
+insert({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
+    mysql_client:insert(mysql_test, "INSERT INTO mysql_test(key, type, term, string, term2) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++");");
+insert([#mysql_test{}|_]=INSERTS) ->
+	SQL = pack_bash_insert(INSERTS),
+	mysql_client:insert(mysql_test, SQL);
+insert([]) ->
+	nothing.
 
 
 unpack_data([[#VALUESRECORD]|Tail], AccInfo) ->
@@ -38,3 +43,11 @@ get_column_datatype(Column) ->
 
 column_datatype() ->
     [{{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar}}].
+
+get_bash_insert_value_list({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
+	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++")".
+
+pack_bash_insert(Inserts) ->
+	Values = string:join([get_bash_insert_value_list(Record)||Record<-Inserts], ", "),
+	"INSERT INTO "++erlang:atom_to_list(mysql_test)++"(key, type, term, string, term2) VALUES"++Values++";".
+
