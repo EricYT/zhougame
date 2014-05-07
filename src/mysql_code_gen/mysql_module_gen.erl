@@ -193,6 +193,12 @@ insert([]) ->
 	nothing.
 
 
+all() ->
+	SQL = \"SELECT * FROM \" ++ atom_to_list($MODULENAME),
+	Res = mysql_client:select($MODULENAME, SQL),
+	unpack_data(Res, []).
+
+
 unpack_data([RecordFor|Tail], AccInfo) ->
     unpack_data(Tail, [mysql_helper:unpack_row($MODULENAME, RecordFor)|AccInfo]);
 unpack_data([], AccInfo) ->

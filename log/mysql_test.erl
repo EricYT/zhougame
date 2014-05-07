@@ -29,6 +29,12 @@ insert([]) ->
 	nothing.
 
 
+all() ->
+	SQL = "SELECT * FROM " ++ atom_to_list(mysql_test),
+	Res = mysql_client:select(mysql_test, SQL),
+	unpack_data(Res, []).
+
+
 unpack_data([RecordFor|Tail], AccInfo) ->
     unpack_data(Tail, [mysql_helper:unpack_row(mysql_test, RecordFor)|AccInfo]);
 unpack_data([], AccInfo) ->
