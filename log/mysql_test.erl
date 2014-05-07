@@ -1,5 +1,5 @@
 
--module(mysql_test).
+-module(module_mysql_test).
 
 -compile(export_all).
 
@@ -33,6 +33,8 @@ all() ->
 	SQL = "SELECT * FROM " ++ atom_to_list(mysql_test),
 	Res = mysql_client:select(mysql_test, SQL),
 	unpack_data(Res, []).
+
+get_key(Record) ->	Record#mysql_test.key.get_type(Record) ->	Record#mysql_test.type.get_term(Record) ->	Record#mysql_test.term.get_string(Record) ->	Record#mysql_test.string.get_term2(Record) ->	Record#mysql_test.term2.
 
 
 unpack_data([RecordFor|Tail], AccInfo) ->

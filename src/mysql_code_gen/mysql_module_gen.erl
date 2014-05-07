@@ -59,6 +59,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 	This = "{"++ModuleNameS++", "++ArgList++"}",
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
     PrimaryKeys = pack_keys(PriKeys, TypeArgList),
+    RecordGetCols = pack_get_record(ModuleName, TypeArgList),
     io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, PrimaryKeys}]),
     ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
@@ -70,6 +71,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 												  {"$RESTR", ArgsStr},
 												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
+                                                  {"$RECORDGETCOLS", RecordGetCols},
                                                   {"$SQL_INSERT0", ValueTest},
                                                   {"$PACKKEYS", PrimaryKeys},
                                                   {"$RECORDDEFINES", TypeArgS}
@@ -114,6 +116,11 @@ pack_update0(ModuleName, PriKeys, ModuleAttrs, TypeArgList) ->
 pack_keys(PriKeys, TypeArgList) ->
     Keys = [{Name, '=', proplists:lookup(Name, TypeArgList)}||Name<-PriKeys],
 	pack_where(Keys).
+
+pack_get_record(ModuleName, TypeArgList) ->
+    PackValues = ["get_"++atom_to_list(Name)++"(Record) ->\r\tRecord#"++atom_to_list(ModuleName)++"."++atom_to_list(Name)++"."
+                  ||{Name, _Type}<-TypeArgList],
+    string:join(PackValues, "\r\r").    
 
 value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
@@ -197,6 +204,8 @@ all() ->
 	SQL = \"SELECT * FROM \" ++ atom_to_list($MODULENAME),
 	Res = mysql_client:select($MODULENAME, SQL),
 	unpack_data(Res, []).
+
+$RECORDGETCOLS
 
 
 unpack_data([RecordFor|Tail], AccInfo) ->
