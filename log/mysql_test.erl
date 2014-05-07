@@ -1,3 +1,4 @@
+
 -module(mysql_test).
 
 -compile(export_all).
@@ -11,13 +12,13 @@ select(FiledList, Conditions) ->
     mysql_client:select(mysql_test, SQL).
 
 read(#mysql_test{key = KEY, type = TYPE}) ->
-    SQL = "SELECT * FROM mysql_test WHERE "++"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++")",
+    SQL = "SELECT * FROM mysql_test "++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++"",
     mysql_client:read(mysql_test, SQL).
+
 read(KEY, TYPE) ->
-    SQL = "SELECT * FROM mysql_test WHERE "++"(key = "++mysql_helper:pack_value_by_type({KEY,int})++" and type ="++mysql_helper:pack_value_by_type({TYPE,int})++")",
+    SQL = "SELECT * FROM mysql_test "++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++"",
     Res = mysql_client:read(mysql_test, SQL),
-    io:format(">>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Res}]).
-%%     unpack_data(Res, []).
+    unpack_data(Res, []).
 
 insert({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
     mysql_client:insert(mysql_test, "INSERT INTO mysql_test(`key`, `type`, `term`, `string`, `term2`) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++");");
@@ -28,10 +29,10 @@ insert([]) ->
 	nothing.
 
 
-%% unpack_data([[#VALUESRECORD]|Tail], AccInfo) ->
-%%     unpack_data(Tail, [mysql_test{$VALUESPACKS}|AccInfo]);
-%% unpack_data([], AccInfo) ->
-%%     lists:reverse(AccInfo).
+unpack_data([RecordFor|Tail], AccInfo) ->
+    unpack_data(Tail, [mysql_helper:unpack_row(mysql_test, RecordFor)|AccInfo]);
+unpack_data([], AccInfo) ->
+    lists:reverse(AccInfo).
 
 
 where_condition_fromat(Conditions) ->

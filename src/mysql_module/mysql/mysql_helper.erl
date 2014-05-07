@@ -139,7 +139,7 @@ pack_kv([{ColumnName, '>=', Val}|Tail], SQL) ->
 pack_kv([{ColumnName, '<', Val}|Tail], SQL) ->
     New = atom_to_list(ColumnName)++" < "++pack_value_by_type(Val),
     pack_kv(Tail, [New|SQL]);
-pack_kv([{ColumnName, '!=', Val}|Tail], SQL) ->
+pack_kv([{ColumnName, '<=', Val}|Tail], SQL) ->
     New = atom_to_list(ColumnName)++" <= "++pack_value_by_type(Val),
     pack_kv(Tail, [New|SQL]);
 pack_kv([{ColumnName, 'in', Val}|Tail], SQL) ->
