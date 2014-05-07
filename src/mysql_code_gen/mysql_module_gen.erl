@@ -118,7 +118,6 @@ pack_keys(PriKeys, TypeArgList) ->
 value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
 
-
 pack_where(Conditions) ->
     SQL = pack_kv(Conditions, []),
     case SQL of
