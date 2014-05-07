@@ -24,7 +24,7 @@
 file_test() ->
     {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
     Content = formate_values(ModuleInfos),
-    {ok, File} = file:open("../log/mysql_test.erl", [write]),
+    {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
 %%     io:format(">>>>>>>>> ~p~n", [{Content}]),
     file:write(File, Content).
 

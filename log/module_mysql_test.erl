@@ -1,4 +1,5 @@
--module(mysql_test).
+
+-module(module_mysql_test).
 
 -compile(export_all).
 
@@ -26,7 +27,6 @@ insert([#mysql_test{}|_]=INSERTS) ->
 	mysql_client:insert(mysql_test, SQL);
 insert([]) ->
 	nothing.
-
 
 all() ->
 	SQL = "SELECT * FROM " ++ atom_to_list(mysql_test),
