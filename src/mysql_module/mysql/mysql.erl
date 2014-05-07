@@ -419,7 +419,6 @@ fetch(ServerName, PoolId, Query) ->
     fetch(ServerName, PoolId, Query, undefined).
 
 fetch(ServerName, PoolId, Query, Timeout) -> 
-    io:format(">>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, ServerName, get(?STATE_VAR)}]),
     case get(?STATE_VAR) of
 	undefined ->
 	    call_server(ServerName, {fetch, PoolId, Query}, Timeout);
