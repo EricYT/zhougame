@@ -166,8 +166,10 @@ pack_orderby({Column, desc}) ->
 
 pack_limit([]) ->
     "";
-pack_limit({Num1, Num2}) when Num1 =< Num2 ->
-    " LIMIT "++integer_to_list(Num1)++","++integer_to_list(Num2).
+pack_limit({Num1, Num2}) ->
+    " LIMIT "++integer_to_list(Num1)++","++integer_to_list(Num2);
+pack_limit(Num) ->
+    " LIMIT "++integer_to_list(Num).
 
 unpack_row(Module, RowColumnDataList) ->
 	list_to_tuple([Module|RowColumnDataList]).
