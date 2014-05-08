@@ -60,8 +60,11 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
     PrimaryKeys = pack_keys(PriKeys, TypeArgList),
     RecordGetCols = pack_get_record(ModuleName, TypeArgList),
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, PrimaryKeys}]),
     ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
+	
+	UnpackRecord = unpack_record(atom_to_list(ModuleName), TypeArgList),
+	
+    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, UnpackRecord}]),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
@@ -71,6 +74,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 												  {"$RESTR", ArgsStr},
 												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
+                                                  {"$UNPACKRECORD", UnpackRecord},
                                                   {"$RECORDGETCOLS", RecordGetCols},
                                                   {"$SQL_INSERT0", ValueTest},
                                                   {"$PACKKEYS", PrimaryKeys},
@@ -120,7 +124,18 @@ pack_keys(PriKeys, TypeArgList) ->
 pack_get_record(ModuleName, TypeArgList) ->
     PackValues = ["get_"++atom_to_list(Name)++"(Record) ->\r\tRecord#"++atom_to_list(ModuleName)++"."++atom_to_list(Name)++"."
                   ||{Name, _Type}<-TypeArgList],
-    string:join(PackValues, "\r\r").    
+    string:join(PackValues, "\r\r").
+
+unpack_record(ModuleName, TypeArgList) ->
+	FilterFun = fun({Name, Type}, Acc) when Type =:= term_varchar; Type =:= term_char ->
+					  TypeString = atom_to_list(Name),
+					  [TypeString++"=mysql_helper:string_to_term(Record#"++ModuleName++"."++TypeString++")"
+					  |Acc];
+				   (_, Acc) ->
+						Acc
+				end,
+	StringList = lists:foldr(FilterFun, [], TypeArgList),
+	"Record#"++ModuleName++"{"++string:join(StringList, ",\r\t\t\t\t\t\t")++"}".
 
 value_format({Name, Type}) ->
 	"{"++string:to_upper(atom_to_list(Name))++","++atom_to_list(Type)++"}".
@@ -200,6 +215,16 @@ insert([]) ->
 	nothing.
 
 
+%%
+%% conditions: [{roleid, '=', 1}, {type, '!=', 3}]
+find(Conditions, Limit, OrderBy) ->
+	FormateCondition = where_condition_fromat(Conditions),
+	SQL = \"SELECT * FROM \"++atom_to_list($MODULENAME)
+							++mysql_helper:pack_where(FormateCondition)
+							++mysql_helper:pack_orderby(OrderBy),
+	Res = mysql_client:select($MODULENAME, SQL),
+	unpack_data(Res, []).
+
 all() ->
 	SQL = \"SELECT * FROM \" ++ atom_to_list($MODULENAME),
 	Res = mysql_client:select($MODULENAME, SQL),
@@ -209,7 +234,8 @@ $RECORDGETCOLS
 
 
 unpack_data([RecordFor|Tail], AccInfo) ->
-    unpack_data(Tail, [mysql_helper:unpack_row($MODULENAME, RecordFor)|AccInfo]);
+	Record = mysql_helper:unpack_row($MODULENAME, RecordFor),
+    unpack_data(Tail, [$UNPACKRECORD|AccInfo]);
 unpack_data([], AccInfo) ->
     lists:reverse(AccInfo).
 

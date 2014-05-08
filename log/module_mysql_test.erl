@@ -28,6 +28,18 @@ insert([#mysql_test{}|_]=INSERTS) ->
 insert([]) ->
 	nothing.
 
+
+%%
+%% conditions: [{roleid, '=', 1}, {type, '!=', 3}]
+find(Conditions, Limit, OrderBy) ->
+	FormateCondition = where_condition_fromat(Conditions),
+	SQL = "SELECT * FROM "++atom_to_list(mysql_test)
+							++mysql_helper:pack_where(FormateCondition)
+							++mysql_helper:pack_orderby(OrderBy),
+	io:format(">>>>>>>>>> ~p~n", [{?MODULE, ?LINE, SQL}]),
+	Res = mysql_client:select(mysql_test, SQL),
+	unpack_data(Res, []).
+
 all() ->
 	SQL = "SELECT * FROM " ++ atom_to_list(mysql_test),
 	Res = mysql_client:select(mysql_test, SQL),
@@ -37,7 +49,8 @@ get_key(Record) ->	Record#mysql_test.key.get_type(Record) ->	Record#mysql_te
 
 
 unpack_data([RecordFor|Tail], AccInfo) ->
-    unpack_data(Tail, [mysql_helper:unpack_row(mysql_test, RecordFor)|AccInfo]);
+	Record = mysql_helper:unpack_row(mysql_test, RecordFor),
+    unpack_data(Tail, [Record#mysql_test{term=mysql_helper:string_to_term(Record#mysql_test.term),						term2=mysql_helper:string_to_term(Record#mysql_test.term2)}|AccInfo]);
 unpack_data([], AccInfo) ->
     lists:reverse(AccInfo).
 
