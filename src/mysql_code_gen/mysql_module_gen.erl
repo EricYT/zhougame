@@ -215,6 +215,9 @@ insert([]) ->
 	nothing.
 
 
+find(Conditions) ->
+    find(Conditions, [], undefined).
+
 %%
 %% conditions: [{roleid, '=', 1}, {type, '!=', 3}]
 find(Conditions, Limit, OrderBy) ->
