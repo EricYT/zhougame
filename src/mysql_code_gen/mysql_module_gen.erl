@@ -224,7 +224,8 @@ find(Conditions, Limit, OrderBy) ->
 	FormateCondition = where_condition_fromat(Conditions),
 	SQL = \"SELECT * FROM \"++atom_to_list($MODULENAME)
 							++mysql_helper:pack_where(FormateCondition)
-							++mysql_helper:pack_orderby(OrderBy),
+							++mysql_helper:pack_orderby(OrderBy)
+                            ++mysql_helper:pack_limit(Limit),
 	Res = mysql_client:select($MODULENAME, SQL),
 	unpack_data(Res, []).
 

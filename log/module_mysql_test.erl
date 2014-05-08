@@ -29,14 +29,17 @@ insert([]) ->
 	nothing.
 
 
+find(Conditions) ->
+    find(Conditions, [], undefined).
+
 %%
 %% conditions: [{roleid, '=', 1}, {type, '!=', 3}]
 find(Conditions, Limit, OrderBy) ->
 	FormateCondition = where_condition_fromat(Conditions),
 	SQL = "SELECT * FROM "++atom_to_list(mysql_test)
 							++mysql_helper:pack_where(FormateCondition)
-							++mysql_helper:pack_orderby(OrderBy),
-	io:format(">>>>>>>>>> ~p~n", [{?MODULE, ?LINE, SQL}]),
+							++mysql_helper:pack_orderby(OrderBy)
+                            ++mysql_helper:pack_limit(Limit),
 	Res = mysql_client:select(mysql_test, SQL),
 	unpack_data(Res, []).
 

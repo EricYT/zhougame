@@ -164,6 +164,11 @@ pack_orderby({Column, asc}) ->
 pack_orderby({Column, desc}) ->
     " ORDER BY "++atom_to_list(Column)++" DESC".
 
+pack_limit([]) ->
+    "";
+pack_limit({Num1, Num2}) when Num1 =< Num2 ->
+    " LIMIT "++integer_to_list(Num1)++","++integer_to_list(Num2).
+
 unpack_row(Module, RowColumnDataList) ->
 	list_to_tuple([Module|RowColumnDataList]).
 
