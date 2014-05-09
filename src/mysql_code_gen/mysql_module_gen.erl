@@ -56,7 +56,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
     Args    = string:join(ArgsTemp, ", "),
 	ArgsStr = string:join(ArgsStrTemp, ", "),
     {KeyValuesStrings, Keys} = formate_key_values(PriKeys, Cols),
-	This = "{"++ModuleNameS++", "++ArgList++"}",
+	This = "{"++ModuleNameS++", "++ArgUps++"}",
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
     PrimaryKeys = pack_keys(PriKeys, TypeArgList),
     RecordGetCols = pack_get_record(ModuleName, TypeArgList),
@@ -214,6 +214,17 @@ insert([#$MODULENAME{}|_]=INSERTS) ->
 insert([]) ->
 	nothing.
 
+
+update_fields(FieldValueList, Conditions) ->
+	todo.
+
+delete($THIS) ->
+	remove($THIS);
+delete(Conditions) when is_list(Conditions) ->
+	todo.
+
+remove($THIS) ->
+	todo.
 
 find(Conditions) ->
     find(Conditions, [], undefined).

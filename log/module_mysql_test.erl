@@ -3,7 +3,7 @@
 
 -compile(export_all).
 
--record(mysql_test, {key, type, term, string, term2}).
+-record(mysql_test, {key, type, term, string, term2, term3}).
 
 select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),
@@ -20,14 +20,25 @@ read(KEY, TYPE) ->
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
 
-insert({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
-    mysql_client:insert(mysql_test, "INSERT INTO mysql_test(`key`, `type`, `term`, `string`, `term2`) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++");");
+insert({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
+    mysql_client:insert(mysql_test, "INSERT INTO mysql_test(`key`, `type`, `term`, `string`, `term2`, `term3`) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++");");
 insert([#mysql_test{}|_]=INSERTS) ->
 	SQL = pack_bash_insert(INSERTS),
 	mysql_client:insert(mysql_test, SQL);
 insert([]) ->
 	nothing.
 
+
+update_fields(FieldValueList, Conditions) ->
+	todo.
+
+delete({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
+	remove({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3});
+delete(Conditions) when is_list(Conditions) ->
+	todo.
+
+remove({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
+	todo.
 
 find(Conditions) ->
     find(Conditions, [], undefined).
@@ -48,7 +59,7 @@ all() ->
 	Res = mysql_client:select(mysql_test, SQL),
 	unpack_data(Res, []).
 
-get_key(Record) ->	Record#mysql_test.key.get_type(Record) ->	Record#mysql_test.type.get_term(Record) ->	Record#mysql_test.term.get_string(Record) ->	Record#mysql_test.string.get_term2(Record) ->	Record#mysql_test.term2.
+get_key(Record) ->	Record#mysql_test.key.get_type(Record) ->	Record#mysql_test.type.get_term(Record) ->	Record#mysql_test.term.get_string(Record) ->	Record#mysql_test.string.get_term2(Record) ->	Record#mysql_test.term2.get_term3(Record) ->	Record#mysql_test.term3.
 
 
 unpack_data([RecordFor|Tail], AccInfo) ->
@@ -66,12 +77,12 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar}].
+    [{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar},	 {term3,timestamp}].
 
-get_bash_insert_value_list({mysql_test, key = KEY, type = TYPE, term = TERM, string = STRING, term2 = TERM2}) ->
-	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++")".
+get_bash_insert_value_list({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
+	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++")".
 
 pack_bash_insert(Inserts) ->
 	Values = string:join([get_bash_insert_value_list(Record)||Record<-Inserts], ", "),
-	"INSERT INTO "++erlang:atom_to_list(mysql_test)++"(`key`, `type`, `term`, `string`, `term2`) VALUES"++Values++";".
+	"INSERT INTO "++erlang:atom_to_list(mysql_test)++"(`key`, `type`, `term`, `string`, `term2`, `term3`) VALUES"++Values++";".
 
