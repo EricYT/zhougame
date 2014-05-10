@@ -52,11 +52,12 @@ transaction(_Table, Fun, Query) ->
 %% Local Functions
 %%
 convert_data({data, Info}) ->
-    io:format(">>>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
+%%     io:format(">>>>>>>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Info}]),
     mysql:get_result_rows(Info);
 convert_data({updated, Info}) ->
     Nums = mysql:get_result_affected_rows(Info),
-    io:format(">>>>>>>>>>>>>>>> update ~p~n", [{?MODULE, ?LINE, Info, Nums}]);
+    Nums;
+%%     io:format(">>>>>>>>>>>>>>>> update ~p~n", [{?MODULE, ?LINE, Info, Nums}]);
 convert_data({error, Info}) ->
     Errors = mysql:get_result_reason(Info),
     io:format(">>>>>>>>>>>>>>>> error ~p~n", [{?MODULE, ?LINE, Info, Errors}]);
