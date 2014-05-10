@@ -60,9 +60,11 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
 	ValuesOfInsert = pack_values_of_insert0(TypeArgList),
     PrimaryKeys = pack_keys(PriKeys, TypeArgList),
     RecordGetCols = pack_get_record(ModuleName, TypeArgList),
-    ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
 	
 	UnpackRecord = unpack_record(atom_to_list(ModuleName), TypeArgList),
+    ValueTest = pack_insert(atom_to_list(ModuleName), ArgsStr, TypeArgList),
+    UpdateData = pack_update0(atom_to_list(ModuleName), PriKeys, ArgsCol, TypeArgList),
+    DeleteData = pack_delete0(atom_to_list(ModuleName), PriKeys, TypeArgList),
 	
     io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, UnpackRecord}]),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
@@ -76,6 +78,8 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
                                                   {"$RECORDVALUES", ArgList},
                                                   {"$UNPACKRECORD", UnpackRecord},
                                                   {"$RECORDGETCOLS", RecordGetCols},
+                                                  {"$UPDATESQL", UpdateData},
+                                                  {"$DELETESQL", DeleteData},
                                                   {"$SQL_INSERT0", ValueTest},
                                                   {"$PACKKEYS", PrimaryKeys},
                                                   {"$RECORDDEFINES", TypeArgS}
@@ -195,11 +199,13 @@ select(FiledList, Conditions) ->
     FormatCond = where_condition_fromat(Conditions),
     Columns = string:join([atom_to_list(Key)||Key<-FiledList], \",\"),
     SQL = \"SELECT \" ++ Columns ++ \" FROM $MODULENAME \" ++ mysql_helper:pack_where(FormatCond),
-    mysql_client:select($MODULENAME, SQL).
+    Res = mysql_client:select($MODULENAME, SQL),
+    unpack_fields(Res, FiledList).
 
 read(#$MODULENAME{$KEYVALUES}) ->
     SQL = \"SELECT * FROM $MODULENAME \"++\"$PACKKEYS\",
-    mysql_client:read($MODULENAME, SQL).
+    Res = mysql_client:read($MODULENAME, SQL),
+    unpack_data(Res, []).
 
 read($KEYS) ->
     SQL = \"SELECT * FROM $MODULENAME \"++\"$PACKKEYS\",
@@ -215,16 +221,28 @@ insert([]) ->
 	nothing.
 
 
+update_fields_by_record($THIS, Conditions) ->
+    FormateCondition = where_condition_fromat(Conditions),
+	SQL = \"$UPDATESQL\"++mysql_helper:pack_where(FormateCondition),
+    mysql_client:update($MODULENAME, SQL).
+
+
 update_fields(FieldValueList, Conditions) ->
-	todo.
+    FormateCondition = where_condition_fromat(Conditions),
+    FieldValueListTemp = where_condition_fromat(FieldValueList),
+	SQL = \"UPDATE $MODULENAME \"++ mysql_helper:pack_update_columns(FieldValueListTemp)++mysql_helper:pack_where(FormateCondition),
+    mysql_client:update($MODULENAME, SQL).
 
 delete($THIS) ->
 	remove($THIS);
 delete(Conditions) when is_list(Conditions) ->
-	todo.
+    FormateCondition = where_condition_fromat(Conditions),
+	SQL = \"DELETE FROM $MODULENAME \"++mysql_helper:pack_where(FormateCondition),
+    mysql_client:remove($MODULENAME, SQL).
 
 remove($THIS) ->
-	todo.
+    SQL = \"$DELETESQL\",
+    mysql_client:remove($MODULENAME, SQL).
 
 find(Conditions) ->
     find(Conditions, [], undefined).
@@ -247,6 +265,35 @@ all() ->
 
 $RECORDGETCOLS
 
+
+unpack_fields(Fields, FieldNames) ->
+    FieldNamesTemp = [get_column_datatype(Column)||Column<-FieldNames],
+    ConvertFun = fun(varchar, {AccIndex, Acc}) ->
+                        {AccIndex+1, [AccIndex|Acc]};
+                    (term_varchar, {AccIndex, Acc}) ->
+                        {AccIndex+1, [AccIndex|Acc]};
+                    (_Other, {AccIndex, Acc}) ->
+                        {AccIndex+1, Acc}
+                 end,
+    {_, FieldList} = lists:foldl(ConvertFun, {1, []}, FieldNamesTemp),
+    unpack_fields(Fields, FieldList, []).
+
+unpack_fields(Res, [], _) ->
+    Res;
+unpack_fields([], _, Acc) ->
+    lists:reverse(Acc);
+unpack_fields([Fields|Tail], FieldList, Acc) ->
+    unpack_fields(Tail, FieldList, [unpack_field1(Fields, [], 1, FieldList)|Acc]).
+
+unpack_field1([Field|Tail], Acc, Index, FieldList) ->
+    case lists:member(Index, FieldList) of
+        true ->
+            unpack_field1(Tail, [mysql_helper:string_to_term(Field)|Acc], Index+1, FieldList);
+        false ->
+            unpack_field1(Tail, [Field|Acc], Index+1, FieldList)
+    end;
+unpack_field1([], Acc, _, _) ->
+    lists:reverse(Acc).
 
 unpack_data([RecordFor|Tail], AccInfo) ->
 	Record = mysql_helper:unpack_row($MODULENAME, RecordFor),

@@ -29,6 +29,12 @@ insert(_Table, Query) ->
     Result = mysql:fetch(ServerName, PoolId, Query),
     convert_data(Result).
 
+remove(_Table, Query) ->
+    ServerName = mysql_name_server:get_client(),
+    PoolId = mysql_util:get_pool_id_write(),
+    Result = mysql:fetch(ServerName, PoolId, Query),
+    convert_data(Result).
+
 select(_Table, Query) ->
     ServerName = mysql_name_server:get_client(),
     PoolId = mysql_util:get_pool_id_read(),
