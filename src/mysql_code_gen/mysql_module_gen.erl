@@ -265,7 +265,6 @@ all() ->
 
 $RECORDGETCOLS
 
-
 unpack_fields(Fields, FieldNames) ->
     FieldNamesTemp = [get_column_datatype(Column)||Column<-FieldNames],
     ConvertFun = fun(varchar, {AccIndex, Acc}) ->
@@ -320,12 +319,4 @@ pack_bash_insert(Inserts) ->
 	\"INSERT INTO \"++erlang:atom_to_list($MODULENAME)++\"($RESTR) VALUES\"++Values++\";\".
 
 ".
-
-
-
-%%
-%% Local Functions
-%%
-
-
 
