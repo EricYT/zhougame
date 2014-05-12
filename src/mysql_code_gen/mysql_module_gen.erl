@@ -192,7 +192,6 @@ pack_update_columns(Columns) ->
 -module($FILENAME).
 
 -compile(export_all).
-
 -record($MODULENAME, {$RECORDS}).
 
 select(FiledList, Conditions) ->
