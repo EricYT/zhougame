@@ -13,21 +13,22 @@ message message_heads{
 }
 
 message login_c2s{
-	require uint16 = 1;
-
+	require uint16 msgid = 1;
+	require int32 id = 2;
+	require string name = 3;
 }
 
 message login_s2c{
-
-
+	require uint16 msgid = 1;
+	require int32 res = 2;
 }
 
 message test_request_c2s{
-
+	require uint16 msgid = 1;
 
 }
 
 message test_request_s2c{
-
+	require uint16 msgid = 1;
 
 }
