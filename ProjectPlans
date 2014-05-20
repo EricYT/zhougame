@@ -8,3 +8,4 @@ This file is a note,we will do it as follow.
 简单的循环选取，应该有一个负载的适配过程；
 6. mochi web增加对网络的短连接来适应当下手机端的网络连接；
 7. 当一个server需要对call不阻塞，可以消防mysql.erl的方式来实现；
+8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；
