@@ -1,0 +1,33 @@
+
+// 这是注释
+message message_heads{
+	// 消息定义
+	msg_login_c2s = 1; //erl:login_pb
+	msg_login_s2c = 2; //
+	
+	
+	msg_test_request_c2s = 3;	// erl:test_packet
+	msg_test_request_s2c = 4;	//
+
+
+}
+
+message login_c2s{
+	require uint16 = 1;
+
+}
+
+message login_s2c{
+
+
+}
+
+message test_request_c2s{
+
+
+}
+
+message test_request_s2c{
+
+
+}
