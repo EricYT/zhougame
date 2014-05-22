@@ -3,22 +3,9 @@
 %% Description: TODO: Add description to login_pb
 -module(login_pb).
 
-%%
-%% Include files
-%%
-
-%%
-%% Exported Functions
-%%
 -export([]).
+-compile(export_all).
 
-%%
-%% API Functions
-%%
-
-
-
-%%
-%% Local Functions
-%%
-
+create_ets_and_init() ->
+	create(),
+	init().
