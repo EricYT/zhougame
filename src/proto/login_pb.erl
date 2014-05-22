@@ -124,9 +124,3 @@ decode_int32_list(Input) when is_binary(Input) ->
                             {[_C|_AccList], _NewAccTail}
                     end, {[], _Rest}, lists:seq(1, _Len)),
     {lists:reverse(_List), _Tail}.
-                  
-
-
-
-
-
