@@ -52,7 +52,7 @@ init() ->
 decode(Input) ->
 	<<ZipFlag:8/unsigned, Left/binary>> = Input,
 	OriBinary = if
-					ZipFlag =:= 0 ->
+					ZipFlag =/= 0 ->
 						zlib:uncompress(Left);
 					true ->
 						Left
