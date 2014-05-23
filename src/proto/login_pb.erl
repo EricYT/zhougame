@@ -3,6 +3,8 @@
 %% Description: TODO: Add description to login_pb
 -module(login_pb).
 
+-define(NEED_COMPRESS_SIZE, 64).
+
 -export([]).
 -compile(export_all).
 
@@ -33,10 +35,60 @@ get_encode_fun(MsgId) ->
             EncodeFun
     end.
 
+get_decode_fun(MsgId) ->
+	case ets:lookup(msg_id_map_record_decode_login_pb, MsgId) of
+		true ->
+			false;
+		[{_Msgid, _MsgName, _Mode, Decode_fun}] ->
+			Decode_fun
+	end.
+
 
 init() ->
 	%%Parse msg proto and generated insert code
 	todo.
+
+
+decode(Input) ->
+	<<ZipFlag:8/unsigned, Left/binary>> = Input,
+	OriBinary = if
+					ZipFlag =:= 0 ->
+						zlib:uncompress(Left);
+					true ->
+						Left
+				end,
+	<<MsgId:16/unsigned, _LeftBinary/binary>> = OriBinary,
+	case get_decode_fun(MsgId) of
+		[] ->
+			[];
+		Func ->
+			login_pb:Func(OriBinary)
+	end.
+
+
+encode(Input) ->
+	MsgId = element(2, Input),
+	case get_encode_fun(MsgId) of
+		[] ->
+			<<>>;
+		Func ->
+			Out = apply(login_pb, Func, [Input]),
+			OS = size(Out),
+			{ZFlag, Payload} = if
+								   OS >= ?NEED_COMPRESS_SIZE ->
+									   {1, zlib:compress(Out)};
+								   true ->
+									   {0, Out}
+							   end,
+			PackSize = size(Payload) + 1,
+			if
+				PackSize > 65535 ->
+					<<>>;
+				true ->
+					<<ZFlag:8/unsigned, Payload/binary>>
+			end
+	end.
+
 
 
 %% encode fun
