@@ -40,8 +40,8 @@ start_link([]) ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    {ok, Soket} = gen_tcp:connect("127.0.0.1", 8089, [{packet, 2}, binary]),
-    io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Soket}]),
+    {ok, Socket} = gen_tcp:connect("127.0.0.1", 8089, [{packet, 2}, binary]),
+    io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Socket}]),
     {ok, #state{}}.
 
 %% --------------------------------------------------------------------
