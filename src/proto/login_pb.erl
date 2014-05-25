@@ -18,6 +18,11 @@ create() ->
 	ets:new(msg_id_map_record_decode_login_pb, [set, named_table, public]).    %% {msgid, msgName, mode, decode_fun}
 
 
+init() ->
+    ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_request_c2s', encode_login_request_c2s, decode_login_request_c2s}]),
+    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_request_s2c', login_pb, decode_login_request_c2s}]).
+
+
 get_record_info(MsgId) ->
     case ets:lookup(msg_id_map_record_decode_login_pb, MsgId) of
         [] ->
@@ -42,11 +47,6 @@ get_decode_fun(MsgId) ->
 		[{_Msgid, _MsgName, _Mode, Decode_fun}] ->
 			Decode_fun
 	end.
-
-
-init() ->
-	%%Parse msg proto and generated insert code
-	todo.
 
 
 decode(Input) ->
