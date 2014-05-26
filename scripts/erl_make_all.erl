@@ -1,6 +1,8 @@
 #!/usr/bin/env escript
-%% - Use to update the erlang beam
+%% -*- erlang -*-
+%%! -smp enable -sname factorial debug
 
+%% - Use to update the erlang beam
 
 main([Options]) ->
 	up_all(Options);

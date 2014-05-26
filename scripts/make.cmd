@@ -1,4 +1,4 @@
 @echo off
 
-escript.exe make.erl
+escript.exe erl_make.erl
 pause

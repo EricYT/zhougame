@@ -18,7 +18,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--record(state, {}).
+-record(state, {socket}).
 
 %% ====================================================================
 %% External functions
@@ -42,7 +42,7 @@ start_link([]) ->
 init([]) ->
     {ok, Socket} = gen_tcp:connect("127.0.0.1", 8089, [{packet, 2}, binary]),
     io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Socket}]),
-    {ok, #state{}}.
+    {ok, #state{socket = Socket}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -76,8 +76,16 @@ handle_cast(Msg, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_info({tcp, Port, BinData}, State) ->
-	io:format(">>>>>>>>>>>>>> handle data from server:~p~n", [{?MODULE, ?LINE, binary_to_term(BinData)}]),
+	io:format("<<<<<<<<<<<<< handle data from server:~p~n", [{?MODULE, ?LINE, binary_to_term(BinData)}]),
     {noreply, State};
+
+handle_info({send_data, Data}, #state{socket = Socket}=State) ->
+    io:format(">>>>>>>>>>>>>>>> send data to server:~p~n", [{?MODULE, ?LINE, Data}]),
+    BinData = erlang:term_to_binary(Data),
+	erlang:port_command(Socket, BinData, [force]),
+%%     gen_tcp:send(Socket, BinData),
+    {noreply, State};
+
 handle_info(Info, State) ->
 	io:format(">>>>>>>>>>>>>> handle data from server:~p~n", [{?MODULE, ?LINE, Info}]),
     {noreply, State}.

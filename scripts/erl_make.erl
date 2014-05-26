@@ -19,6 +19,7 @@ compile_all(Options) ->
 
 
 compile_all() ->
+	%%TODO:增加一个版本控制的beam，以便于在编译的时候检查版本
 	code:add_patha("../ebin"),
 	case make:all() of
 		up_to_date ->
