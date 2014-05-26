@@ -10,7 +10,7 @@ main(_) ->
 
 
 compile_all(Options) ->
-	case make:all(Options) of
+	case mmake:all(get_cpu_cores(), Options) of
 		up_to_date ->
 			halt(0);
 		error ->
@@ -21,12 +21,21 @@ compile_all(Options) ->
 compile_all() ->
 	%%TODO:增加一个版本控制的beam，以便于在编译的时候检查版本
 	code:add_patha("../ebin"),
-	case make:all() of
+	case mmake:all(get_cpu_cores()) of
 		up_to_date ->
 			halt(0);
 		error ->
 			halt(1)
 	end.
+
+get_cpu_cores() ->
+	case os:type() of
+		{unix, _} ->
+			CoreS = erlang:system_info(logical_processors) * 2;
+		_ ->
+			CoreS = erlang:system_info(logical_processors) - 1
+	end,
+	erlang:max(CoreS, 1).
 
 
 covert_args(Args) ->
