@@ -13,7 +13,7 @@
 
 %% --------------------------------------------------------------------
 %% External exports
--export([start_link/1]).
+-export([start_link/1, send_data/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -24,8 +24,14 @@
 %% External functions
 %% ====================================================================
 start_link([]) ->
-    gen_server:start({local, ?MODULE}, ?MODULE, [], []).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+
+-spec send_data(Msg) -> 'ok' | {error, Error} when
+                                                Msg :: term(),
+                                                Error :: atom().
+send_data(Msg) ->
+    erlang:send(?MODULE, {send_data, Msg}).
 
 %% ====================================================================
 %% Server functions
@@ -83,7 +89,9 @@ handle_info({send_data, Data}, #state{socket = Socket}=State) ->
     io:format(">>>>>>>>>>>>>>>> send data to server:~p~n", [{?MODULE, ?LINE, Data}]),
     BinData = erlang:term_to_binary(Data),
 	erlang:port_command(Socket, BinData, [force]),
-%%     gen_tcp:send(Socket, BinData),
+    {noreply, State};
+
+handle_info({inet_reply, _Socket, _Res}, State) ->
     {noreply, State};
 
 handle_info(Info, State) ->
