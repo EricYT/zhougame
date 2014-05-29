@@ -192,10 +192,14 @@ encode_login_c2s(Input) ->
     <<
 	  _msgid/binary,
 	  _id/binary,
-	  _name/binary>>.
+	  _name/binary
+	  >>.
 
 decode_login_c2s(Input) ->
-	todo.
+	<<_msgid:16/unsigned, _Rest1/binary>> = Input,
+	<<_id:64/signed, _Rest2/binary>> = _Rest1,
+	{_name, _LastBin} = decode_string(_Rest2),
+	#login_c2s{msgid = _msgid, id = _id, name = _name}.
 
 encode_login_s2c([MsgBin]) ->
     todo.
