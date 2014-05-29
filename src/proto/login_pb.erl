@@ -182,10 +182,15 @@ decode_int32_list(Input) when is_binary(Input) ->
 %% For test msg proto funcs
 
 encode_login_c2s(Input) ->
-    todo.
+	_msgid = << (Input#login_c2s.msgid):16/unsigned >>,
+	_id = << (Input#login_c2s.id):64/signed>>,
+	{_name, _LastBin} = encode_string(Input#login_c2s.name), 
+    <<
+	  _msgid/binary,
+	  _id/binary,
+	  _name/binary>>.
 
-decode_login_c2s([MsgBin]) ->
-	io:format(">>>>>>>>>> decode_login_c2s:~p~n", [{?MODULE, ?LINE, MsgBin}]),
+decode_login_c2s(Input) ->
 	todo.
 
 encode_login_s2c([MsgBin]) ->

@@ -14,7 +14,7 @@ message message_heads{
 
 message login_c2s{
 	require uint16 msgid = 1;
-	require int32 id = 2;
+	require int64 id = 2;
 	require string name = 3;
 }
 
