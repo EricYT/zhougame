@@ -21,7 +21,8 @@ create() ->
 
 init() ->
     ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_c2s', encode_login_c2s, decode_login_c2s}]),
-    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_s2c', login_pb, decode_login_s2c}]).
+    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_c2s', login_pb, decode_login_c2s}]),
+    ets:insert(msg_id_map_record_decode_login_pb, [{2, 'login_s2c', login_pb, decode_login_s2c}]).
 
 dispath(Msg, GatePid, RolePid) ->
 	io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Msg}]),
@@ -188,7 +189,7 @@ decode_int32_list(Input) when is_binary(Input) ->
 encode_login_c2s(Input) ->
 	_msgid = << (Input#login_c2s.msgid):16/unsigned >>,
 	_id = << (Input#login_c2s.id):64/signed>>,
-	{_name, _LastBin} = encode_string(Input#login_c2s.name), 
+	_name = encode_string(Input#login_c2s.name), 
     <<
 	  _msgid/binary,
 	  _id/binary,

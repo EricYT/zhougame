@@ -14,7 +14,7 @@
 
 %% --------------------------------------------------------------------
 %% External exports
--export([start_link/1, send_data/2]).
+-export([start_link/1, send_data/3]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -30,11 +30,8 @@ start_link([ClientId]) when is_atom(ClientId) ->
     gen_server:start_link({local, ClientId}, ?MODULE, [ClientId], []).
 
 
--spec send_data(ClientId, Msg) -> 'ok' | {error, Error} when
-                                                          ClientId :: integer(),
-                                                          Msg :: term(),
-                                                          Error :: atom().
-send_data(ClientId, Msg) when is_atom(ClientId) ->
+send_data(ClientId, Id, Name) when is_atom(ClientId) ->
+	Msg = login_pb:encode(#login_c2s{id = Id, name = Name}),
     erlang:send(ClientId, {send_data, Msg}).
 
 %% ====================================================================
@@ -91,8 +88,7 @@ handle_info({tcp, Port, BinData}, State) ->
 
 handle_info({send_data, Data}, #state{socket = Socket}=State) ->
     io:format(">>>>>>>>>>>>>>>> send data to server:~p~n", [{?MODULE, ?LINE, Data}]),
-    BinData = erlang:term_to_binary(Data),
-	erlang:port_command(Socket, BinData, [force]),
+	erlang:port_command(Socket, Data, [force]),
     {noreply, State};
 
 handle_info({inet_reply, _Socket, _Res}, State) ->
