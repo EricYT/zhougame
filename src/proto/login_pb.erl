@@ -20,8 +20,12 @@ create() ->
 
 
 init() ->
-    ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_request_c2s', encode_login_request_c2s, decode_login_request_c2s}]),
-    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_request_s2c', login_pb, decode_login_request_c2s}]).
+    ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_c2s', encode_login_c2s, decode_login_c2s}]),
+    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_s2c', login_pb, decode_login_s2c}]).
+
+dispath(Msg, GatePid, RolePid) ->
+	io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Msg}]),
+	todo.
 
 
 get_record_info(MsgId) ->
