@@ -3,6 +3,7 @@
 %% Description: TODO: Add description to login_pb
 -module(login_pb).
 
+-include("login_pb.hrl").
 -define(NEED_COMPRESS_SIZE, 64).
 
 -export([]).
@@ -180,5 +181,15 @@ decode_int32_list(Input) when is_binary(Input) ->
 
 %% For test msg proto funcs
 
-encode_login_request_c2s([MsgBin]) ->
+encode_login_c2s(Input) ->
     todo.
+
+decode_login_c2s([MsgBin]) ->
+	io:format(">>>>>>>>>> decode_login_c2s:~p~n", [{?MODULE, ?LINE, MsgBin}]),
+	todo.
+
+encode_login_s2c([MsgBin]) ->
+    todo.
+
+decode_login_s2c([MsgBin]) ->
+	todo.
