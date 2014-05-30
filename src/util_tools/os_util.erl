@@ -62,6 +62,17 @@ linux_run(CmdLine, Flag) ->
 			end
 	end.
 
+win_run(CmdLine, Flag) ->
+	case os:type() of
+		{win32, nt} ->
+			case Flag of
+				wait -> wait_exe(CmdLine);
+				_ -> run_exe(CmdLine)
+			end;
+		_ ->
+			io:format("linux does not run:~p~n", [CmdLine])
+	end.
+
 
 run_erl(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option) ->
 	CommandLine = get_erl_cmd(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option),

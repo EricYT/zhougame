@@ -79,7 +79,7 @@ win_run_gui_erl(Prefix, Option, ComOpt) ->
 	case os_util:match_ip(Ip) of
 		true ->
 			AddOption = ComOpt ++ " " ++ Addition,
-			os_util:run_erl(gui, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
+			os_util:win_run(gui, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
 		false ->
 			nothing
 	end.
