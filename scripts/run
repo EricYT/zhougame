@@ -5,7 +5,9 @@
 main([]) ->
 	run("../options/run.options");
 main(Options) ->
-	nothing.
+	Options = get_arguments(Options),
+	OptFile = "../options/run.options",
+	todo.
 
 
 
@@ -35,6 +37,27 @@ run(OptionFile) ->
 			io:format("Error ~p~n~p~n", [{E, R}, erlang:get_stacktrace()])
 	end.
 	
+run_tool(RunOptFile, N) ->
+	case run_option:get_options(OptionFile) of
+    		[] ->
+    			io:format("Error Option File ~p~n", [OptionFile]);
+    		Options ->
+    			ComOpt1 = run_option:get_opt_common_option(Options),
+    			Prefix = run_option:get_opt_prefix(Options),
+    			ComOpt = string_util:replace(ComOpt1, "$PREFIX", Prefix),
+    			Nodes = run_option:get_opt_tools_node(Options),
+    			%%io:format("run option file ~p ~n", [Nodes]),
+    			BeamDir = run_option:get_opt_beam_dir(Options),
+    			file:set_cwd(BeamDir),
+    			RunOpt = lists:nth(N, Nodes)
+    			case os:type() of
+    				{win32,nt} ->
+    					win_run_gui_erl(Prefix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt);
+    				_ ->
+    					todo
+    			end
+    end.
+	
 	
 run_erl(Prefix, Option, ComOpt) ->
 	{SNode, Ip, DbDir, Smp, Addition} = Option,
@@ -47,6 +70,16 @@ run_erl(Prefix, Option, ComOpt) ->
 				_ ->
 					os_util:run_erl(hiden, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption)
 			end;
+		false ->
+			nothing
+	end.
+	
+win_run_gui_erl(Prefix, Option, ComOpt) ->
+	{SNode, Ip, DbDir, Smp, Addition} = Option,
+	case os_util:match_ip(Ip) of
+		true ->
+			AddOption = ComOpt ++ " " ++ Addition,
+			os_util:run_erl(gui, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
 		false ->
 			nothing
 	end.

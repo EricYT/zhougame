@@ -65,6 +65,12 @@ get_opt_cache_node(Options) ->
 		{_, CacheNode} -> CacheNode
 	end.
 
+get_opt_tools_node(Options) ->
+	case lists:keyfind(tool_nodes, 1, Options) of
+		false -> undefined;
+		{_, CacheNode} -> CacheNode
+	end.
+
 
 %%
 %% Local Functions
