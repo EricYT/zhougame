@@ -54,6 +54,9 @@ start(Type, StartArgs) ->
             ping_center:wait_all_nodes_connect(true),
             %% MySQL need be treated as application
             erlmysql_app:start(),
+			%% robot test
+			login_pb:create_ets_and_init(),
+			client_robot_sup:start_link([]),
             case gate_sup:start_link(StartArgs) of
                 {ok, Pid} ->
                     {ok, Pid};

@@ -61,6 +61,8 @@ start(Type, StartArgs) ->
 				{error, _Error} ->
 					ListennerState = false
 			end,
+			%% login pb
+			login_pb:create_ets_and_init(),
 %% 			boot_session_manager_sup(),
 			if
 				not ListennerState ->

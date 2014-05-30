@@ -24,9 +24,9 @@
 %% ====================================================================
 %% External functions
 %% ====================================================================
-start_link([ClientId]) when is_list(ClientId) ->
+start_link(ClientId) when is_list(ClientId) ->
     start_link([list_to_atom(ClientId)]);
-start_link([ClientId]) when is_atom(ClientId) ->
+start_link(ClientId) when is_atom(ClientId) ->
     gen_server:start_link({local, ClientId}, ?MODULE, [ClientId], []).
 
 

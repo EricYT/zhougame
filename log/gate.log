@@ -1,133 +1,117 @@
 
-=ERROR REPORT==== 29-May-2014::16:47:52 ===
+=ERROR REPORT==== 30-May-2014::09:59:47 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
                          'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
                          'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
                         true}
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:52 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
-(debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
-
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:47 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) ********* applicationex Application erlmysql_app
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) ************** erlmysql_app app []
 
-=ERROR REPORT==== 29-May-2014::16:47:53 ===
+=ERROR REPORT==== 30-May-2014::09:59:48 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
                          'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
                          'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
                         true}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 29-May-2014::16:47:53 ===
+=INFO REPORT==== 30-May-2014::09:59:48 ===
 (debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=ERROR REPORT==== 29-May-2014::16:48:51 ===
-** Generic server <0.83.0> terminating 
-** Last message in was {tcp,#Port<0.862>,
-                            <<0,0,1,0,0,0,0,0,0,0,1,0,4,98,97,110,103>>}
-** When Server state == {state,#Port<0.862>}
+=ERROR REPORT==== 30-May-2014::10:02:25 ===
+** Generic server <0.84.0> terminating 
+** Last message in was {tcp,#Port<0.1230>,
+                            <<0,0,1,0,0,0,0,0,0,0,2,0,8,98,105,103,32,98,97,
+                              110,103>>}
+** When Server state == {state,#Port<0.1230>}
 ** Reason for termination == 
 ** {badarg,
        [{ets,lookup,[msg_id_map_record_decode_login_pb,1],[]},
         {login_pb,get_decode_fun,1,
-            [{file,"e:/GitHub/zhougame/src/proto/login_pb.erl"},{line,49}]},
+            [{file,"e:/GitHub/zhougame/src/proto/login_pb.erl"},{line,50}]},
         {login_pb,decode,1,
             [{file,"e:/GitHub/zhougame/src/proto/login_pb.erl"},{line,67}]},
-        {socket_callback,on_receive_client_packet,3,
-            [{file,"e:/GitHub/zhougame/src/gate/socket_callback.erl"},
-             {line,21}]},
-        {player_session_processor,handle_info,2,
-            [{file,"e:/GitHub/zhougame/src/gate/player_session_processor.erl"},
-             {line,86}]},
-        {gen_server,handle_msg,5,[{file,"gen_server.erl"},{line,597}]},
-        {proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,227}]}]}
-
-=ERROR REPORT==== 29-May-2014::16:49:57 ===
-** Generic server <0.86.0> terminating 
-** Last message in was {tcp,#Port<0.882>,
-                            <<0,0,1,0,0,0,0,0,0,0,1,0,4,98,97,110,103>>}
-** When Server state == {state,#Port<0.882>}
-** Reason for termination == 
-** {function_clause,
-       [{login_pb,decode_login_s2c,
-            [<<0,1,0,0,0,0,0,0,0,1,0,4,98,97,110,103>>],
-            [{file,"e:/GitHub/zhougame/src/proto/login_pb.erl"},{line,209}]},
         {socket_callback,on_receive_client_packet,3,
             [{file,"e:/GitHub/zhougame/src/gate/socket_callback.erl"},
              {line,21}]},
