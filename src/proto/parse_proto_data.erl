@@ -16,8 +16,25 @@
 parse_proto_data() ->
     case file:consult(?PROTO_FILE) of
         {ok, Messages} ->
-            io:format("~p~n", [Messages]);
+            convert_message_to_record(Messages, [], [], []),
+            ok;
         Error ->
             io:format(">>>>>> Open file faild:~p~n", [{?MODULE, ?LINE, Error}])
     end.
+
+
+convert_message_to_record([], Msgs, MsgDefines, MsgTypes) ->
+    {Msgs, MsgDefines, MsgTypes};
+convert_message_to_record([#message_heads{}=Record|Tail],
+                          Msgs, MsgDefines, MsgTypes) ->
+    io:format("message_heads ~p~n", [Record]),
+    convert_message_to_record(Tail, Msgs, MsgDefines, MsgTypes);
+convert_message_to_record([#msg_normal{}=Record|Tail],
+                          Msgs, MsgDefines, MsgTypes) ->
+    io:format("msg_normal ~p~n", [Record]),
+    convert_message_to_record(Tail, Msgs, MsgDefines, MsgTypes);
+convert_message_to_record([#type_private{}=Record|Tail],
+                          Msgs, MsgDefines, MsgTypes) ->
+    io:format("type_private ~p~n", [Record]),
+    convert_message_to_record(Tail, Msgs, MsgDefines, MsgTypes).
 

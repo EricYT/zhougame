@@ -9,18 +9,18 @@
                 {head_attr, login_s2c, 2, s2c, lua, "登录返回"}
                 ]}.
 
-{message_normal, login_c2s,[
+{msg_normal, login_c2s,[
                 {msg_attr, msgid, 1, uint16, require, "消息id"},
                 {msg_attr, id, 2, int64, require, "role id"},
                 {msg_attr, name, 3, string, require, "名字"}
                 ]}.
                 
-{message_normal, login_s2c,[
+{msg_normal, login_s2c,[
                 {msg_attr, msgid, 1, uint16, require, "消息id"},
                 {msg_attr, res, 2, int32, require, "登录结果"}
                 ]}.
 
-{message_normal, type_test,[
+{msg_normal, type_test,[
                 {msg_attr, msgid, 1, uint16, require, "消息id"},
                 {msg_attr, res, 2, type1, require, "登录结果"}
                 ]}.
