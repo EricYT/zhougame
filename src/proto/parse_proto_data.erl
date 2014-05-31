@@ -32,9 +32,10 @@ parse_proto_data() ->
 
 message_validate([], Msgs, MsgDefines, MsgTypes) ->
     {Msgs, MsgDefines, MsgTypes};
-message_validate([#message_heads{}=Record|Tail],
-                          Msgs, MsgDefines, MsgTypes) ->
-    message_validate(Tail, [Record|Msgs], MsgDefines, MsgTypes);
+message_validate([#message_heads{messages=HeadAttrs}=_Record|Tail],
+                          _Msgs, MsgDefines, MsgTypes) ->
+    Messages = [Head||Head<-HeadAttrs, erlang:is_record(Head, head_attr)],
+    message_validate(Tail, Messages, MsgDefines, MsgTypes);
 message_validate([#msg_normal{}=Record|Tail],
                           Msgs, MsgDefines, MsgTypes) ->
     message_validate(Tail, Msgs, [Record|MsgDefines], MsgTypes);
@@ -49,6 +50,12 @@ init_message_ets(MsgHeads, MsgDefines, MsgType) ->
         ets:new(?MESSAGE_DEFINE_ETS, [named_table, public, set, {keypos, 2}]),
         ets:new(?MESSAGE_TYPE_ETS, [named_table, public, set, {keypos, 2}])
     catch
-        E:R -> io:format("create ets error :~p~n", [{E, R}])
+        E:R ->
+            io:format("create ets error :~p~n", [{E, R}]),
+            erlang:exit("Proto Ets Exists")
     end,
-    todo.
+    %% If the ets exists, exit 
+    ets:insert(?MESSAGE_HEAD_ETS, MsgHeads),
+    ets:insert(?MESSAGE_DEFINE_ETS, MsgDefines),
+    ets:insert(?MESSAGE_TYPE_ETS, MsgType),
+    ok.
