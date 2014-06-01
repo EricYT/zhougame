@@ -24,7 +24,7 @@
 %%
 %% API Functions
 %%
--define(debug, ok).
+%% -define(debug, ok).
 -ifdef(debug).
 	info(Format, Data) ->
 		io:format(?MF_FMT(Format), ?MF_DATA(Data)),
