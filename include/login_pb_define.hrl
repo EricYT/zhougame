@@ -7,7 +7,7 @@
 
 %% 消息的具体定义
 -record(msg_normal, {msg_name, msg_attrs}).               
--record(msg_attr, {field_name, id, base_type, type, comment}).
+-record(msg_attr, {field_name, id, base_type, len, type, comment}).
 
 %% 私有类型定义结构
 -record(type_private, {type_name, attrs}).

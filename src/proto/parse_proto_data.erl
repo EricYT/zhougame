@@ -19,6 +19,9 @@
 -define(MESSAGE_DEFINE_ETS, '$ets_message_define$').
 -define(MESSAGE_TYPE_ETS, '$ets_message_type$').
 
+-define(NORMAL_TYPE, [{"uint", "unsigned"}, {"int", "signed"}]).
+-define(SPECIAL_TYPE, ['string']).
+
 -define(FROAMT_RECORD_HEAD, "%%This file is auto generate,do not modify it.\n").
 -define(FORMAT_RECORD, "-record($RECORD_NAME, {$RECORD_COLS}).\n").
 
@@ -163,10 +166,10 @@ convert_msg_encode_or_decode() ->
         fun(#head_attr{msg_name = MsgName}=MsgRecord, AccRecord) ->
                 MsgNameString = atom_to_list(MsgName),
                 {MsgEncode, MsgDecode} = convert_encode_or_decode_part(MsgRecord),
-                Record =
-                    mysql_op_gen:key_value_replace([{"$RECORD_NAME", MsgNameString},
-                                                    {"$RECORD_COLS", MsgCols}],
-                                                   ?FORMAT_RECORD), 
+%%                 Record =
+%%                     mysql_op_gen:key_value_replace([{"$RECORD_NAME", MsgNameString},
+%%                                                     {"$RECORD_COLS", MsgCols}],
+%%                                                    ?FORMAT_RECORD), 
                 [Record|AccRecord]
         end,
     AllMsgHeads = ets:tab2list(?MESSAGE_HEAD_ETS),
@@ -177,9 +180,9 @@ convert_msg_encode_or_decode() ->
     Res = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
     ok.
 
-convert_encode_or_decode_part(MsgRecord}) ->
+convert_encode_or_decode_part(MsgRecord) ->
     EncodePart = convert_encode_part(MsgRecord),
-    EncodePart = convert_encode_part(MsgRecord),
+    DecodePart = convert_encode_part(MsgRecord),
     {EncodePart, DecodePart}.
 
 convert_encode_part(#head_attr{msg_name = MsgName}) ->
@@ -198,8 +201,30 @@ convert_encode_part(#head_attr{msg_name = MsgName}) ->
     end.
 
 convert_encode_body([#msg_attr{field_name = FieldName, base_type = BaseType,
-                               type = Type}|Tail], MsgNameString, AccInfo) ->
-    ok;
+                               len = Len, type = Type}|Tail], MsgNameString, AccInfo) ->
+    FieldNameString = atom_to_list(FieldName),
+    FieldHead = "\t_"++FieldNameString++" = ",
+    case BaseType of
+        'int' ->
+            if
+                Type =:= required ->
+                    %%  _msgid = <<(Input#login_c2s.msgid):16/unsigned>>
+                    Lan = FieldHead++"<<Input#"++MsgNameString++"."++
+                          FieldNameString++"):"++integer_to_list(Len)++
+                          "/"++"signed"++">>",
+                    convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+                Type =:= repeated ->
+                    %% _role_list = ecnode_int32_list(Input#test.role_list)
+                    Lan = FieldHead++"encode_"++atom_to_list(BaseType)++
+                          "_list(Input#"++MsgNameString++"."++
+                          FieldNameString,
+                    convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+                true ->
+                    exit("Bad type required or repeated")
+            end;
+        {false, _BaseType, _} ->
+            todo
+    end;
 convert_encode_body([], _MsgNameString, AccInfo) ->
     lists:reverse(AccInfo).
 
