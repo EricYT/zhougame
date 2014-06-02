@@ -19,16 +19,6 @@ create() ->
 	ets:new(msg_id_map_record_decode_login_pb, [set, named_table, public]).    %% {msgid, msgName, mode, decode_fun}
 
 
-init() ->
-    ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_c2s', encode_login_c2s, decode_login_c2s}]),
-    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_c2s', login_pb, decode_login_c2s}]),
-    ets:insert(msg_id_map_record_decode_login_pb, [{2, 'login_s2c', login_pb, decode_login_s2c}]).
-
-dispath(Msg, GatePid, RolePid) ->
-	io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Msg}]),
-	todo.
-
-
 get_record_info(MsgId) ->
     case ets:lookup(msg_id_map_record_decode_login_pb, MsgId) of
         [] ->
@@ -182,6 +172,17 @@ decode_int32_list(Input) when is_binary(Input) ->
                             {[_C|_AccList], _NewAccTail}
                     end, {[], _Rest}, lists:seq(1, _Len)),
     {lists:reverse(_List), _Tail}.
+
+
+%% init opeate
+init() ->
+    ets:insert(msg_id_map_record_encode_login_pb, [{1, 'login_c2s', encode_login_c2s, decode_login_c2s}]),
+    ets:insert(msg_id_map_record_decode_login_pb, [{1, 'login_c2s', login_pb, decode_login_c2s}]),
+    ets:insert(msg_id_map_record_decode_login_pb, [{2, 'login_s2c', login_pb, decode_login_s2c}]).
+
+dispath(Msg, GatePid, RolePid) ->
+    io:format(">>>>>>>>>>>> ~p~n", [{?MODULE, ?LINE, Msg}]),
+    todo.
 
 
 %% For test msg proto funcs
