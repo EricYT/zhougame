@@ -183,30 +183,39 @@ convert_msg_encode_or_decode() ->
     Res = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
     string:join(lists:reverse(Res), "\n").
 
-convert_encode_or_decode_part(MsgRecord) ->
-    EncodePart = convert_encode_part(MsgRecord),
-    DecodePart = convert_decode_part(MsgRecord),
-    {EncodePart, DecodePart}.
 
-convert_encode_part(#head_attr{msg_name = MsgName}) ->
+convert_encode_or_decode_part(#head_attr{msg_name = MsgName}) ->
     case ets:lookup(?MESSAGE_DEFINE_ETS, MsgName) of
         [] ->
-            io:format("Message formate error, no message ~p define~n", [MsgName]);
+            io:format("Message formate error, no message ~p define~n", [MsgName]),
+			exit("Message formate error, no message define");
         [#msg_normal{msg_attrs = MsgCols}] ->
-            SortMsgColsById =
-                lists:sort(fun(#msg_attr{id = Id1}, #msg_attr{id = Id2}) ->
-                                   Id1 < Id2
-                           end, MsgCols),
-            MsgNameString = atom_to_list(MsgName),
-            MsgEncodeFun = "encode_"++MsgNameString++"(Input) ->\n",
-            MsgBody = convert_encode_body(SortMsgColsById, MsgNameString, []),
-			MsgTail = convert_encode_tail(SortMsgColsById),
-            MsgEncodeFun++MsgBody++MsgTail
+			SortMsgColsById =
+				lists:sort(fun(#msg_attr{id = Id1}, #msg_attr{id = Id2}) ->
+								   Id1 < Id2
+						   end, MsgCols),
+			EncodePart = convert_encode_part(MsgName, SortMsgColsById),
+			DecodePart = convert_decode_part(MsgName, SortMsgColsById),
+			{EncodePart, DecodePart}
     end.
 
-convert_decode_part(#head_attr{msg_name = MsgName}) ->
-	todo.
+convert_encode_part(MsgName, MsgCols) ->
+	MsgNameString = atom_to_list(MsgName),
+	MsgEncodeFun = "encode_"++MsgNameString++"(Input) ->\n",
+	MsgBody = convert_encode_body(MsgCols, MsgNameString, []),
+	MsgTail = convert_encode_tail(MsgCols),
+	MsgEncodeFun++MsgBody++MsgTail.
 
+convert_decode_part(MsgName, MsgCols) ->
+	MsgNameString = atom_to_list(MsgName),
+	MsgEncodeFun = "decode_"++MsgNameString++"(Input) ->\n"++
+					   "\t_LastBinary0 = Input,\n",
+	MsgBody = convert_decode_body(MsgCols, MsgNameString, 0, []),
+	MsgTail = convert_decode_tail(MsgCols, MsgNameString),
+	MsgEncodeFun++MsgBody++MsgTail.
+
+
+%% encode part
 convert_encode_body([#msg_attr{field_name = FieldName, base_type = 'int',
 							   len = Len, type = Type}|Tail], MsgNameString, AccInfo) ->
 	FieldNameString = atom_to_list(FieldName),
@@ -304,6 +313,107 @@ convert_encode_tail(SortMsgColsById) ->
 		   ||#msg_attr{field_name = Field}<-SortMsgColsById],
 	ColsStringWithComma = string:join(Cols, ",\n\t"),
 	"\t<<\n\t"++ColsStringWithComma++"\n\t>>.\n".
+
+
+%% decode part
+convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'int',
+							   len = Len, type = Type}|Tail], MsgNameString, AccIndex, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	if
+		Type =:= required ->
+			%%  <<_field:16/signed, _LastBinary1/binary>> = _LastBinary0
+			Lan = "<<_"++FieldNameString++":"++integer_to_list(Len)++
+					  "/signed, _LastBinary"++integer_to_list(AccIndex+1)++
+					  "/binary>> = _LastBinary"++integer_to_list(AccIndex),
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% {_field, _LastBinary1} = decode_int32_list(_LastBinary0)
+			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+					  "} = decode_int"++integer_to_list(Len)++"_list(_LastBinary"++
+					  integer_to_list(AccIndex)++")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'uint',
+							   len = Len, type = Type}|Tail], MsgNameString, AccIndex, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	if
+		Type =:= required ->
+			%%  <<_field:16/unsigned, _LastBinary1/binary>> = _LastBinary0
+			Lan = "<<_"++FieldNameString++":"++integer_to_list(Len)++
+					  "/unsigned, _LastBinary"++integer_to_list(AccIndex+1)++
+					  "/binary>> = _LastBinary"++integer_to_list(AccIndex),
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% {_field, _LastBinary1} = decode_uint32_list(_LastBinary0)
+			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+					  "} = decode_uint"++integer_to_list(Len)++"_list(_LastBinary"++
+					  integer_to_list(AccIndex)++")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'string',
+							   len = _Len, type = Type}|Tail], MsgNameString, AccIndex, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	if
+		Type =:= required ->
+			%% {_field, _LastBinary1} = decode_string(LastBinary0)
+			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+					  "} = decode_string(_LastBinary"++integer_to_list(AccIndex)++
+					  ")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% {_field, _LastBinary1} = decode_string_list(LastBinary0)
+			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+					  "} = decode_string_list(_LastBinary"++integer_to_list(AccIndex)++
+					  ")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_decode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
+							   len = _Len, type = Type}|Tail], MsgNameString, AccIndex, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	FieldHead = "\t_"++FieldNameString++" = ",
+	PrivTypeString = atom_to_list(PrivType),
+	if
+		Type =:= required ->
+			%%  {_field, _LastBinary1} = decode_privType(_LastBinary0)
+			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+					  "} = decode_"++PrivTypeString++"(_LastBinary"++
+					  integer_to_list(AccIndex)++")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% <<_field_count:16/unisgned, _LastBinary1_temp/binary>> = _LastBinary0,
+			%% {_field, _LastBinary1} = lists:foldl(_, {_cls_list_field, _cls_bin_field}) ->
+			%%			{_new_cls_field, _new_cls_bin_field} = decode_privType(_cls_list_field),
+			%%			{[_cls_list_field|_new_cls_field], _new_cls_bin_field}
+			%%			end, {[], _LastBinary1_temp}, lists:seq(1, _field_count))
+			CountString = "\t_<<_"++FieldNameString++"_count:16/unsigned, _LastBinary"++
+							  integer_to_list(AccIndex+1)++"_temp/binary>> = _LastBinary"++
+							  integer_to_list(AccIndex)++",\n",
+			Lan = CountString++"{_"++FieldNameString++", _LastBinary"++
+					  integer_to_list(AccIndex+1)++"} = "++"lists:foldl(fun(_cls_list_"++
+					  FieldNameString++
+					  ", _cls_bin_"++FieldNameString++") ->\n\t\t"++
+					  "_new_cls_bin_"++FieldNameString++" = encode_"++
+					  PrivTypeString++"(_cls_list_"++FieldNameString++
+					  "),\n\t\t"++"<<_cls_bin_"++FieldNameString++
+					  "/binary, _new_cls_bin_"++FieldNameString++
+					  "/binary>>\n"++"\tend,<<_"++FieldNameString++"_count:16/unsigned"++
+					  ">>, Input#"++MsgNameString++"."++FieldNameString++")",
+			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_decode_body([], _MsgNameString, _AccIndex, AccInfo) ->
+	string:join(lists:reverse([""|AccInfo]), ",\n").
+
+
+convert_decode_tail(SortMsgColsById, MsgNameString) ->
+	"".
 
 
 %% login_pb.erl template

@@ -203,6 +203,3 @@ encode_type_test(Input) ->
 	_res/binary
 	>>.
 
-encode_type1(_) ->
-	todo.
-
