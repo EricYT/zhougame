@@ -183,6 +183,16 @@ encode_login_c2s(Input) ->
 	_name/binary
 	>>.
 
+decode_login_c2s(Input) ->
+	_LastBinary0 = Input,
+	<<_msgid:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
+	<<_id:64/signed, _LastBinary2/binary>> = _LastBinary1,
+	{_name, _LastBinary3} = decode_string_list(_LastBinary2),
+	#login_c2s{
+		msgid = _msgid,
+		id = _id,
+		name = _name}.
+
 encode_login_s2c(Input) ->
 	_msgid = <<(Input#login_s2c.msgid):16/unsigned>>,
 	_res = <<(Input#login_s2c.res):32/signed>>,
@@ -190,6 +200,14 @@ encode_login_s2c(Input) ->
 	_msgid/binary,
 	_res/binary
 	>>.
+
+decode_login_s2c(Input) ->
+	_LastBinary0 = Input,
+	<<_msgid:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
+	<<_res:32/signed, _LastBinary2/binary>> = _LastBinary1,
+	#login_s2c{
+		msgid = _msgid,
+		res = _res}.
 
 encode_type_test(Input) ->
 	_msgid = <<(Input#type_test.msgid):16/unsigned>>,
@@ -202,4 +220,16 @@ encode_type_test(Input) ->
 	_msgid/binary,
 	_res/binary
 	>>.
+
+decode_type_test(Input) ->
+	_LastBinary0 = Input,
+	<<_msgid:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
+	_<<_res_count:16/unsigned, _LastBinary2_temp/binary>> = _LastBinary1,
+	{_res, _LastBinary2} = lists:foldl(fun(_, {_cls_list_res, _cls_bin_res}) ->
+		{_new_cls_res, _new_cls_bin_res} = decode_type1(_cls_bin_res),
+		{[_cls_list_res|_new_cls_res], _new_cls_binres}
+	end,{[], _LastBinary2_temp}, lists:seq(1, _res_count)),
+	#type_test{
+		msgid = _msgid,
+		res = _res}.
 

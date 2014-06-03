@@ -164,16 +164,9 @@ convert_msg_insert(#head_attr{id = Id, msg_name = MsgName, mod = Mod}) ->
 
 convert_msg_encode_or_decode() ->
     ConvertRecord =
-        fun(#head_attr{msg_name = MsgName}=MsgRecord, AccRecord) ->
-                MsgNameString = atom_to_list(MsgName),
+        fun(#head_attr{}=MsgRecord, AccRecord) ->
                 {MsgEncode, MsgDecode} = convert_encode_or_decode_part(MsgRecord),
-				io:format(">>>>> ~p~n", [MsgEncode]),
-%%                 Record =
-%%                     mysql_op_gen:key_value_replace([{"$RECORD_NAME", MsgNameString},
-%%                                                     {"$RECORD_COLS", MsgCols}],
-%%                                                    ?FORMAT_RECORD), 
-%%                 [Record|AccRecord]
-				[MsgEncode|AccRecord]
+				[MsgDecode]++[MsgEncode]++AccRecord
         end,
     AllMsgHeads = ets:tab2list(?MESSAGE_HEAD_ETS),
     SortAllMsgHeads =
@@ -322,13 +315,13 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'int',
 	if
 		Type =:= required ->
 			%%  <<_field:16/signed, _LastBinary1/binary>> = _LastBinary0
-			Lan = "<<_"++FieldNameString++":"++integer_to_list(Len)++
+			Lan = "\t<<_"++FieldNameString++":"++integer_to_list(Len)++
 					  "/signed, _LastBinary"++integer_to_list(AccIndex+1)++
 					  "/binary>> = _LastBinary"++integer_to_list(AccIndex),
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
 		Type =:= repeated ->
 			%% {_field, _LastBinary1} = decode_int32_list(_LastBinary0)
-			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+			Lan = "\t{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
 					  "} = decode_int"++integer_to_list(Len)++"_list(_LastBinary"++
 					  integer_to_list(AccIndex)++")",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
@@ -341,13 +334,13 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'uint',
 	if
 		Type =:= required ->
 			%%  <<_field:16/unsigned, _LastBinary1/binary>> = _LastBinary0
-			Lan = "<<_"++FieldNameString++":"++integer_to_list(Len)++
+			Lan = "\t<<_"++FieldNameString++":"++integer_to_list(Len)++
 					  "/unsigned, _LastBinary"++integer_to_list(AccIndex+1)++
 					  "/binary>> = _LastBinary"++integer_to_list(AccIndex),
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
 		Type =:= repeated ->
 			%% {_field, _LastBinary1} = decode_uint32_list(_LastBinary0)
-			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+			Lan = "\t{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
 					  "} = decode_uint"++integer_to_list(Len)++"_list(_LastBinary"++
 					  integer_to_list(AccIndex)++")",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
@@ -360,13 +353,13 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'string',
 	if
 		Type =:= required ->
 			%% {_field, _LastBinary1} = decode_string(LastBinary0)
-			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+			Lan = "\t{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
 					  "} = decode_string(_LastBinary"++integer_to_list(AccIndex)++
 					  ")",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
 		Type =:= repeated ->
 			%% {_field, _LastBinary1} = decode_string_list(LastBinary0)
-			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+			Lan = "\t{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
 					  "} = decode_string_list(_LastBinary"++integer_to_list(AccIndex)++
 					  ")",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
@@ -376,12 +369,11 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = 'string',
 convert_decode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 							   len = _Len, type = Type}|Tail], MsgNameString, AccIndex, AccInfo) ->
 	FieldNameString = atom_to_list(FieldName),
-	FieldHead = "\t_"++FieldNameString++" = ",
 	PrivTypeString = atom_to_list(PrivType),
 	if
 		Type =:= required ->
 			%%  {_field, _LastBinary1} = decode_privType(_LastBinary0)
-			Lan = "{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
+			Lan = "\t{_"++FieldNameString++", _LastBinary"++integer_to_list(AccIndex+1)++
 					  "} = decode_"++PrivTypeString++"(_LastBinary"++
 					  integer_to_list(AccIndex)++")",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
@@ -393,17 +385,17 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 			%%			end, {[], _LastBinary1_temp}, lists:seq(1, _field_count))
 			CountString = "\t_<<_"++FieldNameString++"_count:16/unsigned, _LastBinary"++
 							  integer_to_list(AccIndex+1)++"_temp/binary>> = _LastBinary"++
-							  integer_to_list(AccIndex)++",\n",
+							  integer_to_list(AccIndex)++",\n\t",
 			Lan = CountString++"{_"++FieldNameString++", _LastBinary"++
-					  integer_to_list(AccIndex+1)++"} = "++"lists:foldl(fun(_cls_list_"++
-					  FieldNameString++
-					  ", _cls_bin_"++FieldNameString++") ->\n\t\t"++
-					  "_new_cls_bin_"++FieldNameString++" = encode_"++
-					  PrivTypeString++"(_cls_list_"++FieldNameString++
-					  "),\n\t\t"++"<<_cls_bin_"++FieldNameString++
-					  "/binary, _new_cls_bin_"++FieldNameString++
-					  "/binary>>\n"++"\tend,<<_"++FieldNameString++"_count:16/unsigned"++
-					  ">>, Input#"++MsgNameString++"."++FieldNameString++")",
+					  integer_to_list(AccIndex+1)++"} = "++"lists:foldl(fun(_, {_cls_list_"++
+					  FieldNameString++", _cls_bin_"++FieldNameString++"}) ->\n\t\t"++
+					  "{_new_cls_"++FieldNameString++", _new_cls_bin_"++FieldNameString++
+					  "} = decode_"++PrivTypeString++"(_cls_bin_"++FieldNameString++
+					  "),\n\t\t"++"{[_cls_list_"++FieldNameString++
+					  "|_new_cls_"++FieldNameString++"], _new_cls_bin"++
+					  FieldNameString++"}\n"++"\tend,{[], _LastBinary"++
+					  integer_to_list(AccIndex+1)++"_temp}"++
+					  ", lists:seq(1, "++"_"++FieldNameString++"_count))",
 			convert_decode_body(Tail, MsgNameString, AccIndex+1, [Lan|AccInfo]);
 		true ->
 			exit("Bad type required or repeated")
@@ -413,7 +405,9 @@ convert_decode_body([], _MsgNameString, _AccIndex, AccInfo) ->
 
 
 convert_decode_tail(SortMsgColsById, MsgNameString) ->
-	"".
+	ColsTemp = [atom_to_list(Field)++" = _"++atom_to_list(Field)
+			   ||#msg_attr{field_name=Field}<-SortMsgColsById],
+	"\t#"++MsgNameString++"{\n\t\t"++string:join(ColsTemp, ",\n\t\t")++"}.\n".
 
 
 %% login_pb.erl template
