@@ -169,7 +169,9 @@ init() ->
 	ets:insert(msg_id_map_record_encode_login_pb, [{1, login_c2s, encode_login_c2s, decode_login_c2s}]),
 	ets:insert(msg_id_map_record_decode_login_pb, [{1, login_c2s, login_pb, decode_login_c2s}]),
 	ets:insert(msg_id_map_record_encode_login_pb, [{2, login_s2c, encode_login_s2c, decode_login_s2c}]),
-	ets:insert(msg_id_map_record_decode_login_pb, [{2, login_s2c, lua, decode_login_s2c}]).
+	ets:insert(msg_id_map_record_decode_login_pb, [{2, login_s2c, lua, decode_login_s2c}]),
+	ets:insert(msg_id_map_record_encode_login_pb, [{3, type_test, encode_type_test, decode_type_test}]),
+	ets:insert(msg_id_map_record_decode_login_pb, [{3, type_test, login_pb, decode_type_test}]).
 
 encode_login_c2s(Input) ->
 	_msgid = <<(Input#login_c2s.msgid):16/unsigned>>,
@@ -180,6 +182,7 @@ encode_login_c2s(Input) ->
 	_id/binary,
 	_name/binary
 	>>.
+
 encode_login_s2c(Input) ->
 	_msgid = <<(Input#login_s2c.msgid):16/unsigned>>,
 	_res = <<(Input#login_s2c.res):32/signed>>,
@@ -187,4 +190,19 @@ encode_login_s2c(Input) ->
 	_msgid/binary,
 	_res/binary
 	>>.
+
+encode_type_test(Input) ->
+	_msgid = <<(Input#type_test.msgid):16/unsigned>>,
+	_res_count = length(Input#type_test.res),
+	_res = lists:foldl(fun(_cls_list_res, _cls_bin_res) ->
+		_new_cls_bin_res = encode_type1(_cls_list_res),
+		<<_cls_bin_res/binary, _new_cls_bin_res/binary>>
+	end,<<_res_count:16/unsigned>>, Input#type_test.res),
+	<<
+	_msgid/binary,
+	_res/binary
+	>>.
+
+encode_type1(_) ->
+	todo.
 

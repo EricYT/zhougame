@@ -6,7 +6,8 @@
 
 {message_heads, [
                 {head_attr, login_c2s, 1, c2s, login_pb, "登录消息"},
-                {head_attr, login_s2c, 2, s2c, lua, "登录返回"}
+                {head_attr, login_s2c, 2, s2c, lua, "登录返回"},
+                {head_attr, type_test, 3, c2s, login_pb, "测试消息"}
                 ]}.
 
 {msg_normal, login_c2s,[
@@ -22,7 +23,7 @@
 
 {msg_normal, type_test,[
                 {msg_attr, msgid, 1, uint, 16, required, "消息id"},
-                {msg_attr, res, 2, type1, 0, required, "登录结果"}
+                {msg_attr, res, 2, type1, 0, repeated, "登录结果"}
                 ]}.
                 
 {type_private, type1,[

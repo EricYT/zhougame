@@ -181,7 +181,7 @@ convert_msg_encode_or_decode() ->
                            Id1 < Id2
                    end, AllMsgHeads),
     Res = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
-    lists:reverse(Res).
+    string:join(lists:reverse(Res), "\n").
 
 convert_encode_or_decode_part(MsgRecord) ->
     EncodePart = convert_encode_part(MsgRecord),
@@ -273,7 +273,8 @@ convert_encode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 	if
 		Type =:= required ->
 			%%  _priv_type = encode_privType(#Input#test.field)
-			Lan = FieldHead++"encode_"++PrivTypeString++")",
+			Lan = FieldHead++"encode_"++PrivTypeString++"(Input#"++
+					  MsgNameString++"."++FieldNameString++")",
 			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
 		Type =:= repeated ->
 			%% _field_count = length(Input#test.field),
@@ -281,13 +282,15 @@ convert_encode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 			%%			_new_cls_bin_field = encode_privType(_cls_list_field),
 			%%			<<_cls_bin_field/binary, _new_cls_bin_field/binary>>
 			%%			end,<<_field_count:16/unsigned>>, Input#test.field)
-			CountString = "\t_"++FieldNameString++" = "++"length(Input#"++
-							  MsgNameString++"."++FieldNameString++"\n",
-			Lan = CountString++FieldHead++"lists:foldl(_cls_list_"++FieldNameString++
+			CountString = "\t_"++FieldNameString++"_count = "++"length(Input#"++
+							  MsgNameString++"."++FieldNameString++"),\n",
+			Lan = CountString++FieldHead++"lists:foldl(fun(_cls_list_"++FieldNameString++
 					  ", _cls_bin_"++FieldNameString++") ->\n\t\t"++
 					  "_new_cls_bin_"++FieldNameString++" = encode_"++
 					  PrivTypeString++"(_cls_list_"++FieldNameString++
-					  "),\n\t\tend,<<_"++FieldNameString++"_count:16/unsigned"++
+					  "),\n\t\t"++"<<_cls_bin_"++FieldNameString++
+					  "/binary, _new_cls_bin_"++FieldNameString++
+					  "/binary>>\n"++"\tend,<<_"++FieldNameString++"_count:16/unsigned"++
 					  ">>, Input#"++MsgNameString++"."++FieldNameString++")",
 			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
 		true ->
