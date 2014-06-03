@@ -383,7 +383,7 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 			%%			{_new_cls_field, _new_cls_bin_field} = decode_privType(_cls_list_field),
 			%%			{[_cls_list_field|_new_cls_field], _new_cls_bin_field}
 			%%			end, {[], _LastBinary1_temp}, lists:seq(1, _field_count))
-			CountString = "\t_<<_"++FieldNameString++"_count:16/unsigned, _LastBinary"++
+			CountString = "\t<<_"++FieldNameString++"_count:16/unsigned, _LastBinary"++
 							  integer_to_list(AccIndex+1)++"_temp/binary>> = _LastBinary"++
 							  integer_to_list(AccIndex)++",\n\t",
 			Lan = CountString++"{_"++FieldNameString++", _LastBinary"++
@@ -392,7 +392,7 @@ convert_decode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
 					  "{_new_cls_"++FieldNameString++", _new_cls_bin_"++FieldNameString++
 					  "} = decode_"++PrivTypeString++"(_cls_bin_"++FieldNameString++
 					  "),\n\t\t"++"{[_cls_list_"++FieldNameString++
-					  "|_new_cls_"++FieldNameString++"], _new_cls_bin"++
+					  "|_new_cls_"++FieldNameString++"], _new_cls_bin_"++
 					  FieldNameString++"}\n"++"\tend,{[], _LastBinary"++
 					  integer_to_list(AccIndex+1)++"_temp}"++
 					  ", lists:seq(1, "++"_"++FieldNameString++"_count))",

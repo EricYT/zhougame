@@ -224,10 +224,10 @@ encode_type_test(Input) ->
 decode_type_test(Input) ->
 	_LastBinary0 = Input,
 	<<_msgid:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
-	_<<_res_count:16/unsigned, _LastBinary2_temp/binary>> = _LastBinary1,
+	<<_res_count:16/unsigned, _LastBinary2_temp/binary>> = _LastBinary1,
 	{_res, _LastBinary2} = lists:foldl(fun(_, {_cls_list_res, _cls_bin_res}) ->
 		{_new_cls_res, _new_cls_bin_res} = decode_type1(_cls_bin_res),
-		{[_cls_list_res|_new_cls_res], _new_cls_binres}
+		{[_cls_list_res|_new_cls_res], _new_cls_bin_res}
 	end,{[], _LastBinary2_temp}, lists:seq(1, _res_count)),
 	#type_test{
 		msgid = _msgid,
