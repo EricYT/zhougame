@@ -76,6 +76,7 @@ init_message_ets(MsgHeads, MsgDefines, MsgType) ->
 gen_proto_hrl_file() ->
     case file:open(?PROTO_HRL_FILE, [write]) of
         {ok, FileHandle} ->
+			%% normal message define
             ConvertRecord =
                 fun(#head_attr{msg_name = MsgName}=MsgRecord, AccRecord) ->
                         MsgNameString = atom_to_list(MsgName),
@@ -91,8 +92,22 @@ gen_proto_hrl_file() ->
                 lists:sort(fun(#head_attr{id = Id1}, #head_attr{id = Id2}) ->
                                    Id1 > Id2
                            end, AllMsgHeads),
-            Res = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
-            file:write(FileHandle, ?FROAMT_RECORD_HEAD++Res),
+            Res1 = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
+			
+			%% private type define
+			ConvertTypeRecord =
+                fun(#type_private{type_name = TypeName}=TypeRecord, AccTypes) ->
+						TypeNameString = atom_to_list(TypeName),
+                        TypeCols = convert_type_message_record(TypeRecord),
+                        Record =
+                            mysql_op_gen:key_value_replace([{"$RECORD_NAME", TypeNameString},
+                                                            {"$RECORD_COLS", TypeCols}],
+                                                           ?FORMAT_RECORD), 
+                        [Record|AccTypes]
+                end,
+            AllMsgTypes = ets:tab2list(?MESSAGE_TYPE_ETS),
+            Res2 = lists:foldl(ConvertTypeRecord, [], AllMsgTypes),
+            file:write(FileHandle, Res1++Res2),
             file:close(FileHandle),
             ok;
         {error, Reason} ->
@@ -115,15 +130,26 @@ convert_message_record(#head_attr{id = Id, msg_name = MsgName}) ->
             string:join(AddMsgId, ", ")
     end.
 
+convert_type_message_record(#type_private{attrs = Cols}) ->
+	SortColsById =
+		lists:sort(fun(#msg_attr{id = Id1}, #msg_attr{id = Id2}) ->
+						   Id1 < Id2
+				   end, Cols),
+	Temp = [atom_to_list(MsgAttr#msg_attr.field_name)
+			  ||MsgAttr<-SortColsById],
+	string:join(Temp, ", ").
+
 
 gen_proto_operate_file() ->
     case file:open(?PROTO_OP_FILE, [write]) of
         {ok, FileHandle} ->
             InsertLan = convert_msg_insert(),
             CodeLan = convert_msg_encode_or_decode(),
+			PrivateTypeLan = convert_msg_private_type(),
             GengerateCon =
                 mysql_op_gen:key_value_replace([{"$INSERT_LANS", InsertLan},
-												{"$MSG_CODE", CodeLan}
+												{"$MSG_CODE", CodeLan},
+												{"$MSG_TYPE_CODE", PrivateTypeLan}
                                                ],
                                                 'login_pb_template'()),
             file:write(FileHandle, GengerateCon),
@@ -177,6 +203,18 @@ convert_msg_encode_or_decode() ->
     string:join(lists:reverse(Res), "\n").
 
 
+convert_msg_private_type() ->
+    ConvertRecord =
+        fun(#type_private{}=TypeRecord, AccRecord) ->
+                {MsgEncode, MsgDecode} =
+					convert_private_type_encode_or_decode_part(TypeRecord),
+				[MsgDecode]++[MsgEncode]++AccRecord
+        end,
+    AllMsgHeads = ets:tab2list(?MESSAGE_TYPE_ETS),
+    Res = lists:foldl(ConvertRecord, [], AllMsgHeads),
+    string:join(lists:reverse(Res), "\n").
+
+
 convert_encode_or_decode_part(#head_attr{msg_name = MsgName}) ->
     case ets:lookup(?MESSAGE_DEFINE_ETS, MsgName) of
         [] ->
@@ -192,6 +230,16 @@ convert_encode_or_decode_part(#head_attr{msg_name = MsgName}) ->
 			{EncodePart, DecodePart}
     end.
 
+convert_private_type_encode_or_decode_part(#type_private{type_name = MsgName,
+														 attrs = Cols}) ->
+	SortColsById =
+		lists:sort(fun(#msg_attr{id = Id1}, #msg_attr{id = Id2}) ->
+						   Id1 < Id2
+				   end, Cols),
+	EncodePart = convert_encode_part(MsgName, SortColsById),
+	DecodePart = convert_type_decode_part(MsgName, SortColsById),
+	{EncodePart, DecodePart}.
+
 convert_encode_part(MsgName, MsgCols) ->
 	MsgNameString = atom_to_list(MsgName),
 	MsgEncodeFun = "encode_"++MsgNameString++"(Input) ->\n",
@@ -205,6 +253,14 @@ convert_decode_part(MsgName, MsgCols) ->
 					   "\t_LastBinary0 = Input,\n",
 	MsgBody = convert_decode_body(MsgCols, MsgNameString, 0, []),
 	MsgTail = convert_decode_tail(MsgCols, MsgNameString),
+	MsgEncodeFun++MsgBody++MsgTail.
+
+convert_type_decode_part(MsgName, MsgCols) ->
+	MsgNameString = atom_to_list(MsgName),
+	MsgEncodeFun = "decode_"++MsgNameString++"(Input) ->\n"++
+					   "\t_LastBinary0 = Input,\n",
+	MsgBody = convert_decode_body(MsgCols, MsgNameString, 0, []),
+	MsgTail = convert_type_decode_tail(MsgCols, MsgNameString),
 	MsgEncodeFun++MsgBody++MsgTail.
 
 
@@ -410,6 +466,14 @@ convert_decode_tail(SortMsgColsById, MsgNameString) ->
 	"\t#"++MsgNameString++"{\n\t\t"++string:join(ColsTemp, ",\n\t\t")++"}.\n".
 
 
+convert_type_decode_tail(SortMsgColsById, MsgNameString) ->
+	ColsTemp = [atom_to_list(Field)++" = _"++atom_to_list(Field)
+			   ||#msg_attr{field_name=Field}<-SortMsgColsById],
+	Length = erlang:length(SortMsgColsById),
+	"\t{#"++MsgNameString++"{\n\t\t"++string:join(ColsTemp, ",\n\t\t")++
+		"}, _LastBinary"++integer_to_list(Length)++"}.\n".
+
+
 %% login_pb.erl template
 
 -compile({inline, [login_pb_template/0]}).
@@ -583,6 +647,10 @@ decode_int32_list(Input) when is_binary(Input) ->
 %% init opeate
 init() ->
 $INSERT_LANS.
+
+
+$MSG_TYPE_CODE
+
 
 $MSG_CODE
 ".

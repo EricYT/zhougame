@@ -173,6 +173,49 @@ init() ->
 	ets:insert(msg_id_map_record_encode_login_pb, [{3, type_test, encode_type_test, decode_type_test}]),
 	ets:insert(msg_id_map_record_decode_login_pb, [{3, type_test, login_pb, decode_type_test}]).
 
+
+encode_type2(Input) ->
+	_col1 = <<(Input#type2.col1):16/unsigned>>,
+	_col2 = <<(Input#type2.col2):32/signed>>,
+	<<
+	_col1/binary,
+	_col2/binary
+	>>.
+
+decode_type2(Input) ->
+	_LastBinary0 = Input,
+	<<_col1:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
+	<<_col2:32/signed, _LastBinary2/binary>> = _LastBinary1,
+	{#type2{
+		col1 = _col1,
+		col2 = _col2}, _LastBinary2}.
+
+encode_type1(Input) ->
+	_col1 = <<(Input#type1.col1):16/unsigned>>,
+	_col2_count = length(Input#type1.col2),
+	_col2 = lists:foldl(fun(_cls_list_col2, _cls_bin_col2) ->
+		_new_cls_bin_col2 = encode_type2(_cls_list_col2),
+		<<_cls_bin_col2/binary, _new_cls_bin_col2/binary>>
+	end,<<_col2_count:16/unsigned>>, Input#type1.col2),
+	<<
+	_col1/binary,
+	_col2/binary
+	>>.
+
+decode_type1(Input) ->
+	_LastBinary0 = Input,
+	<<_col1:16/unsigned, _LastBinary1/binary>> = _LastBinary0,
+	<<_col2_count:16/unsigned, _LastBinary2_temp/binary>> = _LastBinary1,
+	{_col2, _LastBinary2} = lists:foldl(fun(_, {_cls_list_col2, _cls_bin_col2}) ->
+		{_new_cls_col2, _new_cls_bin_col2} = decode_type2(_cls_bin_col2),
+		{[_cls_list_col2|_new_cls_col2], _new_cls_bin_col2}
+	end,{[], _LastBinary2_temp}, lists:seq(1, _col2_count)),
+	{#type1{
+		col1 = _col1,
+		col2 = _col2}, _LastBinary2}.
+
+
+
 encode_login_c2s(Input) ->
 	_msgid = <<(Input#login_c2s.msgid):16/unsigned>>,
 	_id = <<(Input#login_c2s.id):64/signed>>,
