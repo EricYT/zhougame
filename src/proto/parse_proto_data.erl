@@ -648,9 +648,7 @@ decode_int32_list(Input) when is_binary(Input) ->
 init() ->
 $INSERT_LANS.
 
-
 $MSG_TYPE_CODE
-
 
 $MSG_CODE
 ".

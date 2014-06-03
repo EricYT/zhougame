@@ -173,7 +173,6 @@ init() ->
 	ets:insert(msg_id_map_record_encode_login_pb, [{3, type_test, encode_type_test, decode_type_test}]),
 	ets:insert(msg_id_map_record_decode_login_pb, [{3, type_test, login_pb, decode_type_test}]).
 
-
 encode_type2(Input) ->
 	_col1 = <<(Input#type2.col1):16/unsigned>>,
 	_col2 = <<(Input#type2.col2):32/signed>>,
@@ -213,7 +212,6 @@ decode_type1(Input) ->
 	{#type1{
 		col1 = _col1,
 		col2 = _col2}, _LastBinary2}.
-
 
 
 encode_login_c2s(Input) ->
