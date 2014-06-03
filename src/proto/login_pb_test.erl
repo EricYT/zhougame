@@ -171,4 +171,20 @@ init() ->
 	ets:insert(msg_id_map_record_encode_login_pb, [{2, login_s2c, encode_login_s2c, decode_login_s2c}]),
 	ets:insert(msg_id_map_record_decode_login_pb, [{2, login_s2c, lua, decode_login_s2c}]).
 
-$MSG_CODE
+encode_login_c2s(Input) ->
+	_msgid = <<(Input#login_c2s.msgid):16/unsigned>>,
+	_id = <<(Input#login_c2s.id):64/signed>>,
+	_name = encode_string_list(Input#login_c2s.name),
+	<<
+	_msgid/binary,
+	_id/binary,
+	_name/binary
+	>>.
+encode_login_s2c(Input) ->
+	_msgid = <<(Input#login_s2c.msgid):16/unsigned>>,
+	_res = <<(Input#login_s2c.res):32/signed>>,
+	<<
+	_msgid/binary,
+	_res/binary
+	>>.
+

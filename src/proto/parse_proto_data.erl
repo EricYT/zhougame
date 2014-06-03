@@ -122,7 +122,8 @@ gen_proto_operate_file() ->
             InsertLan = convert_msg_insert(),
             CodeLan = convert_msg_encode_or_decode(),
             GengerateCon =
-                mysql_op_gen:key_value_replace([{"$INSERT_LANS", InsertLan}
+                mysql_op_gen:key_value_replace([{"$INSERT_LANS", InsertLan},
+												{"$MSG_CODE", CodeLan}
                                                ],
                                                 'login_pb_template'()),
             file:write(FileHandle, GengerateCon),
@@ -166,11 +167,13 @@ convert_msg_encode_or_decode() ->
         fun(#head_attr{msg_name = MsgName}=MsgRecord, AccRecord) ->
                 MsgNameString = atom_to_list(MsgName),
                 {MsgEncode, MsgDecode} = convert_encode_or_decode_part(MsgRecord),
+				io:format(">>>>> ~p~n", [MsgEncode]),
 %%                 Record =
 %%                     mysql_op_gen:key_value_replace([{"$RECORD_NAME", MsgNameString},
 %%                                                     {"$RECORD_COLS", MsgCols}],
 %%                                                    ?FORMAT_RECORD), 
-                [Record|AccRecord]
+%%                 [Record|AccRecord]
+				[MsgEncode|AccRecord]
         end,
     AllMsgHeads = ets:tab2list(?MESSAGE_HEAD_ETS),
     SortAllMsgHeads =
@@ -178,11 +181,11 @@ convert_msg_encode_or_decode() ->
                            Id1 < Id2
                    end, AllMsgHeads),
     Res = lists:foldl(ConvertRecord, [], SortAllMsgHeads),
-    ok.
+    lists:reverse(Res).
 
 convert_encode_or_decode_part(MsgRecord) ->
     EncodePart = convert_encode_part(MsgRecord),
-    DecodePart = convert_encode_part(MsgRecord),
+    DecodePart = convert_decode_part(MsgRecord),
     {EncodePart, DecodePart}.
 
 convert_encode_part(#head_attr{msg_name = MsgName}) ->
@@ -197,36 +200,107 @@ convert_encode_part(#head_attr{msg_name = MsgName}) ->
             MsgNameString = atom_to_list(MsgName),
             MsgEncodeFun = "encode_"++MsgNameString++"(Input) ->\n",
             MsgBody = convert_encode_body(SortMsgColsById, MsgNameString, []),
-            todo
+			MsgTail = convert_encode_tail(SortMsgColsById),
+            MsgEncodeFun++MsgBody++MsgTail
     end.
 
-convert_encode_body([#msg_attr{field_name = FieldName, base_type = BaseType,
-                               len = Len, type = Type}|Tail], MsgNameString, AccInfo) ->
-    FieldNameString = atom_to_list(FieldName),
-    FieldHead = "\t_"++FieldNameString++" = ",
-    case BaseType of
-        'int' ->
-            if
-                Type =:= required ->
-                    %%  _msgid = <<(Input#login_c2s.msgid):16/unsigned>>
-                    Lan = FieldHead++"<<Input#"++MsgNameString++"."++
-                          FieldNameString++"):"++integer_to_list(Len)++
-                          "/"++"signed"++">>",
-                    convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
-                Type =:= repeated ->
-                    %% _role_list = ecnode_int32_list(Input#test.role_list)
-                    Lan = FieldHead++"encode_"++atom_to_list(BaseType)++
-                          "_list(Input#"++MsgNameString++"."++
-                          FieldNameString,
-                    convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
-                true ->
-                    exit("Bad type required or repeated")
-            end;
-        {false, _BaseType, _} ->
-            todo
-    end;
+convert_decode_part(#head_attr{msg_name = MsgName}) ->
+	todo.
+
+convert_encode_body([#msg_attr{field_name = FieldName, base_type = 'int',
+							   len = Len, type = Type}|Tail], MsgNameString, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	FieldHead = "\t_"++FieldNameString++" = ",
+	if
+		Type =:= required ->
+			%%  _msgid = <<(Input#login_c2s.msgid):16/signed>>
+			Lan = FieldHead++"<<(Input#"++MsgNameString++"."++
+					  FieldNameString++"):"++integer_to_list(Len)++
+					  "/"++"signed"++">>",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% _role_list = ecnode_int32_list(Input#test.role_list)
+			Lan = FieldHead++"encode_"++atom_to_list('int')++integer_to_list(Len)++
+					  "_list(Input#"++MsgNameString++"."++
+					  FieldNameString,
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_encode_body([#msg_attr{field_name = FieldName, base_type = 'uint',
+							   len = Len, type = Type}|Tail], MsgNameString, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	FieldHead = "\t_"++FieldNameString++" = ",
+	if
+		Type =:= required ->
+			%%  _msgid = <<(Input#login_c2s.msgid):16/unsigned>>
+			Lan = FieldHead++"<<(Input#"++MsgNameString++"."++
+					  FieldNameString++"):"++integer_to_list(Len)++
+					  "/"++"unsigned"++">>",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% _role_list = ecnode_uint32_list(Input#test.role_list)
+			Lan = FieldHead++"encode_"++atom_to_list('uint')++integer_to_list(Len)++
+					  "_list(Input#"++MsgNameString++"."++
+					  FieldNameString,
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_encode_body([#msg_attr{field_name = FieldName, base_type = 'string',
+							   len = _Len, type = Type}|Tail], MsgNameString, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	FieldHead = "\t_"++FieldNameString++" = ",
+	if
+		Type =:= required ->
+			%%  _test_string = encode_string(Input#test.test)
+			Lan = FieldHead++"encode_string(Input#"++MsgNameString++
+					  "."++FieldNameString++")",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% _role_list = ecnode_string_list(Input#test.role_list)
+			Lan = FieldHead++"encode_string_list(Input#"++MsgNameString++
+					  "."++FieldNameString++")",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
+convert_encode_body([#msg_attr{field_name = FieldName, base_type = PrivType,
+							   len = _Len, type = Type}|Tail], MsgNameString, AccInfo) ->
+	FieldNameString = atom_to_list(FieldName),
+	FieldHead = "\t_"++FieldNameString++" = ",
+	PrivTypeString = atom_to_list(PrivType),
+	if
+		Type =:= required ->
+			%%  _priv_type = encode_privType(#Input#test.field)
+			Lan = FieldHead++"encode_"++PrivTypeString++")",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		Type =:= repeated ->
+			%% _field_count = length(Input#test.field),
+			%% _field = lists:foldl(_cls_list_field, _cls_bin_field) ->
+			%%			_new_cls_bin_field = encode_privType(_cls_list_field),
+			%%			<<_cls_bin_field/binary, _new_cls_bin_field/binary>>
+			%%			end,<<_field_count:16/unsigned>>, Input#test.field)
+			CountString = "\t_"++FieldNameString++" = "++"length(Input#"++
+							  MsgNameString++"."++FieldNameString++"\n",
+			Lan = CountString++FieldHead++"lists:foldl(_cls_list_"++FieldNameString++
+					  ", _cls_bin_"++FieldNameString++") ->\n\t\t"++
+					  "_new_cls_bin_"++FieldNameString++" = encode_"++
+					  PrivTypeString++"(_cls_list_"++FieldNameString++
+					  "),\n\t\tend,<<_"++FieldNameString++"_count:16/unsigned"++
+					  ">>, Input#"++MsgNameString++"."++FieldNameString++")",
+			convert_encode_body(Tail, MsgNameString, [Lan|AccInfo]);
+		true ->
+			exit("Bad type required or repeated")
+	end;
 convert_encode_body([], _MsgNameString, AccInfo) ->
-    lists:reverse(AccInfo).
+	string:join(lists:reverse([""|AccInfo]), ",\n").
+
+convert_encode_tail(SortMsgColsById) ->
+	Cols = ["_"++atom_to_list(Field)++"/binary"
+		   ||#msg_attr{field_name = Field}<-SortMsgColsById],
+	ColsStringWithComma = string:join(Cols, ",\n\t"),
+	"\t<<\n\t"++ColsStringWithComma++"\n\t>>.\n".
 
 
 %% login_pb.erl template

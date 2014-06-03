@@ -12,7 +12,7 @@
 {msg_normal, login_c2s,[
                 {msg_attr, msgid, 1, uint, 16, required, "消息id"},
                 {msg_attr, id, 2, int, 64, required, "role id"},
-                {msg_attr, name, 3, string, 0, required, "名字"}
+                {msg_attr, name, 3, string, 0, repeated, "名字"}
                 ]}.
                 
 {msg_normal, login_s2c,[
