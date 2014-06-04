@@ -1,11 +1,13 @@
 This file is a note,we will do it as follow.
 
-1. Migrate MochiWeb;
-2. Mysql generate modules;
-3. A sock connection or a http connection;
-4. 重构mysql模块使得可以启动多个mysql_dispath(将默认的server name改为给定的name);
+1. Migrate MochiWeb;(1/2)
+2. Mysql generate modules;(done)
+3. A sock connection or a http connection;(done)
+4. 重构mysql模块使得可以启动多个mysql_dispath(将默认的server name改为给定的name);(done)
 5. 应该有一个单独的gen_server来管理4中mysql的server name，但是这里的每次适配一个名字不应该只是
-简单的循环选取，应该有一个负载的适配过程；
+简单的循环选取，应该有一个负载的适配过程；(1/2)
 6. mochi web增加对网络的短连接来适应当下手机端的网络连接；
-7. 当一个server需要对call不阻塞，可以消防mysql.erl的方式来实现；
-8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；
+7. 当一个server需要对call不阻塞，可以消防mysql.erl的方式来实现；(done)
+8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；(done)
+
+9. 引入一个客户端框架，可能是 quick-cocos2d-x，或者其它的一些客户端架构；
