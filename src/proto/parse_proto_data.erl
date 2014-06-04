@@ -35,7 +35,6 @@ parse_proto_data() ->
             init_message_ets(Msgs, MsgDefines, MsgTypes),
             gen_proto_hrl_file(),
             gen_proto_operate_file(),
-%%             io:format("Message : ~p~n", [{Msgs, MsgDefines, MsgTypes}]),
             ok;
         Error ->
             io:format(">>>>>> Open file faild:~p~n", [{?MODULE, ?LINE, Error}])
