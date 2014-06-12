@@ -9,5 +9,5 @@ This file is a note,we will do it as follow.
 6. mochi web增加对网络的短连接来适应当下手机端的网络连接；
 7. 当一个server需要对call不阻塞，可以消防mysql.erl的方式来实现；(done)
 8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；(done)
-
 9. 引入一个客户端框架，可能是 quick-cocos2d-x，或者其它的一些客户端架构；
+10. 简单实现一个c/s结构的小游戏；
