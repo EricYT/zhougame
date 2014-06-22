@@ -27,7 +27,6 @@ file_test() ->
     {ModuleInfos, _ProtoInfos} = mysql_config:read_config(),
     Content = formate_values(ModuleInfos, []),
     SqlContent = formate_sql(ModuleInfos, []),
-    io:format(">>>>>>>>> ~p~n", [{?MODULE, ?LINE, SqlContent}]),
     try
         {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
         {ok, SQLFile} = file:open("../log/mysql_schemal.sql", [write]),
@@ -183,8 +182,7 @@ formate_sql_index(Indexs) ->
                           "\tKEY `"++atom_to_list(Index)++"`"++
                           " (`"++atom_to_list(Index)++"`)"
                   end, Indexs),
-    IndexString = string:join(IndexTemp, ","),
-    IndexString.
+    string:join(IndexTemp, ",").
 
 formate_key_values(Keys, Records) ->
     ConvertFun =
