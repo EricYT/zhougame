@@ -10,6 +10,8 @@
 
 -define(FilePre, "module_").
 
+%%
+
 -define(IF(C, A, B), case C of true -> A; _Other -> B end).
 
 %%
@@ -22,14 +24,22 @@
 %% API Functions
 %%
 file_test() ->
-    {[ModuleInfos], _ProtoInfos} = mysql_config:read_config(),
-    Content = formate_values(ModuleInfos),
-    {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
-%%     io:format(">>>>>>>>> ~p~n", [{Content}]),
-    file:write(File, Content).
+    {ModuleInfos, _ProtoInfos} = mysql_config:read_config(),
+    Content = formate_values(ModuleInfos, []),
+    SqlContent = formate_sql(ModuleInfos, []),
+    try
+        {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
+        {ok, SQLFile} = file:open("../log/mysql_schemal.sql", [write]),
+        file:write(File, Content),
+        file:write(SQLFile, SqlContent),
+        file:close(File),
+        file:close(SQLFile)
+    catch Error:Reason ->
+            io:format(">>>>>>>>> ~p~n", [{ModuleInfos}])
+    end.
 
-formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
-                              index = Indexs, engine = Eng}=_MoudleRecord) ->
+formate_values([#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
+                              index = Indexs, engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
     ModuleNameS = atom_to_list(ModuleName),
     ConvertFun =
@@ -42,7 +52,7 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
                  [NameString++" = "++NameToUpper|AccArgList],
                  [NameToUpper|AccArgUps],
                  [NameString|AccArgs],
-				 ["`"++NameString++"`"|AccArgsStr],
+                 ["`"++NameString++"`"|AccArgsStr],
                  [Name|AccArgsCol]};
            (_, Values) ->
                 Values
@@ -84,7 +94,43 @@ formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_
                                                   {"$PACKKEYS", PrimaryKeys},
                                                   {"$RECORDDEFINES", TypeArgS}
                                                  ], 'module_template'()),
-    TestReplace.
+    formate_values(Tail, [TestReplace|AccInfos]);
+formate_values([], AccInfos) ->
+    lists:reverse(AccInfos).
+
+
+formate_sql([#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
+                              index = Indexs, engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
+    TableName = erlang:atom_to_list(ModuleName),
+    Sqls = formate_sql_by_colums(Cols, []),
+    ;
+formate_sql([], AccInfos) ->
+    lists:reverse(AccInfos).
+
+%% `roleid` bigint(255) NOT NULL DEFAULT '0'
+%% `rolename` blob NOT NULL
+formate_sql_by_colums([#columns_define{type=term_varchar}=ColRecord|Tail], AccInfos) ->
+    formate_sql_by_colums([ColRecord#columns_define{type=varchar}|Tail], AccInfos);
+formate_sql_by_colums([#columns_define{type=blob}=ColRecord|Tail], AccInfos) ->
+    #columns_define{col_name=ColName, type=Type, length=Len, is_null=IsNull,
+                    default=Default, description=Des}=ColRecord,
+    Col = "\'"++atom_to_list(ColName)++"\' blob ",
+    if
+        IsNull =:= 'notnull' ->
+            Col1 = Col++"NOT NULL ";
+        true ->
+            Col1 = Col
+    end,
+    if
+        Default =:= []; Default =:= "" ->
+            Col2 = Col1++"DEFAULT '' ";
+        true ->
+            Col2 = Col1++"DEFAULT '"++atom_to_list(Default)++"' "
+    end,
+    formate_sql_by_colums(Tail, AccInfos);
+formate_sql_by_colums([], AccInfos) ->
+    lists:reverse(AccInfos).
+
 
 formate_key_values(Keys, Records) ->
     ConvertFun =
@@ -185,6 +231,19 @@ pack_update_columns(Columns) ->
         0 -> "";
         _Any -> " SET " ++ string:join(KV, ", ")
     end.
+
+
+'mysql_schemal_template'() ->
+"
+-- ----------------------------
+-- Table structure for `$TABLE_NAME`
+-- ----------------------------
+DROP TABLE IF EXISTS `$TABLE_NAME`;
+CREATE TABLE `$TABLE_NAME` (
+    $TABLE_COMMENT
+) ENGINE=$DB_ENGINE DEFAULT CHARSET=$DB_CHARSET;
+
+".
 
 
 'module_template'() ->
