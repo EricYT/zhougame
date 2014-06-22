@@ -27,6 +27,7 @@ file_test() ->
     {ModuleInfos, _ProtoInfos} = mysql_config:read_config(),
     Content = formate_values(ModuleInfos, []),
     SqlContent = formate_sql(ModuleInfos, []),
+    io:format(">>>>>>>>> ~p~n", [{?MODULE, ?LINE, SqlContent}]),
     try
         {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
         {ok, SQLFile} = file:open("../log/mysql_schemal.sql", [write]),
@@ -76,7 +77,7 @@ formate_values([#module_define{module_name = ModuleName, columns = Cols, primary
     UpdateData = pack_update0(atom_to_list(ModuleName), PriKeys, ArgsCol, TypeArgList),
     DeleteData = pack_delete0(atom_to_list(ModuleName), PriKeys, TypeArgList),
 	
-    io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, UnpackRecord}]),
+%%     io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, UnpackRecord}]),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
@@ -103,11 +104,11 @@ formate_sql([#module_define{module_name = ModuleName, columns = Cols, primary_ke
                               index = Indexs, engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
     TableName = erlang:atom_to_list(ModuleName),
     Sqls = formate_sql_by_colums(Cols, []),
-    ;
+    formate_sql(Tail, AccInfos);
 formate_sql([], AccInfos) ->
     lists:reverse(AccInfos).
 
-%% `roleid` bigint(255) NOT NULL DEFAULT '0'
+%% `roleid` bigint(255) NOT NULL DEFAULT '0' COMMENT 'sdfsadfsdf'
 %% `rolename` blob NOT NULL
 formate_sql_by_colums([#columns_define{type=term_varchar}=ColRecord|Tail], AccInfos) ->
     formate_sql_by_colums([ColRecord#columns_define{type=varchar}|Tail], AccInfos);
@@ -127,7 +128,27 @@ formate_sql_by_colums([#columns_define{type=blob}=ColRecord|Tail], AccInfos) ->
         true ->
             Col2 = Col1++"DEFAULT '"++atom_to_list(Default)++"' "
     end,
-    formate_sql_by_colums(Tail, AccInfos);
+    Col3 = Col2++"COMMENT '"++atom_to_list(Des),
+    formate_sql_by_colums(Tail, [Col3|AccInfos]);
+formate_sql_by_colums([#columns_define{}=ColRecord|Tail], AccInfos) ->
+    #columns_define{col_name=ColName, type=Type, length=Len, is_null=IsNull,
+                    default=Default, description=Des}=ColRecord,
+    Col = "\'"++atom_to_list(ColName)++atom_to_list(Type)++"("++
+              erlang:integer_to_list(Len)++") ",
+    if
+        IsNull =:= 'notnull' ->
+            Col1 = Col++"NOT NULL ";
+        true ->
+            Col1 = Col
+    end,
+    if
+        Default =:= []; Default =:= "" ->
+            Col2 = Col1++"DEFAULT '' ";
+        true ->
+            Col2 = Col1++"DEFAULT '"++atom_to_list(Default)++"' "
+    end,
+    Col3 = Col2++"COMMENT '"++Des,
+    formate_sql_by_colums(Tail, [Col3|AccInfos]);
 formate_sql_by_colums([], AccInfos) ->
     lists:reverse(AccInfos).
 
