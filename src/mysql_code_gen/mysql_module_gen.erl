@@ -77,15 +77,14 @@ formate_values([#module_define{module_name = ModuleName, columns = Cols, primary
     UpdateData = pack_update0(atom_to_list(ModuleName), PriKeys, ArgsCol, TypeArgList),
     DeleteData = pack_delete0(atom_to_list(ModuleName), PriKeys, TypeArgList),
 	
-%%     io:format(">>>>>>>>>>>>> ~p~n", [{TypeArgList, ArgList, ArgUps, Args, Keys, This, ArgsStr, UnpackRecord}]),
     TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
                                                   {"$KEYVALUES", KeyValuesStrings},
                                                   {"$KEYS", Keys},
-												  {"$THIS", This},
-												  {"$RESTR", ArgsStr},
-												  {"?ValuesOfInsertSqlString", ValuesOfInsert},
+                                                  {"$THIS", This},
+                                                  {"$RESTR", ArgsStr},
+                                                  {"?ValuesOfInsertSqlString", ValuesOfInsert},
                                                   {"$RECORDVALUES", ArgList},
                                                   {"$UNPACKRECORD", UnpackRecord},
                                                   {"$RECORDGETCOLS", RecordGetCols},
@@ -100,58 +99,92 @@ formate_values([], AccInfos) ->
     lists:reverse(AccInfos).
 
 
-formate_sql([#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
-                              index = Indexs, engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
+formate_sql([#module_define{module_name = ModuleName, columns = Cols,
+                            primary_key = PriKeys, index = Indexs,
+                            engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
     TableName = erlang:atom_to_list(ModuleName),
     Sqls = formate_sql_by_colums(Cols, []),
-    formate_sql(Tail, AccInfos);
+    PriKeyString = formate_sql_primary_keys(PriKeys),
+    IndexString = formate_sql_index(Indexs),
+    if
+        PriKeys =/= [] ->
+            SqlPrimay = Sqls++",\n"++PriKeyString;
+        true ->
+            SqlPrimay = Sqls
+    end,
+    if
+        Indexs =/= [] ->
+            SqlIndex = SqlPrimay++",\n"++IndexString;
+        true ->
+            SqlIndex = SqlPrimay
+    end,
+    SqlContent =
+        mysql_op_gen:key_value_replace([{"$TABLE_NAME", TableName},
+                                        {"$TABLE_COMMENT", SqlIndex},
+                                        {"$DB_ENGINE", atom_to_list(Eng)},
+                                        {"$DB_CHARSET", "'utf8'"}],
+                                        'mysql_schemal_template'()),
+    formate_sql(Tail, [SqlContent|AccInfos]);
 formate_sql([], AccInfos) ->
-    lists:reverse(AccInfos).
+    string:join(lists:reverse(AccInfos), "\n\n\n").
 
 %% `roleid` bigint(255) NOT NULL DEFAULT '0' COMMENT 'sdfsadfsdf'
 %% `rolename` blob NOT NULL
+%%  PRIMARY KEY (`aaa`,`2`)
+%%  KEY `index` (`2`)
 formate_sql_by_colums([#columns_define{type=term_varchar}=ColRecord|Tail], AccInfos) ->
     formate_sql_by_colums([ColRecord#columns_define{type=varchar}|Tail], AccInfos);
 formate_sql_by_colums([#columns_define{type=blob}=ColRecord|Tail], AccInfos) ->
     #columns_define{col_name=ColName, type=Type, length=Len, is_null=IsNull,
                     default=Default, description=Des}=ColRecord,
-    Col = "\'"++atom_to_list(ColName)++"\' blob ",
+    Col = "\`"++atom_to_list(ColName)++"\` blob ",
     if
         IsNull =:= 'notnull' ->
             Col1 = Col++"NOT NULL ";
         true ->
-            Col1 = Col
+            Col1 = Col++"NULL "
     end,
-    if
-        Default =:= []; Default =:= "" ->
-            Col2 = Col1++"DEFAULT '' ";
-        true ->
-            Col2 = Col1++"DEFAULT '"++atom_to_list(Default)++"' "
-    end,
-    Col3 = Col2++"COMMENT '"++atom_to_list(Des),
-    formate_sql_by_colums(Tail, [Col3|AccInfos]);
+    Col2 = Col1++"COMMENT '"++Des++"'",
+    formate_sql_by_colums(Tail, [Col2|AccInfos]);
 formate_sql_by_colums([#columns_define{}=ColRecord|Tail], AccInfos) ->
     #columns_define{col_name=ColName, type=Type, length=Len, is_null=IsNull,
                     default=Default, description=Des}=ColRecord,
-    Col = "\'"++atom_to_list(ColName)++atom_to_list(Type)++"("++
-              erlang:integer_to_list(Len)++") ",
+    Col = "\`"++atom_to_list(ColName)++"` "++atom_to_list(Type)++"("++
+              integer_to_list(Len)++") ",
     if
         IsNull =:= 'notnull' ->
             Col1 = Col++"NOT NULL ";
         true ->
-            Col1 = Col
+            Col1 = Col++"NULL "
     end,
     if
         Default =:= []; Default =:= "" ->
-            Col2 = Col1++"DEFAULT '' ";
+            Col2 = Col1;
         true ->
-            Col2 = Col1++"DEFAULT '"++atom_to_list(Default)++"' "
+            Col2 = Col1++"DEFAULT '"++util:term_to_string(Default)++"' "
     end,
-    Col3 = Col2++"COMMENT '"++Des,
+    Col3 = Col2++"COMMENT '"++Des++"'",
     formate_sql_by_colums(Tail, [Col3|AccInfos]);
 formate_sql_by_colums([], AccInfos) ->
-    lists:reverse(AccInfos).
+    string:join(lists:reverse(""++AccInfos), ", \n\t").
 
+formate_sql_primary_keys([]) ->
+    "";
+formate_sql_primary_keys(PrimaryKeys) ->
+    KeysTems = ["`"++atom_to_list(Key)++"`"||Key<-PrimaryKeys],
+    Keys = string:join(KeysTems, ","),
+    "\tPRIMARY KEY ("++Keys++")".
+
+formate_sql_index([]) ->
+    "";
+formate_sql_index(Indexs) ->
+    IndexTemp = 
+        lists:map(fun(Index) ->
+                          "\tKEY `"++atom_to_list(Index)++"`"++
+                          " (`"++atom_to_list(Index)++"`)"
+                  end, Indexs),
+    IndexString = string:join(IndexTemp, ","),
+    IndexString.
 
 formate_key_values(Keys, Records) ->
     ConvertFun =

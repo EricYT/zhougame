@@ -3,7 +3,7 @@
 -record(module_define, {module_name, columns, primary_key, index, engine}).
 
 %%
--record(columns_define, {col_name, type, length, is_null, default, description}).
+-record(columns_define, {col_name, type, length, default, is_null, description}).
 
 %% proto
 -record(proto_define, {proto_name, columns, key, type}).

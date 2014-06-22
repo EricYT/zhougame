@@ -22,7 +22,7 @@ read(KEY, TYPE) ->
     unpack_data(Res, []).
 
 insert({mysql_test1, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
-    mysql_client:insert(mysql_test1, "INSERT INTO mysql_test1(`key`, `type`, `term`, `string`, `term2`, `term3`) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++");");
+    mysql_client:insert(mysql_test1, "INSERT INTO mysql_test1(`key`, `type`, `term`, `string`, `term2`, `term3`) VALUES ("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,blob})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++");");
 insert([#mysql_test1{}|_]=INSERTS) ->
 	SQL = pack_bash_insert(INSERTS),
 	mysql_client:insert(mysql_test1, SQL);
@@ -32,7 +32,7 @@ insert([]) ->
 
 update_fields_by_record({mysql_test1, KEY, TYPE, TERM, STRING, TERM2, TERM3}, Conditions) ->
     FormateCondition = where_condition_fromat(Conditions),
-	SQL = "UPDATE mysql_test1 SET `term` = "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", `string` = "++mysql_helper:pack_value_by_type({STRING,varchar})++", `term2` = "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", `term3` = "++mysql_helper:pack_value_by_type({TERM3,timestamp})++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++""++mysql_helper:pack_where(FormateCondition),
+	SQL = "UPDATE mysql_test1 SET `term` = "++mysql_helper:pack_value_by_type({TERM,blob})++", `string` = "++mysql_helper:pack_value_by_type({STRING,varchar})++", `term2` = "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", `term3` = "++mysql_helper:pack_value_by_type({TERM3,timestamp})++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++""++mysql_helper:pack_where(FormateCondition),
     mysql_client:update(mysql_test1, SQL).
 
 
@@ -105,7 +105,7 @@ unpack_field1([], Acc, _, _) ->
 
 unpack_data([RecordFor|Tail], AccInfo) ->
 	Record = mysql_helper:unpack_row(mysql_test1, RecordFor),
-    unpack_data(Tail, [Record#mysql_test1{term=mysql_helper:string_to_term(Record#mysql_test1.term),						term2=mysql_helper:string_to_term(Record#mysql_test1.term2)}|AccInfo]);
+    unpack_data(Tail, [Record#mysql_test1{term2=mysql_helper:string_to_term(Record#mysql_test1.term2)}|AccInfo]);
 unpack_data([], AccInfo) ->
     lists:reverse(AccInfo).
 
@@ -118,10 +118,10 @@ get_column_datatype(Column) ->
     proplists:get_value(Column, column_datatype()).
 
 column_datatype() ->
-    [{key,int},	 {type,int},	 {term,term_varchar},	 {string,varchar},	 {term2,term_varchar},	 {term3,timestamp}].
+    [{key,int},	 {type,int},	 {term,blob},	 {string,varchar},	 {term2,term_varchar},	 {term3,timestamp}].
 
 get_bash_insert_value_list({mysql_test1, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
-	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++")".
+	"("++mysql_helper:pack_value_by_type({KEY,int})++", "++mysql_helper:pack_value_by_type({TYPE,int})++", "++mysql_helper:pack_value_by_type({TERM,blob})++", "++mysql_helper:pack_value_by_type({STRING,varchar})++", "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", "++mysql_helper:pack_value_by_type({TERM3,timestamp})++")".
 
 pack_bash_insert(Inserts) ->
 	Values = string:join([get_bash_insert_value_list(Record)||Record<-Inserts], ", "),
@@ -140,13 +140,13 @@ select(FiledList, Conditions) ->
     Res = mysql_client:select(mysql_test, SQL),
     unpack_fields(Res, FiledList).
 
-read(#mysql_test{key = KEY, type = TYPE}) ->
-    SQL = "SELECT * FROM mysql_test "++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++"",
+read(#mysql_test{}) ->
+    SQL = "SELECT * FROM mysql_test "++"",
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
 
-read(KEY, TYPE) ->
-    SQL = "SELECT * FROM mysql_test "++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++"",
+read() ->
+    SQL = "SELECT * FROM mysql_test "++"",
     Res = mysql_client:read(mysql_test, SQL),
     unpack_data(Res, []).
 
@@ -161,7 +161,7 @@ insert([]) ->
 
 update_fields_by_record({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}, Conditions) ->
     FormateCondition = where_condition_fromat(Conditions),
-	SQL = "UPDATE mysql_test SET `term` = "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", `string` = "++mysql_helper:pack_value_by_type({STRING,varchar})++", `term2` = "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", `term3` = "++mysql_helper:pack_value_by_type({TERM3,timestamp})++" WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++""++mysql_helper:pack_where(FormateCondition),
+	SQL = "UPDATE mysql_test SET `key` = "++mysql_helper:pack_value_by_type({KEY,int})++", `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++", `term` = "++mysql_helper:pack_value_by_type({TERM,term_varchar})++", `string` = "++mysql_helper:pack_value_by_type({STRING,varchar})++", `term2` = "++mysql_helper:pack_value_by_type({TERM2,term_varchar})++", `term3` = "++mysql_helper:pack_value_by_type({TERM3,timestamp})++""++mysql_helper:pack_where(FormateCondition),
     mysql_client:update(mysql_test, SQL).
 
 
@@ -179,7 +179,7 @@ delete(Conditions) when is_list(Conditions) ->
     mysql_client:remove(mysql_test, SQL).
 
 remove({mysql_test, KEY, TYPE, TERM, STRING, TERM2, TERM3}) ->
-    SQL = "DELETE FROM mysql_test WHERE `key` = "++mysql_helper:pack_value_by_type({KEY,int})++" AND `type` = "++mysql_helper:pack_value_by_type({TYPE,int})++"",
+    SQL = "DELETE FROM mysql_test",
     mysql_client:remove(mysql_test, SQL).
 
 find(Conditions) ->
