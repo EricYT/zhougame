@@ -9,6 +9,9 @@
 -include("module_define.hrl").
 
 -define(FilePre, "module_").
+-define(SQLFilePre, "schemal_").
+
+-define(GEN_DIR, "../log/").
 
 %%
 
@@ -23,23 +26,36 @@
 %%
 %% API Functions
 %%
-file_test() ->
+run() ->
     {ModuleInfos, _ProtoInfos} = mysql_config:read_config(),
-    Content = formate_values(ModuleInfos, []),
-    SqlContent = formate_sql(ModuleInfos, []),
+    SQL = gen_by_module(ModuleInfos, []),
+    {ok, FileModule} = file:open(?GEN_DIR++"schemal.sql", [write]),
+    file:write(FileModule, SQL),
+    file:close(FileModule),
+    ok.
+
+gen_by_module([], AccInfos) ->
+    lists:reverse(AccInfos);
+gen_by_module([#module_define{module_name = ModuleName}=Module|Tail],
+              AccInfos) ->
+    FileName = ?FilePre++erlang:atom_to_list(ModuleName)++".erl",
+    SqlFileName = ?SQLFilePre++erlang:atom_to_list(ModuleName)++".sql",
+    Content = formate_values(Module),
+    SqlContent = formate_sql(Module),
     try
-        {ok, File} = file:open("../log/module_mysql_test.erl", [write]),
-        {ok, SQLFile} = file:open("../log/mysql_schemal.sql", [write]),
-        file:write(File, Content),
+        {ok, FileModule} = file:open(?GEN_DIR++FileName, [write]),
+        {ok, SQLFile} = file:open(?GEN_DIR++SqlFileName, [write]),
+        file:write(FileModule, Content),
         file:write(SQLFile, SqlContent),
-        file:close(File),
-        file:close(SQLFile)
+        file:close(FileModule),
+        file:close(SQLFile),
+        gen_by_module(Tail, [SqlContent|AccInfos])
     catch Error:Reason ->
-            io:format(">>>>>>>>> ~p~n", [{ModuleInfos}])
+            io:format(">>>>>>>>> ~p~n", [{ModuleName}])
     end.
 
-formate_values([#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
-                              index = Indexs, engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
+formate_values(#module_define{module_name = ModuleName, columns = Cols, primary_key = PriKeys,
+                              index = Indexs, engine = Eng}=_MoudleRecord) ->
     FileName = ?FilePre++erlang:atom_to_list(ModuleName),
     ModuleNameS = atom_to_list(ModuleName),
     ConvertFun =
@@ -76,7 +92,7 @@ formate_values([#module_define{module_name = ModuleName, columns = Cols, primary
     UpdateData = pack_update0(atom_to_list(ModuleName), PriKeys, ArgsCol, TypeArgList),
     DeleteData = pack_delete0(atom_to_list(ModuleName), PriKeys, TypeArgList),
 	
-    TestReplace = mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
+    mysql_op_gen:key_value_replace([{"$FILENAME", FileName},
                                                   {"$RECORDS", Args},
                                                   {"$MODULENAME", ModuleNameS},
                                                   {"$KEYVALUES", KeyValuesStrings},
@@ -92,15 +108,12 @@ formate_values([#module_define{module_name = ModuleName, columns = Cols, primary
                                                   {"$SQL_INSERT0", ValueTest},
                                                   {"$PACKKEYS", PrimaryKeys},
                                                   {"$RECORDDEFINES", TypeArgS}
-                                                 ], 'module_template'()),
-    formate_values(Tail, [TestReplace|AccInfos]);
-formate_values([], AccInfos) ->
-    lists:reverse(AccInfos).
+                                                 ], 'module_template'()).
 
 
-formate_sql([#module_define{module_name = ModuleName, columns = Cols,
+formate_sql(#module_define{module_name = ModuleName, columns = Cols,
                             primary_key = PriKeys, index = Indexs,
-                            engine = Eng}=_MoudleRecord|Tail], AccInfos) ->
+                            engine = Eng}=_MoudleRecord) ->
     TableName = erlang:atom_to_list(ModuleName),
     Sqls = formate_sql_by_colums(Cols, []),
     PriKeyString = formate_sql_primary_keys(PriKeys),
@@ -117,15 +130,11 @@ formate_sql([#module_define{module_name = ModuleName, columns = Cols,
         true ->
             SqlIndex = SqlPrimay
     end,
-    SqlContent =
-        mysql_op_gen:key_value_replace([{"$TABLE_NAME", TableName},
-                                        {"$TABLE_COMMENT", SqlIndex},
-                                        {"$DB_ENGINE", atom_to_list(Eng)},
-                                        {"$DB_CHARSET", "'utf8'"}],
-                                        'mysql_schemal_template'()),
-    formate_sql(Tail, [SqlContent|AccInfos]);
-formate_sql([], AccInfos) ->
-    string:join(lists:reverse(AccInfos), "\n\n\n").
+    mysql_op_gen:key_value_replace([{"$TABLE_NAME", TableName},
+                                    {"$TABLE_COMMENT", SqlIndex},
+                                    {"$DB_ENGINE", atom_to_list(Eng)},
+                                    {"$DB_CHARSET", "'utf8'"}],
+                                   'mysql_schemal_template'()).
 
 %% `roleid` bigint(255) NOT NULL DEFAULT '0' COMMENT 'sdfsadfsdf'
 %% `rolename` blob NOT NULL
