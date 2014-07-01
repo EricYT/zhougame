@@ -1,4 +1,4 @@
-%% Author: Administrator
+%% Author: Eric.yutao
 %% Created: 2014-4-22
 %% Description: TODO: Add description to mysql_module_gen
 -module(mysql_module_gen).
