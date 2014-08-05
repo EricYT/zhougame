@@ -29,7 +29,7 @@
 parse_file(Filename) ->
     {ok, Data} = file:read_file(Filename),
     Raw = scan(binary_to_list(Data)),
-    io:format(">>>>>>>> parse file:~p~n", [{?MODULE, ?LINE, Raw}]),
+%%     io:format(">>>>>>>> parse file:~p~n", [{?MODULE, ?LINE, Raw}]),
     parse(Raw).
 
 %% @hidden

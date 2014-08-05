@@ -1,0 +1,4 @@
+-record(person, {name, id, email, phone}).
+-record(test, {msgid, roleid, name}).
+-record(person_phonenumber, {number, type}).
+-record(person_phonenumber_phonetype, {mobile, home, work}).

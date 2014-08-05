@@ -31,6 +31,7 @@ encode_pikachu(Record) when is_record(Record, pikachu) ->
     encode(pikachu, Record).
 
 encode(pikachu, Record) ->
+    io:format(">>>>>> ~p~n", [{?MODULE, ?LINE, Record}]),
     iolist_to_binary([
         pack(1, required, with_default(Record#pikachu.abc, none), string, [])
     ]).
