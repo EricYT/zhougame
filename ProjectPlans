@@ -8,7 +8,8 @@ This file is a note,we will do it as follow.
 简单的循环选取，应该有一个负载的适配过程；(1/2)
 6. mochi web增加对网络的短连接来适应当下手机端的网络连接；
 7. 当一个server需要对call不阻塞，可以消防mysql.erl的方式来实现；(done)
-8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；(done)
+8. 增加消息的接码与编码模块，使客户端与服务端的通信协议一直；(done) 后面改为google protol buffers
 9. 引入一个客户端框架，可能是 quick-cocos2d-x，或者其它的一些客户端架构；
 10. 简单实现一个c/s结构的小游戏;
 11. 增加mysql建表语句代码；(done)
+12. protol buffers 模块的修改，重构；
