@@ -1,0 +1,26 @@
+/*
+****  A protobuffer file for TCP 
+****
+*/
+
+
+message msg_header{
+	enum MSG_ID{
+	msg_init_s2c = 1;
+	msg_init_module_complete_c2s = 2;  //erl:login_pb
+	}
+}
+
+message Person {
+	required string name = 1 [ default="niaho"];
+	required string address = 2;
+	required string phone_number = 3; // comment test
+	required int32 age = 4;
+	repeated string hobbies = 5;
+	repeated Location locations = 6;
+}
+
+message Location {
+    required string region = 1;
+    required string country = 2; //comment
+}
