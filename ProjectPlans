@@ -13,3 +13,4 @@ This file is a note,we will do it as follow.
 10. 简单实现一个c/s结构的小游戏;
 11. 增加mysql建表语句代码；(done)
 12. protol buffers 模块的修改，重构；
+13. 使用12的protol buffers将消息转为生成消息模块的record；
