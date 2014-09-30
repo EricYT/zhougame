@@ -54,7 +54,8 @@ run_tool(RunOptFile, N) ->
     				{win32,nt} ->
     					win_run_gui_erl(Prefix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt);
     				_ ->
-    					todo
+    					os_util:linux_run("ulimit -SHn 65535", wait),
+    					linux_run_noraml_erl(PreFix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt, false)
     			end
     end.
 	
@@ -86,3 +87,14 @@ win_run_gui_erl(Prefix, Option, ComOpt) ->
 	
 get_arguments(_) ->
     todo.
+    
+    
+linux_run_noraml_erl(Prefix, Option, ComOpt, IsShell) ->
+	{SNode, Ip, DbDir, Smp, Addition} = Option,
+	case os_util:match_ip(Ip) of
+		true ->
+			AddOption = ComOpt ++ " " ++ Addition,
+			os_util:run_erl(normal, Prefix++SNode, Ip, DbDir, Smp, wait, AddOption, IsShell);
+		false ->
+			nothing
+	end.

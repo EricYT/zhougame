@@ -84,6 +84,21 @@ run_erl(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option) ->
 			run_exe(CommandLine)
 	end.
 
+run_erl(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option, IsShell) ->
+	CommandLine = get_erl_cmd(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option),
+	io:format("Command ~p~n", [CommandLine]),
+	if
+		IsShell ->
+			erl_command:main(CommandLine);
+		true ->
+			case Wait of
+				wait ->
+					wait_exe(CommandLine);
+				nowait ->
+					run_exe(CommandLine)
+			end
+	end.
+
 
 wait_exe(CmdLine) ->
 	wait_exe(CmdLine, prompt).
