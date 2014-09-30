@@ -64,5 +64,5 @@ inputloop(ProcPid, Main) ->
 			end,
 			exit(normal);
 		true ->
-
+			ProcPid ! 
 
