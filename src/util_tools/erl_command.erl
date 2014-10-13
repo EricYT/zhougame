@@ -64,5 +64,23 @@ inputloop(ProcPid, Main) ->
 			end,
 			exit(normal);
 		true ->
-			ProcPid ! 
+			ProcPid ! {input, Input},
+			inputloop(ProcPid, Main)
+	end.
+
+
+mainloop(InputPid) ->
+	receive
+		{exit} ->
+			Exit = true,
+			erlang:exit(InputPid, kill);
+		_Other ->
+			Exit = false
+	end,
+	if
+		Exit ->
+			over;
+		true ->
+			mainloop(InputPid)
+	end.
 
