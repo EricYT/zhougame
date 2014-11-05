@@ -15,3 +15,4 @@ This file is a note,we will do it as follow.
 12. protol buffers 模块的修改，重构；
 13. 使用12的protol buffers将消息转为生成消息模块的record；
 14. 增加工具函数；
+15. 假如RabbitMQ中的gen_server2,和优先级队列；
