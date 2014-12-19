@@ -10,8 +10,7 @@
 %%
 %% Exported Functions
 %%
--export([]).
--compile(export_all).
+-export([get_argument/1]).
 
 %%
 %% API Functions

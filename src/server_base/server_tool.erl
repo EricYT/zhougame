@@ -12,8 +12,6 @@
 %%
 -export([run/0, print_tool/0]).
 
--compile(export_all).
-
 %%
 %% API Functions
 %%

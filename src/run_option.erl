@@ -40,6 +40,12 @@ get_opt_prefix(Options) ->
 		false -> "";
 		{_, Prefix} -> Prefix
 	end.
+       
+get_opt_cookie(Options) ->
+	case lists:keyfind(cookie, 1, Options) of
+		false -> '';
+		{_, Cookie} -> Cookie
+	end.
 
 get_opt_common_option(Options) ->
 	case lists:keyfind(common_option, 1, Options) of
