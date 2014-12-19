@@ -77,7 +77,7 @@ list_beam(BeamDir) ->
 
 up_nodes() ->
     AllNodes = nodes(),
-    rpc:multicall(AllNodes, ?MOUDLE, up_all_by_other_node, []).
+    rpc:multicall(AllNodes, ?MODULE, up_all_by_other_node, []).
     %%lists:foreach(fun(Node) ->
     %%                      io:format(">>>>>>>>> Node ~p~n", [Node]),
     %%                      rpc:call(Node, ?MODULE, up_all_by_other_node, [])

@@ -4,10 +4,17 @@
 
 main([]) ->
 	run("../options/run.options");
-main(Options) ->
-	Options = get_arguments(Options),
+main(OptionList) ->
+	io:format("-----~p~n", [OptionList]),
+	Options = get_arguments(OptionList),
 	OptFile = "../options/run.options",
-	todo.
+	case Options of
+		{tool, Num} ->
+			run_tool(OptFile, Num);
+		_Erro ->
+			throw(error_mode)
+	end,
+	ok.
 
 
 
@@ -21,6 +28,7 @@ run(OptionFile) ->
     			ComOpt1 = run_option:get_opt_common_option(Options),
     			Prefix = run_option:get_opt_prefix(Options),
     			ComOpt = string_util:replace(ComOpt1, "$PREFIX", Prefix),
+    			io:format("---- ~p  ~p~n", [ComOpt1, ComOpt]),
     			%%io:format("run option file ~p ~n", [ComOpt]),
     			Nodes = run_option:get_opt_nodes(Options),
     			BeamDir = run_option:get_opt_beam_dir(Options),
@@ -43,8 +51,9 @@ run_tool(RunOptFile, N) ->
     			io:format("Error Option File ~p~n", [RunOptFile]);
     		Options ->
     			ComOpt1 = run_option:get_opt_common_option(Options),
-    			Prefix = run_option:get_opt_prefix(Options),
-    			ComOpt = string_util:replace(ComOpt1, "$PREFIX", Prefix),
+    			PreFix = run_option:get_opt_prefix(Options),
+    			ComOpt = string_util:replace(ComOpt1, "$PREFIX", PreFix),
+    			io:format("---- ~p  ~p~n", [ComOpt1, ComOpt]),
     			Nodes = run_option:get_opt_tools_node(Options),
     			%%io:format("run option file ~p ~n", [Nodes]),
     			BeamDir = run_option:get_opt_beam_dir(Options),
@@ -52,7 +61,7 @@ run_tool(RunOptFile, N) ->
     			RunOpt = lists:nth(N, Nodes),
     			case os:type() of
     				{win32,nt} ->
-    					win_run_gui_erl(Prefix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt);
+    					win_run_gui_erl(PreFix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt);
     				_ ->
     					os_util:linux_run("ulimit -SHn 65535", wait),
     					linux_run_noraml_erl(PreFix, RunOpt, " -pa " ++ BeamDir ++ " " ++ ComOpt, false)
@@ -65,6 +74,7 @@ run_erl(Prefix, Option, ComOpt) ->
 	case os_util:match_ip(Ip) of
 		true ->
 			AddOption = ComOpt ++ " " ++ Addition,
+			io:format("----~p~n",[AddOption]),
 			case os:type() of
 				{win32, nt} ->
 					os_util:run_erl(normal, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);
@@ -84,9 +94,13 @@ win_run_gui_erl(Prefix, Option, ComOpt) ->
 		false ->
 			nothing
 	end.
+
+get_arguments(["-mode",  "tool", N|Tail]) ->
+	io:format("open a tool ~p node ~n", [list_to_integer(N)]),
+	{tool, list_to_integer(N)};
 	
 get_arguments(_) ->
-    todo.
+    throw(error_arguments).
     
     
 linux_run_noraml_erl(Prefix, Option, ComOpt, IsShell) ->

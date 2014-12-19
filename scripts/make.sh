@@ -2,7 +2,7 @@
 
 #set -x
 
-MAKE_FILE=make.erl
+MAKE_FILE=erl_make.erl
 
 if [ -f $MAKE_FILE ]
 then
