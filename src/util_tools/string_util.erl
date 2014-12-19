@@ -32,6 +32,7 @@ replace_by_re(String, Tokens, RepString) ->
 	{ok, MP} = re:compile(Tokens),
 	re:replace(String, MP, RepString, [global, {return,list}]).
 
+%% test result
 
 %% 7> F1 = fun() -> string_util:replace("222abc22222 abc 2332abc2222", "abc", "ddd") end.
 %% #Fun<erl_eval.20.90072148>
@@ -50,6 +51,8 @@ replace_by_re(String, Tokens, RepString) ->
 %% 14> timer:tc(F2).
 %% {50,"222ddd22222 ddd 2332ddd2222"}
 
+%% {ok,F}=file:read_file(ThisFile).
+%% A=binary:bin_to_list(F).
 %% 24> R1 = fun() -> string_util:replace(A, "replace", "123") end.
 %% #Fun<erl_eval.20.90072148>
 %% 25> R2 = fun() -> string_util:replace_by_re(A, "replace", "123") end.
