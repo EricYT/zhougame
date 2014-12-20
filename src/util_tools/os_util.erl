@@ -76,29 +76,28 @@ win_run(CmdLine, Flag) ->
 
 run_erl(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option) ->
 	CommandLine = get_erl_cmd(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option),
-	io:format("Command ~p~n", [CommandLine]).
-%% 	case Wait of
-%% 		wait ->
-%% 			wait_exe(CommandLine);
-%% 		nowait ->
-%% 			run_exe(CommandLine)
-%% 	end.
+	io:format("Command ~p~n", [CommandLine]),
+	case Wait of
+		wait ->
+			wait_exe(CommandLine);
+		nowait ->
+			run_exe(CommandLine)
+	end.
 
 run_erl(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option, IsShell) ->
 	CommandLine = get_erl_cmd(Hiden, Name, Host, MnesiaDir, SmpEnable, Wait, Option),
 	io:format("Command ~p~n", [CommandLine]),
-	ok.
-%% 	if
-%% 		IsShell ->
-%% 			erl_command:main(CommandLine);
-%% 		true ->
-%% 			case Wait of
-%% 				wait ->
-%% 					wait_exe(CommandLine);
-%% 				nowait ->
-%% 					run_exe(CommandLine)
-%% 			end
-%% 	end.
+	if
+		IsShell ->
+			erl_command:main(CommandLine);
+		true ->
+			case Wait of
+				wait ->
+					wait_exe(CommandLine);
+				nowait ->
+					run_exe(CommandLine)
+			end
+	end.
 
 
 wait_exe(CmdLine) ->

@@ -1,60 +1,136 @@
 
-=ERROR REPORT==== 21-Dec-2014::00:02:35 ===
+=ERROR REPORT==== 21-Dec-2014::00:08:23 ===
 (debug 43) Test for log file
 
-=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+=INFO REPORT==== 21-Dec-2014::00:08:23 ===
 (debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
                          'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
                          'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
                         true}
 
-=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+=INFO REPORT==== 21-Dec-2014::00:08:23 ===
 (debug 31) Ping_center {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+=INFO REPORT==== 21-Dec-2014::00:08:23 ===
 (debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+=INFO REPORT==== 21-Dec-2014::00:08:23 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:36 ===
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:37 ===
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_map1@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_map2@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) ********* Application erlmysql_app
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) ************** erlmysql_app app []
+
+=ERROR REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 43) Test for log file
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
+                         'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
+                         'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
+                        true}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_db@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
 (debug 31) Ping_center {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:38 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_line@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:39 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:40 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_gate1@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:41 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:42 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_gate2@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:43 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:44 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_map1@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:45 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:46 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) Ping_center ok  {'ericts_map2@127.0.0.1'}
 
-=INFO REPORT==== 21-Dec-2014::00:02:47 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+    application: erlmysql_app
+    exited: {bad_return,
+                {{erlmysql_app,start,[normal,[]]},
+                 {'EXIT',
+                     {{badmatch,
+                          {error,
+                              {{error,connect_failed},
+                               {child,undefined,ericts_db_mysql_1,
+                                   {mysql,start_link,
+                                       [ericts_db_mysql_1,write,"localhost",
+                                        3306,"root","123456","webgame",
+                                        #Fun<erlmysql_sup.0.37846160>,utf8]},
+                                   transient,2000,worker,
+                                   [ericts_db_mysql_1]}}}},
+                      [{erlmysql_sup,start_mysql,1,
+                           [{file,
+                                "/Users/yutao/Documents/erlang/zhougame/src/mysql_module/mysql_sup/erlmysql_sup.erl"},
+                            {line,56}]},
+                       {erlmysql_app,start_mysql,2,
+                           [{file,
+                                "/Users/yutao/Documents/erlang/zhougame/src/app/erlmysql_app.erl"},
+                            {line,81}]},
+                       {erlmysql_app,start,2,
+                           [{file,
+                                "/Users/yutao/Documents/erlang/zhougame/src/app/erlmysql_app.erl"},
+                            {line,57}]},
+                       {application_master,start_it_old,4,
+                           [{file,"application_master.erl"},{line,272}]}]}}}}
+    type: temporary
 
-=INFO REPORT==== 21-Dec-2014::00:02:48 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) *************** {gate_sup,54}
 
-=INFO REPORT==== 21-Dec-2014::00:02:49 ===
-(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+=INFO REPORT==== 21-Dec-2014::00:08:24 ===
+(debug 31) *************** {gate_manager,44}
