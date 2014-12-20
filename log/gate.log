@@ -1,3 +1,60 @@
 
-=ERROR REPORT==== 5-Aug-2014::22:14:18 ===
-(debug 67) Test for log file
+=ERROR REPORT==== 21-Dec-2014::00:02:35 ===
+(debug 43) Test for log file
+
+=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+(debug 31) Ping_center {['ericts_db@127.0.0.1','ericts_line@127.0.0.1',
+                         'ericts_gate1@127.0.0.1','ericts_gate2@127.0.0.1',
+                         'ericts_map1@127.0.0.1','ericts_map2@127.0.0.1'],
+                        true}
+
+=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+(debug 31) Ping_center {'ericts_db@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+(debug 31) Ping_center ok  {'ericts_db@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:35 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:36 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:37 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:38 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:39 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:40 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:41 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:42 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:43 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:44 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:45 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:46 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:47 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:48 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}
+
+=INFO REPORT==== 21-Dec-2014::00:02:49 ===
+(debug 31) Ping_center {'ericts_line@127.0.0.1'}

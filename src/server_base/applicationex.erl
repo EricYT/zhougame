@@ -30,9 +30,9 @@ start(Application) ->
     force_start(),
     Cookie = env:get(cookie, ?ERLNULL),
     erlang:set_cookie(node(), Cookie),
-    debug:info("********* applicationex Application ~p~n", [Application]),
+    debug:info("********* Application ~p~n", [Application]),
     application:start(Application),
-    ok.
+	ok.
 
 start(Application, Type) ->
 	force_start(),
@@ -60,7 +60,6 @@ force_start() ->
 %% --------------------------------------------------------------------
 init([]) ->
     debug:info("applicationex start ~p ~n", [node()]),
-%%     OptionName = "../options/option",
     env:init([]),
     version_up:init(),
     debug:info("applicationex ########################## ~p~n", [{"End"}]),

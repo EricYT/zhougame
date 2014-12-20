@@ -74,7 +74,6 @@ run_erl(Prefix, Option, ComOpt) ->
 	case os_util:match_ip(Ip) of
 		true ->
 			AddOption = ComOpt ++ " " ++ Addition,
-			io:format("----~p~n",[AddOption]),
 			case os:type() of
 				{win32, nt} ->
 					os_util:run_erl(normal, Prefix++SNode, Ip, DbDir, Smp, nowait, AddOption);

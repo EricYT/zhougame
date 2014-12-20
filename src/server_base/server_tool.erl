@@ -16,6 +16,7 @@
 %% API Functions
 %%
 run() ->
+	io:format("---- Just a test message ~n"),
     applicationex:force_start(),
     check_line_run(),
     check_map_run(),
@@ -43,6 +44,7 @@ check_map_run() ->
 
 check_db_run() ->
 	Node = node_util:get_node_sname(node()),
+	io:format("----- check db run ~p~n", [{node(), Node}]),
 	case node_util:check_snode_match(db, Node) of
 		true -> db_app:start();
 		_ -> ignore

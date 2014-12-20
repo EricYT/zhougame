@@ -45,6 +45,7 @@
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start(Type, StartArgs) ->
+	io:format("------ db_app start ~n"),
     case app_util:get_argument("-line") of
         [] -> slogger:msg("Error in Gate app ~p~n", [?MODULE]);
         [_Center|Rest] ->
